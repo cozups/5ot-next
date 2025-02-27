@@ -3,6 +3,12 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Pacifico } from 'next/font/google';
+
+const FontPacifico = Pacifico({
+  subsets: ['latin'],
+  weight: ['400'],
+});
 
 export default function MainHeader() {
   const path = usePathname();
@@ -16,6 +22,7 @@ export default function MainHeader() {
     >
       <h1
         className={clsx(
+          FontPacifico.className,
           'text-4xl  hover:text-neutral-500 transition-colors duration-100',
           `${path === '/' ? 'text-white' : 'text-black'}`
         )}

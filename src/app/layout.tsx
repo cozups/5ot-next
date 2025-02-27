@@ -6,8 +6,8 @@ import Footer from '@/components/footer';
 import clsx from 'clsx';
 
 const NotoSansKr = Noto_Sans_KR({
-  variable: '--font-noto-sans-kr',
   subsets: ['latin'],
+  weight: ['400', '700'],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={clsx(
-          `${NotoSansKr.variable} antialiased`,
+          `${NotoSansKr.className} antialiased`,
           `w-screen relative`
         )}
       >
