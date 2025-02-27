@@ -16,7 +16,7 @@ export default function MainHeader() {
   return (
     <div
       className={clsx(
-        'w-full flex justify-between items-center py-4 px-8',
+        'w-full h-20 flex justify-between items-center px-8',
         `${path === '/' ? 'absolute top-0 left-0 z-[1]' : undefined}`
       )}
     >
