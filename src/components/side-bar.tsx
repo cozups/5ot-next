@@ -1,25 +1,35 @@
 'use client';
-
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-const menMenus = [
-  { name: 'menu 1', href: '/men/menu1' },
-  { name: 'menu 2', href: '/men/menu2' },
-  { name: 'menu 3', href: '/men/menu3' },
-  { name: 'menu 4', href: '/men/menu4' },
-];
-
-const womanMenus = [
-  { name: 'menu 1', href: '/woman/menu1' },
-  { name: 'menu 2', href: '/woman/menu2' },
-  { name: 'menu 3', href: '/woman/menu3' },
-  { name: 'menu 4', href: '/woman/menu4' },
-];
+import { Category } from '@/types/category';
+import { createClient } from '@/utils/supabase/client';
 
 export default function SideBar() {
   const path = usePathname();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    async function getCategories() {
+      const supabase = createClient();
+
+      try {
+        const { data } = await supabase.from('category').select();
+
+        setCategories(data as Category[]);
+      } catch (error) {
+        if (error instanceof Error) {
+          console.log(error.message);
+        } else {
+          console.log('알 수 없는 에러:', error);
+        }
+      }
+    }
+
+    getCategories();
+  });
   return (
     <div
       className={clsx(
@@ -33,21 +43,25 @@ export default function SideBar() {
       <div>
         <h2 className="text-2xl my-1 font-semibold">Men</h2>
         <ul>
-          {menMenus.map((menu) => (
-            <li key={menu.href}>
-              <Link href={menu.href}>{menu.name}</Link>
-            </li>
-          ))}
+          {categories
+            .filter((category) => category.sex === 'men')
+            .map((menu) => (
+              <li key={menu.id}>
+                <Link href={`/${menu.sex}/${menu.name}`}>{menu.name}</Link>
+              </li>
+            ))}
         </ul>
       </div>
       <div>
         <h2 className="text-2xl my-1 font-semibold">Woman</h2>
         <ul>
-          {womanMenus.map((menu) => (
-            <li key={menu.href}>
-              <Link href={menu.href}>{menu.name}</Link>
-            </li>
-          ))}
+          {categories
+            .filter((category) => category.sex === 'women')
+            .map((menu) => (
+              <li key={menu.id}>
+                <Link href={`/${menu.sex}/${menu.name}`}>{menu.name}</Link>
+              </li>
+            ))}
         </ul>
       </div>
     </div>

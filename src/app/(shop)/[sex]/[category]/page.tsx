@@ -1,40 +1,8 @@
-import { Star } from 'lucide-react';
 import Link from 'next/link';
 
-const DUMMY_PRODUCTS = [
-  {
-    id: 1,
-    title: 'Clothes 1',
-    href: '/men/menu1/clothes1',
-    image: '',
-    rate: 5,
-    price: 12000,
-  },
-  {
-    id: 2,
-    title: 'Clothes 2',
-    href: '/men/menu1/clothes2',
-    image: '',
-    rate: 5,
-    price: 12000,
-  },
-  {
-    id: 3,
-    title: 'Clothes 3',
-    href: '/men/menu1/clothes3',
-    image: '',
-    rate: 5,
-    price: 12000,
-  },
-  {
-    id: 4,
-    title: 'Clothes 4',
-    href: '/men/menu1/clothes4',
-    image: '',
-    rate: 5,
-    price: 12000,
-  },
-];
+import { Clothes } from '@/types/clothes';
+import { createClient } from '@/utils/supabase/server';
+import { Star } from 'lucide-react';
 
 interface ProductListPageProps {
   params: {
@@ -43,8 +11,15 @@ interface ProductListPageProps {
   };
 }
 
-export default function ProductListPage({ params }: ProductListPageProps) {
-  const { sex, category } = params;
+export default async function ProductListPage({
+  params,
+}: ProductListPageProps) {
+  const { sex, category } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('clothes')
+    .select()
+    .eq('category', `${sex}/${category}`);
 
   return (
     <div className="w-[1000px] mx-auto">
@@ -53,11 +28,11 @@ export default function ProductListPage({ params }: ProductListPageProps) {
       </h2>
       <div className="grid grid-cols-3 gap-6">
         {/* product list */}
-        {DUMMY_PRODUCTS.map((product) => (
-          <Link key={product.title} href={`/${sex}/${category}/${product.id}`}>
+        {data?.map((product: Clothes) => (
+          <Link key={product.name} href={`/${sex}/${category}/${product.id}`}>
             <div className="cursor-pointer transition-scale duration-200 hover:scale-105">
               <div className="w-full aspect-square bg-slate-600 rounded-xl" />
-              <p className="text-lg font-semibold mt-2">{product.title}</p>
+              <p className="text-lg font-semibold mt-2">{product.name}</p>
               <div className="flex justify-between mt-3">
                 <div className="flex items-center gap-1">
                   <Star fill="orange" className="w-4 h-4" />

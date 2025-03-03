@@ -1,6 +1,9 @@
+import { Clothes } from '@/types/clothes';
+import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
+import { notFound } from 'next/navigation';
 
-export default function ProductDetailPage({
+export default async function ProductDetailPage({
   params,
 }: {
   params: {
@@ -8,6 +11,17 @@ export default function ProductDetailPage({
   };
 }) {
   const { productId } = params;
+  const supabase = await createClient();
+  const { data: product } = await supabase
+    .from('clothes')
+    .select()
+    .eq('id', productId)
+    .single<Clothes>();
+
+  if (!product) {
+    notFound();
+  }
+
   return (
     <div className="w-[1000px] mx-auto py-8">
       {/* product info */}
@@ -16,16 +30,12 @@ export default function ProductDetailPage({
         <div className="flex-1 flex flex-col justify-between">
           <div className="h-[80%] flex flex-col items-start justify-between">
             <div>
-              <h2 className="text-2xl font-semibold">Clothes {productId}</h2>
-              <p>제조사</p>
+              <h2 className="text-2xl font-semibold">{product.name}</h2>
+              <p>{product.brand}</p>
             </div>
 
-            <div className="flex flex-col items-start">
-              <p>
-                제품설명 Lorem ipsum dolor sit amet consectetur, adipisicing
-                elit. Distinctio alias blanditiis veritatis, commodi accusamus
-                quia ea a eius sunt sed.
-              </p>
+            <div className="w-full flex flex-col items-start">
+              <p>{product.description}</p>
               <div className="w-full mt-8 flex items-center justify-between">
                 <input
                   type="number"
@@ -33,7 +43,7 @@ export default function ProductDetailPage({
                   className="px-4 border h-10"
                   defaultValue={1}
                 />
-                <p>12000원</p>
+                <p className="font-bold">{product.price.toLocaleString()}원</p>
               </div>
             </div>
           </div>
