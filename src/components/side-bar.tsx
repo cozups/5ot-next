@@ -26,7 +26,7 @@ export default async function SideBar() {
         <h2 className="text-2xl my-1 font-semibold">Woman</h2>
         <ul>
           {(data as Category[])
-            .filter((category) => category.sex === 'women')
+            ?.filter((category) => category.sex === 'women')
             .map((menu) => (
               <li key={menu.id}>
                 <Link href={`/${menu.sex}/${menu.name}`}>{menu.name}</Link>
