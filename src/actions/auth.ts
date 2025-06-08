@@ -1,5 +1,7 @@
 'use server';
 
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 import { z } from 'zod/v4';
 
 const formSchema = z.object({
@@ -41,7 +43,14 @@ export async function createUser(
   }
 
   // TODO: 데이터 전송 및 유저 가입
+  const supabase = createClient();
+
+  (await supabase).auth.signUp({
+    email: raw.userEmail,
+    password: raw.password,
+    phone: raw.phoneNumber,
+  });
 
   // TODO: 리다이렉션
-  return { success: true };
+  redirect('/login');
 }
