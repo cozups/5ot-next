@@ -4,7 +4,7 @@ import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod/v4';
 
-const formSchema = z.object({
+const joinFormSchema = z.object({
   username: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
   phoneNumber: z
     .string()
@@ -14,16 +14,28 @@ const formSchema = z.object({
   password: z.string().trim().min(6, '6자 이상의 암호를 입력해주세요.'),
 });
 
+const loginFormSchema = z.object({
+  userEmail: z.email('올바른 이메일 형식을 작성해주세요.'),
+  password: z.string().trim().min(6, '6자 이상의 암호를 입력해주세요.'),
+});
+
 export interface FormState {
   success: boolean;
   errors?: Record<string, string[]>;
-  values?: z.infer<typeof formSchema>;
+}
+
+export interface JoinFormState extends FormState {
+  values?: z.infer<typeof joinFormSchema>;
+}
+
+export interface LoginFormState extends FormState {
+  values?: z.infer<typeof loginFormSchema>;
 }
 
 export async function createUser(
-  prevState: FormState,
+  prevState: JoinFormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<JoinFormState> {
   const raw = {
     username: formData.get('username')?.toString() || '',
     phoneNumber: formData.get('phoneNumber')?.toString() || '',
@@ -31,8 +43,8 @@ export async function createUser(
     password: formData.get('password')?.toString() || '',
   };
 
-  // TODO: 유효성 검사
-  const result = formSchema.safeParse(raw);
+  // 유효성 검사
+  const result = joinFormSchema.safeParse(raw);
 
   if (!result.success) {
     return {
@@ -42,15 +54,59 @@ export async function createUser(
     };
   }
 
-  // TODO: 데이터 전송 및 유저 가입
-  const supabase = createClient();
+  // 데이터 전송 및 유저 가입
+  const supabase = await createClient();
 
-  (await supabase).auth.signUp({
+  await supabase.auth.signUp({
     email: raw.userEmail,
     password: raw.password,
     phone: raw.phoneNumber,
   });
 
-  // TODO: 리다이렉션
+  // 리다이렉션
   redirect('/login');
+}
+
+export async function loginUser(
+  prevState: LoginFormState,
+  formData: FormData
+): Promise<LoginFormState> {
+  const raw = {
+    userEmail: formData.get('userEmail')?.toString() || '',
+    password: formData.get('password')?.toString() || '',
+  };
+
+  // 유효성 검사
+  const result = loginFormSchema.safeParse(raw);
+
+  if (!result.success) {
+    return {
+      success: false,
+      errors: z.flattenError(result.error).fieldErrors,
+      values: raw,
+    };
+  }
+
+  // 로그인 요청
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email: raw.userEmail,
+    password: raw.password,
+  });
+
+  if (error) {
+    const errorMessage =
+      error.code === 'invalid_credentials'
+        ? 'ID 혹은 패스워드가 일치하지 않습니다.'
+        : '로그인에 실패했습니다.';
+    return {
+      success: false,
+      errors: { result: [errorMessage] },
+      values: raw,
+    };
+  }
+
+  // 리다이렉트
+  redirect('/');
 }

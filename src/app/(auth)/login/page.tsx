@@ -1,25 +1,41 @@
+'use client';
+
+import { LoginFormState, loginUser } from '@/actions/auth';
 import Link from 'next/link';
+import { useActionState } from 'react';
+
+const initialState: LoginFormState = {
+  success: false,
+};
 
 export default function LoginPage() {
+  const [state, formAction] = useActionState(loginUser, initialState);
+
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center">
       <form
-        action=""
+        action={formAction}
         className="border-2 w-[36rem] flex flex-col items-center py-8"
       >
         <h1 className="text-center text-2xl font-bold mb-8">Login</h1>
 
         <div className="w-72 flex flex-col gap-8 my-8">
           <div className="flex flex-col">
-            <label htmlFor="userId" className="font-semibold">
+            <label htmlFor="userEmail" className="font-semibold">
               ID
             </label>
             <input
               type="text"
-              id="userId"
-              name="userId"
+              id="userEmail"
+              name="userEmail"
               className="border-b-2"
+              defaultValue={state.values?.userEmail}
             />
+            {state.errors?.userEmail?.map((msg) => (
+              <p key={msg} className="text-sm text-red-600">
+                {msg}
+              </p>
+            ))}
           </div>
 
           <div className="flex flex-col">
@@ -31,9 +47,21 @@ export default function LoginPage() {
               id="password"
               name="password"
               className="border-b-2"
+              defaultValue={state.values?.password}
             />
+            {state.errors?.password?.map((msg) => (
+              <p key={msg} className="text-sm text-red-600">
+                {msg}
+              </p>
+            ))}
           </div>
         </div>
+
+        {state.errors?.result?.map((msg) => (
+          <p key={msg} className="text-sm text-red-600">
+            {msg}
+          </p>
+        ))}
         <button className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">
           로그인 하기
         </button>

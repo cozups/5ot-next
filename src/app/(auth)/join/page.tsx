@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 
-import { createUser, FormState } from '@/actions/auth';
+import { createUser, JoinFormState } from '@/actions/auth';
 import { useActionState } from 'react';
 
-const initialState: FormState = {
+const initialState: JoinFormState = {
   success: false,
 };
 
