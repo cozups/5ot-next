@@ -5,10 +5,10 @@ import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
 
 interface ProductListPageProps {
-  params: {
+  params: Promise<{
     sex: string;
     category: string;
-  };
+  }>;
 }
 
 export default async function ProductListPage({

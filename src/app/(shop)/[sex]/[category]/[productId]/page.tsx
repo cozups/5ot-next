@@ -6,11 +6,11 @@ import { notFound } from 'next/navigation';
 export default async function ProductDetailPage({
   params,
 }: {
-  params: {
+  params: Promise<{
     productId: string;
-  };
+  }>;
 }) {
-  const { productId } = params;
+  const { productId } = await params;
   const supabase = await createClient();
   const { data: product } = await supabase
     .from('clothes')
