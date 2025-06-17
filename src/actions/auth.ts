@@ -61,10 +61,16 @@ export async function createUser(
     email: raw.userEmail,
     password: raw.password,
     phone: raw.phoneNumber,
+    options: {
+      data: {
+        username: raw.username,
+        role: 'normal',
+      },
+    },
   });
 
   // 리다이렉션
-  redirect('/login');
+  redirect('/');
 }
 
 export async function loginUser(
