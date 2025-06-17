@@ -23,8 +23,12 @@ export default async function CategoryProductView({
 
   return (
     <div className="h-full bg-white rounded-2xl">
-      {!data && <p>해당 카테고리의 제품이 없습니다.</p>}
-      {data && (
+      {(!data || data.length < 1) && (
+        <p className="h-full font-semibold flex justify-center items-center">
+          해당 카테고리의 제품이 없습니다.
+        </p>
+      )}
+      {data && data.length > 0 && (
         <Table>
           <TableHeader>
             <TableRow>
