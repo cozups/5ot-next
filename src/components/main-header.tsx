@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { Pacifico } from 'next/font/google';
 import { createClient } from '@/utils/supabase/server';
+import { logout } from '@/actions/auth';
 
 const FontPacifico = Pacifico({
   subsets: ['latin'],
@@ -36,9 +37,9 @@ export default async function MainHeader() {
         </nav>
       )}
       {user && (
-        <div>
-          <button>로그아웃</button>
-        </div>
+        <form action={logout}>
+          <button className="cursor-pointer">로그아웃</button>
+        </form>
       )}
     </div>
   );
