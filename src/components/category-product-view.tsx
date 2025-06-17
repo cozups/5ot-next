@@ -1,0 +1,52 @@
+import { createClient } from '@/utils/supabase/server';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './ui/table';
+
+interface CategoryProductViewProps {
+  category: string;
+}
+
+export default async function CategoryProductView({
+  category,
+}: CategoryProductViewProps) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('clothes')
+    .select()
+    .eq('category', category);
+
+  return (
+    <div className="h-full bg-white rounded-2xl">
+      {!data && <p>해당 카테고리의 제품이 없습니다.</p>}
+      {data && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">이름</TableHead>
+              <TableHead className="text-center">제조사</TableHead>
+              <TableHead className="text-center">가격</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((product) => (
+              <TableRow key={product.id} className="text-center">
+                <TableCell className="flex gap-2 items-center">
+                  <div className="w-16 h-16 bg-black"></div>
+                  {product.name}
+                </TableCell>
+                <TableCell>{product.brand}</TableCell>
+                <TableCell>{product.price}원</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
+    </div>
+  );
+}
