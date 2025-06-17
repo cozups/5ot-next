@@ -10,6 +10,10 @@ export default async function MyPage() {
     redirect('/login');
   }
 
+  if (data.user.user_metadata.role === 'admin') {
+    redirect('/admin');
+  }
+
   return (
     <div>
       {/* 프로필 영역 */}
