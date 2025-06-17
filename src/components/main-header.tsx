@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Pacifico } from 'next/font/google';
 import { createClient } from '@/utils/supabase/server';
 import { logout } from '@/actions/auth';
@@ -37,9 +38,25 @@ export default async function MainHeader() {
         </nav>
       )}
       {user && (
-        <form action={logout}>
-          <button className="cursor-pointer">로그아웃</button>
-        </form>
+        <div className="flex items-center gap-8">
+          <Link href="/mypage">
+            <div className="flex gap-2 items-center">
+              <div className="w-8 h-8 rounded-full  overflow-hidden">
+                <Image
+                  src="/images/user.png"
+                  width={32}
+                  height={32}
+                  className="w-full"
+                  alt="user profile image"
+                />
+              </div>
+              <p>{user.user_metadata.username}</p>
+            </div>
+          </Link>
+          <form action={logout}>
+            <button className="cursor-pointer">로그아웃</button>
+          </form>
+        </div>
       )}
     </div>
   );
