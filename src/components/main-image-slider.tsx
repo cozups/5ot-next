@@ -17,7 +17,7 @@ export default function MainImageSlider() {
           delay: 4000,
         }),
       ]}
-      className="h-screen relative"
+      className="relative w-full h-96 overflow-hidden rounded-2xl mx-auto"
     >
       <CarouselContent className="h-full -mt-0">
         <CarouselItem className="relative">

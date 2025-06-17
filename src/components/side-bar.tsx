@@ -2,14 +2,13 @@ import Link from 'next/link';
 
 import { Category } from '@/types/category';
 import { createClient } from '@/utils/supabase/server';
-import SideBarWrapper from './side-bar-wrapper';
 
 export default async function SideBar() {
   const supabase = await createClient();
   const { data } = await supabase.from('category').select();
 
   return (
-    <SideBarWrapper>
+    <div className="pl-8 pt-4">
       <div>
         <h2 className="text-2xl my-1 font-semibold">Men</h2>
         <ul>
@@ -34,6 +33,6 @@ export default async function SideBar() {
             ))}
         </ul>
       </div>
-    </SideBarWrapper>
+    </div>
   );
 }

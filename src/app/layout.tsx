@@ -4,6 +4,7 @@ import './globals.css';
 import MainHeader from '@/components/main-header';
 import Footer from '@/components/footer';
 import clsx from 'clsx';
+import SideBar from '@/components/side-bar';
 
 const NotoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
@@ -29,7 +30,10 @@ export default function RootLayout({
         )}
       >
         <MainHeader />
-        {children}
+        <div className="w-full h-full grid grid-cols-[1fr_4fr_1fr]">
+          <SideBar />
+          {children}
+        </div>
         <Footer />
       </body>
     </html>

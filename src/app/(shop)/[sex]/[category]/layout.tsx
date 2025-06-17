@@ -1,4 +1,3 @@
-import SideBar from '@/components/side-bar';
 import { ReactNode } from 'react';
 
 export default function ProductListLayout({
@@ -6,10 +5,5 @@ export default function ProductListLayout({
 }: {
   children: ReactNode;
 }) {
-  return (
-    <div className="min-h-[calc(100vh-10rem)]">
-      <SideBar />
-      {children}
-    </div>
-  );
+  return <div className="min-h-[calc(100vh-10rem)]">{children}</div>;
 }

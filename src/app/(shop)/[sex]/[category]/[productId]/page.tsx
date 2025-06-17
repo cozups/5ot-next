@@ -23,7 +23,7 @@ export default async function ProductDetailPage({
   }
 
   return (
-    <div className="w-[1000px] mx-auto py-8">
+    <div className="py-8">
       {/* product info */}
       <div className="flex justify-between gap-16">
         <div className="w-96 aspect-square bg-slate-700 rounded-xl " />

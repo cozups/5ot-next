@@ -22,7 +22,7 @@ export default async function ProductListPage({
     .eq('category', `${sex}/${category}`);
 
   return (
-    <div className="w-[1000px] mx-auto">
+    <div>
       <h2 className="text-3xl font-bold my-4">
         {sex === 'men' ? '남성' : '여성'} {category}
       </h2>
