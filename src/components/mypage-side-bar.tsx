@@ -1,5 +1,6 @@
 'use client';
 
+import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -27,10 +28,20 @@ export default function MyPageSideBar() {
   return (
     <>
       {mode === 'admin' && (
-        <ul>
+        <ul className="mx-8">
           {menus[mode].map((menu) => (
-            <li key={menu.title}>
-              <Link href={menu.link}>{menu.title}</Link>
+            <li
+              key={menu.title}
+              className={clsx(
+                'rounded mb-2',
+                pathname === menu.link
+                  ? 'bg-blue-200 hover:bg-blue-300'
+                  : 'hover:bg-slate-100'
+              )}
+            >
+              <Link href={menu.link} className="w-full block px-2 py-2">
+                {menu.title}
+              </Link>
             </li>
           ))}
         </ul>
