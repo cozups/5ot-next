@@ -1,5 +1,6 @@
 'use server';
 
+import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import { z } from 'zod/v4';
@@ -124,6 +125,24 @@ export async function logout() {
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  redirect('/');
+}
+
+export async function deleteUser(id: string) {
+  const supabase = await createClient();
+
+  const { error: logoutError } = await supabase.auth.signOut();
+
+  if (logoutError) {
+    throw new Error(logoutError.message);
+  }
+
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+
+  if (error) {
+    throw new Error('회원 탈퇴에 실패했습니다.');
   }
 
   redirect('/');

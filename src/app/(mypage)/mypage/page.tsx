@@ -1,3 +1,15 @@
+import { deleteUser } from '@/actions/auth';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { parseToKorTime } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
@@ -55,11 +67,27 @@ export default async function MyPage() {
         ))}
       </div>
 
-      <div>
-        <button className="text-gray-600 underline text-sm mt-4">
-          회원 탈퇴하기
-        </button>
-      </div>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <form action={deleteUser.bind(null, data.user.id)}>
+            <button className="text-gray-600 underline text-sm mt-4 cursor-pointer">
+              회원 탈퇴하기
+            </button>
+          </form>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>정말로 탈퇴하시겠습니까?</AlertDialogTitle>
+            <AlertDialogDescription>
+              영구적으로 회원님의 정보가 삭제됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction>탈퇴하기</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
