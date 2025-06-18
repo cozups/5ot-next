@@ -1,0 +1,103 @@
+'use server';
+
+import { createClient } from '@/utils/supabase/server';
+import { revalidatePath } from 'next/cache';
+import { z } from 'zod/v4';
+
+const formSchema = z.object({
+  name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
+  brand: z.string().trim().min(1, '제조사를 반드시 입력해주세요.'),
+  price: z.string().trim().min(1, '가격을 반드시 입력해주세요.'),
+  image: z.file().min(1, '이미지를 반드시 삽입해주세요.'),
+  description: z.string().trim().min(1, '제품 설명을 적어주세요.'),
+  category: z.string().trim().min(1, '카테고리를 지정해주세요.'),
+  sex: z.string().trim().min(1, '성별을 선택해주세요'),
+});
+
+export interface FormState {
+  success: boolean;
+  errors?: Record<string, string[]>;
+  values?: {
+    name: string;
+    brand: string;
+    price: string;
+    category: string;
+    sex: string;
+    description: string;
+  };
+}
+
+export async function addProduct(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const raw = {
+    name: formData.get('name')?.toString() || '',
+    brand: formData.get('brand')?.toString() || '',
+    price: formData.get('price')?.toString() || '',
+    image: formData.get('image') as File,
+    description: formData.get('description')?.toString() || '',
+    category: formData.get('category')?.toString() || '',
+    sex: formData.get('sex')?.toString() || '',
+  };
+
+  const result = formSchema.safeParse(raw);
+
+  if (!result.success) {
+    return {
+      success: false,
+      errors: z.flattenError(result.error).fieldErrors,
+      values: {
+        name: raw.name,
+        brand: raw.brand,
+        price: raw.price,
+        description: raw.description,
+        category: raw.category,
+        sex: raw.sex,
+      },
+    };
+  }
+
+  // 이미지 업로드
+  const supabase = await createClient();
+  const imageName = raw.name + raw.image.type.split('/')[1];
+
+  const { data, error } = await supabase.storage
+    .from('products')
+    .upload(imageName, raw.image);
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        imageUpload: ['이미지 업로드에 실패했습니다.'],
+      },
+    };
+  }
+
+  const { data: uploadedPath } = supabase.storage
+    .from('products')
+    .getPublicUrl(data.path);
+
+  // DB에 저장
+  const { error: productUploadError } = await supabase.from('clothes').insert({
+    name: raw.name,
+    brand: raw.brand,
+    price: raw.price,
+    image: uploadedPath.publicUrl,
+    category: `${raw.sex}/${raw.category}`,
+    description: raw.description,
+  });
+
+  if (productUploadError) {
+    return {
+      success: false,
+      errors: {
+        insertError: ['제품을 업로드 하지 못했습니다.'],
+      },
+    };
+  }
+
+  revalidatePath('/admin/product');
+  return { success: true };
+}
