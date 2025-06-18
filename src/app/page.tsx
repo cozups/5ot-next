@@ -35,7 +35,6 @@ export default async function Home() {
                     className="object-cover"
                   />
 
-                  {/* 이 div가 안 보였다가 커서가 올라오면 서서히 나타나게 하고 싶은데 어떻게 하는거지 */}
                   <Link href={`/${clothes.category}/${clothes.id}`}>
                     <div
                       className={clsx(
