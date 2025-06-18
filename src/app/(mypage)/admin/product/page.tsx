@@ -50,6 +50,7 @@ export default async function ProductManagementPage() {
                           src={product.image}
                           alt={`${product.name} image`}
                           fill
+                          className="object-cover"
                         />
                       )}
                     </div>

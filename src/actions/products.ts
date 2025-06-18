@@ -4,6 +4,7 @@ import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
+import { generateRandomId } from '@/lib/utils';
 
 const formSchema = z.object({
   name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
@@ -61,13 +62,16 @@ export async function addProduct(
 
   // 이미지 업로드
   const supabase = await createClient();
-  const imageName = `images/${raw.name}.${raw.image.type.split('/')[1]}`;
+  const imageName = `images/${generateRandomId()}.${
+    raw.image.type.split('/')[1]
+  }`;
 
   const { data, error } = await supabase.storage
     .from('products')
     .upload(imageName, raw.image);
 
   if (error) {
+    console.log(error);
     return {
       success: false,
       errors: {

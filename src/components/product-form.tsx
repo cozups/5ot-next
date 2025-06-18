@@ -169,7 +169,14 @@ export default function ProductForm() {
           </div>
         </div>
         <div className="flex-1 aspect-square bg-slate-500 relative">
-          {pickedImage && <Image src={pickedImage} fill alt="product image" />}
+          {pickedImage && (
+            <Image
+              src={pickedImage}
+              fill
+              alt="product image"
+              className="object-cover"
+            />
+          )}
         </div>
       </div>
       <Button>추가</Button>

@@ -23,6 +23,7 @@
     "embla-carousel-autoplay": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "lucide-react": "^0.476.0",
+    "nanoid": "^5.1.5",
     "next": "15.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
