@@ -7,7 +7,7 @@ export default async function Home() {
   const { data } = await supabase.from('clothes').select().limit(4);
 
   return (
-    <div className="w-full h-full grid grid-cols-[1fr_4fr_1fr]">
+    <div className="w-full h-full min-h-[calc(100vh-10rem)] grid grid-cols-[1fr_4fr_1fr]">
       <SideBar />
       <div className="w-full">
         <MainImageSlider />
