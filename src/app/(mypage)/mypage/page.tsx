@@ -1,5 +1,7 @@
+import { Button } from '@/components/ui/button';
 import { parseToKorTime } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
 export default async function MyPage() {
@@ -18,8 +20,15 @@ export default async function MyPage() {
     <div>
       {/* 프로필 영역 */}
       <h1 className="text-3xl font-bold mb-8">내 정보</h1>
-      <div className="flex gap-8 rounded-2xl p-4">
-        <div className="w-48 h-48 rounded-full bg-black"></div>
+      <div className="flex gap-8 rounded-2xl p-4 bg-slate-100">
+        <div className="w-48 h-48 rounded-full relative overflow-hidden">
+          <Image
+            src={data.user?.user_metadata.image || '/images/user.png'}
+            fill
+            alt="profile image"
+            className="object-cover"
+          />
+        </div>
         <div className="flex flex-1 flex-col justify-between">
           <div>
             <p className="text-2xl font-bold">
@@ -31,7 +40,7 @@ export default async function MyPage() {
             </p>
           </div>
           <div className="self-end">
-            <button>프로필 수정</button>
+            <Button>프로필 수정</Button>
           </div>
         </div>
       </div>
@@ -47,7 +56,9 @@ export default async function MyPage() {
       </div>
 
       <div>
-        <button>회원 탈퇴하기</button>
+        <button className="text-gray-600 underline text-sm mt-4">
+          회원 탈퇴하기
+        </button>
       </div>
     </div>
   );
