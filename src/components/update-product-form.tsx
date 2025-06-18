@@ -28,7 +28,9 @@ export default function UpdateProductForm({
     updateProduct.bind(null, product),
     initialState
   );
-  const [sex, setSex] = useState<string>('men');
+  const [defaultSex, defaultCategory] = product.category.split('/');
+
+  const [sex, setSex] = useState<string>(defaultSex);
   const [category, setCategory] = useState<Category[]>([]);
   const [pickedImage, setPickedImage] = useState<string | null>(
     product.image || null
@@ -74,8 +76,6 @@ export default function UpdateProductForm({
 
     fileReader.readAsDataURL(file);
   };
-
-  const [defaultSex, defaultCategory] = product.category.split('/');
 
   return (
     <form action={formAction}>
