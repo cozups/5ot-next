@@ -1,4 +1,4 @@
-import { createCategory } from '@/actions/category';
+import { createCategory, deleteCategory } from '@/actions/category';
 import CategoryProductView from '@/components/category-product-view';
 import DeleteButton from '@/components/delete-button';
 import { Button } from '@/components/ui/button';
@@ -74,7 +74,9 @@ export default async function CategoryManagementPage({
                         >
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton id={cat.id} />
+                        <DeleteButton
+                          action={deleteCategory.bind(null, cat.id)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -94,7 +96,9 @@ export default async function CategoryManagementPage({
                         >
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton id={cat.id} />
+                        <DeleteButton
+                          action={deleteCategory.bind(null, cat.id)}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

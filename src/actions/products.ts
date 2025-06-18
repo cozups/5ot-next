@@ -1,5 +1,6 @@
 'use server';
 
+import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
@@ -60,7 +61,7 @@ export async function addProduct(
 
   // 이미지 업로드
   const supabase = await createClient();
-  const imageName = raw.name + raw.image.type.split('/')[1];
+  const imageName = `images/${raw.name}.${raw.image.type.split('/')[1]}`;
 
   const { data, error } = await supabase.storage
     .from('products')
@@ -100,4 +101,33 @@ export async function addProduct(
 
   revalidatePath('/admin/product');
   return { success: true };
+}
+
+export async function deleteProduct(product: Clothes) {
+  const supabase = await createClient();
+
+  // 이미지 삭제
+  const filePath = product.image?.split('/products/')[1];
+
+  if (filePath) {
+    const { error: deleteImageError } = await supabase.storage
+      .from('products')
+      .remove([filePath]);
+
+    if (deleteImageError) {
+      throw new Error('이미지 삭제에 실패했습니다.');
+    }
+  }
+
+  // 데이터 삭제
+  const { error } = await supabase
+    .from('clothes')
+    .delete()
+    .eq('id', product.id);
+
+  if (error) {
+    throw new Error('데이터 삭제에 실패했습니다.');
+  }
+
+  revalidatePath('/admin/product');
 }

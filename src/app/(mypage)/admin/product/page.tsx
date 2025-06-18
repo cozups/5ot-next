@@ -1,3 +1,5 @@
+import { deleteProduct } from '@/actions/products';
+import DeleteButton from '@/components/delete-button';
 import ProductForm from '@/components/product-form';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,13 +12,13 @@ import {
 } from '@/components/ui/table';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
-import { Pen, Trash } from 'lucide-react';
+import { Pen } from 'lucide-react';
 import Image from 'next/image';
 
 export default async function ProductManagementPage() {
   const supabase = await createClient();
   const { data: productList } = await supabase.from('clothes').select();
-  console.log('error');
+
   return (
     <div className="w-full">
       <h1 className="text-3xl font-bold">제품 관리</h1>
@@ -62,15 +64,18 @@ export default async function ProductManagementPage() {
                       <Button>
                         <Pen />
                       </Button>
-                      <Button variant="destructive">
-                        <Trash />
-                      </Button>
+                      <DeleteButton
+                        action={deleteProduct.bind(null, product)}
+                      />
                     </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          {productList && productList.length < 1 && (
+            <p className="text-center font-semibold">등록된 제품이 없습니다.</p>
+          )}
         </div>
       </div>
     </div>

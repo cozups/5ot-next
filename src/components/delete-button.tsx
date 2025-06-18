@@ -1,6 +1,5 @@
 'use client';
 
-import { deleteCategory } from '@/actions/category';
 import { Button } from './ui/button';
 import {
   AlertDialog,
@@ -13,16 +12,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
+import { Trash } from 'lucide-react';
 
-export default function DeleteButton({ id }: { id: string }) {
-  const onClickDelete = async (id: string) => {
-    await deleteCategory(id);
-  };
-
+export default function DeleteButton({ action }: { action: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">삭제</Button>
+        <Button variant="destructive">
+          <Trash />
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
@@ -33,9 +31,7 @@ export default function DeleteButton({ id }: { id: string }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={onClickDelete.bind(null, id)}>
-            삭제
-          </AlertDialogAction>
+          <AlertDialogAction onClick={action}>삭제</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
