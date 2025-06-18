@@ -2,6 +2,7 @@ import { deleteProduct } from '@/actions/products';
 import DeleteButton from '@/components/delete-button';
 import ProductForm from '@/components/product-form';
 import { Button } from '@/components/ui/button';
+import { DialogClose, DialogFooter } from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -10,9 +11,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import UpdateProductButton from '@/components/update-product-button';
+import UpdateProductForm from '@/components/update-product-form';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
-import { Pen } from 'lucide-react';
 import Image from 'next/image';
 
 export default async function ProductManagementPage() {
@@ -62,9 +64,18 @@ export default async function ProductManagementPage() {
                   <TableCell>{product.price.toLocaleString()}원</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Button>
-                        <Pen />
-                      </Button>
+                      <UpdateProductButton>
+                        <UpdateProductForm product={product}>
+                          <DialogFooter>
+                            <DialogClose asChild>
+                              <Button variant="secondary">취소</Button>
+                            </DialogClose>
+                            <DialogClose asChild>
+                              <Button type="submit">수정</Button>
+                            </DialogClose>
+                          </DialogFooter>
+                        </UpdateProductForm>
+                      </UpdateProductButton>
                       <DeleteButton
                         action={deleteProduct.bind(null, product)}
                       />
