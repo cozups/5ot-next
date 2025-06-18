@@ -7,6 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
+import Image from 'next/image';
+import { Clothes } from '@/types/clothes';
 
 interface CategoryProductViewProps {
   category: string;
@@ -38,14 +40,21 @@ export default async function CategoryProductView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((product) => (
+            {data.map((product: Clothes) => (
               <TableRow key={product.id} className="text-center">
                 <TableCell className="flex gap-2 items-center">
-                  <div className="w-16 h-16 bg-black"></div>
+                  <div className="w-16 h-16 bg-black relative">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   {product.name}
                 </TableCell>
                 <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.price}원</TableCell>
+                <TableCell>{product.price.toLocaleString()}원</TableCell>
               </TableRow>
             ))}
           </TableBody>
