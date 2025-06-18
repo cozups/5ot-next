@@ -4,9 +4,14 @@ import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+interface SideBarItem {
+  title: string;
+  link: string;
+}
+
 export default function MyPageSideBar() {
   const pathname = usePathname();
-  let mode = 'normal';
+  let mode: 'normal' | 'admin' = 'normal';
 
   if (pathname.startsWith('/admin')) {
     mode = 'admin';
@@ -27,9 +32,9 @@ export default function MyPageSideBar() {
 
   return (
     <>
-      {mode === 'admin' && (
+      {
         <ul className="mx-8">
-          {menus[mode].map((menu) => (
+          {menus[mode].map((menu: SideBarItem) => (
             <li
               key={menu.title}
               className={clsx(
@@ -45,13 +50,7 @@ export default function MyPageSideBar() {
             </li>
           ))}
         </ul>
-      )}
-      {mode === 'normal' && (
-        <ul>
-          <li>내 정보</li>
-          <li>문의 하기</li>
-        </ul>
-      )}
+      }
     </>
   );
 }
