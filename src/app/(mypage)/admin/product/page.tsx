@@ -1,7 +1,22 @@
 import ProductForm from '@/components/product-form';
-import { Table, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Clothes } from '@/types/clothes';
+import { createClient } from '@/utils/supabase/server';
+import { Pen, Trash } from 'lucide-react';
+import Image from 'next/image';
 
-export default function ProductManagementPage() {
+export default async function ProductManagementPage() {
+  const supabase = await createClient();
+  const { data: productList } = await supabase.from('clothes').select();
+  console.log('error');
   return (
     <div className="w-full">
       <h1 className="text-3xl font-bold">제품 관리</h1>
@@ -23,6 +38,38 @@ export default function ProductManagementPage() {
                 <TableHead>관리</TableHead>
               </TableRow>
             </TableHeader>
+            <TableBody>
+              {productList?.map((product: Clothes) => (
+                <TableRow key={product.id}>
+                  <TableCell className="flex items-center gap-2">
+                    <div className="w-16 aspect-square relative">
+                      {product.image && (
+                        <Image
+                          src={product.image}
+                          alt={`${product.name} image`}
+                          fill
+                        />
+                      )}
+                    </div>
+                    <p>{product.name}</p>
+                  </TableCell>
+                  <TableCell>{product.category}</TableCell>
+                  <TableCell>{product.brand}</TableCell>
+                  <TableCell>{product.description}</TableCell>
+                  <TableCell>{product.price.toLocaleString()}원</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button>
+                        <Pen />
+                      </Button>
+                      <Button variant="destructive">
+                        <Trash />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
           </Table>
         </div>
       </div>
