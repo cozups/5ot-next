@@ -1,6 +1,7 @@
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 export default async function ProductDetailPage({
@@ -26,12 +27,19 @@ export default async function ProductDetailPage({
     <div className="py-8">
       {/* product info */}
       <div className="flex justify-between gap-16">
-        <div className="w-96 aspect-square bg-slate-700 rounded-xl " />
+        <div className="w-96 aspect-square  rounded-xl relative overflow-hidden">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover"
+          />
+        </div>
         <div className="flex-1 flex flex-col justify-between">
           <div className="h-[80%] flex flex-col items-start justify-between">
             <div>
               <h2 className="text-2xl font-semibold">{product.name}</h2>
-              <p>{product.brand}</p>
+              <p className="text-sm text-gray-400">{product.brand}</p>
             </div>
 
             <div className="w-full flex flex-col items-start">

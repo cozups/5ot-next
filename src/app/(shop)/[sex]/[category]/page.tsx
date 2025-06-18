@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 
 interface ProductListPageProps {
   params: Promise<{
@@ -31,8 +32,16 @@ export default async function ProductListPage({
         {data?.map((product: Clothes) => (
           <Link key={product.name} href={`/${sex}/${category}/${product.id}`}>
             <div className="cursor-pointer transition-scale duration-200 hover:scale-105">
-              <div className="w-full aspect-square bg-slate-600 rounded-xl" />
+              <div className="w-full aspect-square rounded-xl relative overflow-hidden">
+                <Image
+                  src={product.image}
+                  fill
+                  alt={product.name}
+                  className="object-cover"
+                />
+              </div>
               <p className="text-lg font-semibold mt-2">{product.name}</p>
+              <p className="text-sm text-gray-400">{product.brand}</p>
               <div className="flex justify-between mt-3">
                 <div className="flex items-center gap-1">
                   <Star fill="orange" className="w-4 h-4" />
