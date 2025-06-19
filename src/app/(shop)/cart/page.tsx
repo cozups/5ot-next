@@ -11,13 +11,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { type Cart } from '@/types/cart';
+import { Cart } from '@/types/cart';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-export default function Cart() {
+export default function CartPage() {
   const [cartData, setCartData] = useState<Cart[]>([]);
   useEffect(() => {
     const cartStorage: Cart[] = JSON.parse(
