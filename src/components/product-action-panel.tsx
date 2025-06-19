@@ -17,6 +17,7 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { Cart } from '@/types/cart';
+import Link from 'next/link';
 
 export default function ProductActionPanel({ product }: { product: Clothes }) {
   const countRef = useRef<HTMLInputElement>(null);
@@ -44,6 +45,14 @@ export default function ProductActionPanel({ product }: { product: Clothes }) {
 
   const redirectToCart = () => {
     router.push('/cart');
+  };
+
+  const onClickPurchase = () => {
+    sessionStorage.setItem(
+      'purchase',
+      JSON.stringify([{ product, qty: countRef.current?.value }])
+    );
+    router.push('/purchase');
   };
 
   return (
@@ -93,9 +102,14 @@ export default function ProductActionPanel({ product }: { product: Clothes }) {
           </AlertDialogContent>
         </AlertDialog>
 
-        <button className="w-1/2 h-16 bg-blue-950 text-white rounded">
-          구매하기
-        </button>
+        <Link href="/purchase" className="block w-1/2">
+          <Button
+            className="w-full h-16 bg-blue-950 hover:bg-blue-900 text-white rounded cursor-pointer"
+            onClick={onClickPurchase}
+          >
+            구매하기
+          </Button>
+        </Link>
       </div>
     </div>
   );

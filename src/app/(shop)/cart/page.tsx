@@ -15,10 +15,13 @@ import { Cart } from '@/types/cart';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function CartPage() {
   const [cartData, setCartData] = useState<Cart[]>([]);
+  const router = useRouter();
+
   useEffect(() => {
     const cartStorage: Cart[] = JSON.parse(
       sessionStorage.getItem('cart') || '[]'
@@ -62,6 +65,15 @@ export default function CartPage() {
     sessionStorage.setItem('cart', JSON.stringify(updated));
   };
 
+  const onClickPurchase = () => {
+    const selected = cartData.filter((cart) => cart.isSelected);
+    const data = selected.map((item) => ({
+      product: item.product,
+      qty: item.qty,
+    }));
+    sessionStorage.setItem('purchase', JSON.stringify(data));
+    router.push('/purchase');
+  };
   const selected = cartData.filter((cart) => cart.isSelected);
   const totalPrice = selected.reduce(
     (acc, data) => acc + parseInt(data.product.price) * parseInt(data.qty),
@@ -152,14 +164,15 @@ export default function CartPage() {
                     ).toLocaleString()}
                     원
                   </p>
-                  )
                 </div>
               ))}
           </div>
           <div className="self-end flex flex-col items-end gap-2">
             <p className="font-semibold">총 {totalPrice.toLocaleString()}원</p>
             <Link href="/purchase">
-              <Button className="cursor-pointer">선택 상품 구매하기</Button>
+              <Button className="cursor-pointer" onClick={onClickPurchase}>
+                선택 상품 구매하기
+              </Button>
             </Link>
           </div>
         </div>
