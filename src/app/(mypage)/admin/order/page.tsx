@@ -1,12 +1,7 @@
-import { deleteOrder } from '@/actions/orders';
+import { deleteOrder, updateOrderStatus } from '@/actions/orders';
 import DeleteButton from '@/components/delete-button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import OrderStatusAction from '@/components/order-status-action';
+
 import {
   Table,
   TableBody,
@@ -22,7 +17,8 @@ export default async function OrderManagementPage() {
   const supabase = await createClient();
   const { data: orderList } = await supabase
     .from('orders')
-    .select(`*, profiles:user_id (name)`);
+    .select(`*, profiles:user_id (name)`)
+    .order('created_at', { ascending: true });
 
   return (
     <div className="h-[calc(100vh-10rem)]">
@@ -61,16 +57,10 @@ export default async function OrderManagementPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Select defaultValue={order.status}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="상태" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="processing">처리 중</SelectItem>
-                      <SelectItem value="delivering">배송 중</SelectItem>
-                      <SelectItem value="done">완료</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <OrderStatusAction
+                    defaultValue={order.status}
+                    action={updateOrderStatus.bind(null, order.id)}
+                  />
                 </TableCell>
                 <TableCell>
                   <DeleteButton action={deleteOrder.bind(null, order.id)} />

@@ -77,3 +77,18 @@ export async function deleteOrder(id: string) {
 
   revalidatePath('/admin/order');
 }
+
+export async function updateOrderStatus(id: string, status: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('orders')
+    .update({ status })
+    .eq('id', id);
+
+  if (error) {
+    throw new Error('주문 상태 업데이트에 실패했습니다.');
+  }
+
+  revalidatePath('/admin/order');
+}
