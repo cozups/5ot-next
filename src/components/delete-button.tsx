@@ -18,7 +18,7 @@ export default function DeleteButton({ action }: { action: () => void }) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive">
+        <Button variant="destructive" className="cursor-pointer">
           <Trash />
         </Button>
       </AlertDialogTrigger>

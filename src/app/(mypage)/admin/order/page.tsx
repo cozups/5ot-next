@@ -1,4 +1,5 @@
-import { Button } from '@/components/ui/button';
+import { deleteOrder } from '@/actions/orders';
+import DeleteButton from '@/components/delete-button';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,6 @@ import {
 } from '@/components/ui/table';
 import { Order } from '@/types/orders';
 import { createClient } from '@/utils/supabase/server';
-import { Trash } from 'lucide-react';
 
 export default async function OrderManagementPage() {
   const supabase = await createClient();
@@ -73,9 +73,7 @@ export default async function OrderManagementPage() {
                   </Select>
                 </TableCell>
                 <TableCell>
-                  <Button variant="destructive">
-                    <Trash />
-                  </Button>
+                  <DeleteButton action={deleteOrder.bind(null, order.id)} />
                 </TableCell>
               </TableRow>
             ))}

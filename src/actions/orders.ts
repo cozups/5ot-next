@@ -2,6 +2,7 @@
 
 import { Purchase } from '@/types/orders';
 import { createClient } from '@/utils/supabase/server';
+import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
 
 const formSchema = z.object({
@@ -63,4 +64,16 @@ export async function createOrder(
   }
 
   return { success: true };
+}
+
+export async function deleteOrder(id: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.from('orders').delete().eq('id', id);
+
+  if (error) {
+    throw new Error('주문 삭제에 실패했습니다.');
+  }
+
+  revalidatePath('/admin/order');
 }
