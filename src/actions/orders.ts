@@ -47,7 +47,7 @@ export async function createOrder(
   const { error: insertError } = await supabase.from('orders').insert({
     user_id: authData.user?.id,
     products,
-    status: '처리 중',
+    status: 'processing',
     address: raw.address,
     receiver: raw.receiver,
     phoneNumber: raw.phoneNumber,

@@ -19,7 +19,7 @@ export default function MyPageSideBar() {
 
   const menus = {
     admin: [
-      { title: '유저 관리', link: '/admin/user' },
+      { title: '주문 관리', link: '/admin/order' },
       { title: '카테고리 관리', link: '/admin/category' },
       { title: '제품 관리', link: '/admin/product' },
       { title: '문의', link: '/admin/qna' },
