@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Pacifico } from 'next/font/google';
 import { createClient } from '@/utils/supabase/server';
 import { logout } from '@/actions/auth';
+import { ShoppingBasket } from 'lucide-react';
+import { Button } from './ui/button';
 
 const FontPacifico = Pacifico({
   subsets: ['latin'],
@@ -38,8 +40,8 @@ export default async function MainHeader() {
         </nav>
       )}
       {user && (
-        <div className="flex items-center gap-8">
-          <Link href="/mypage">
+        <div className="flex items-center gap-2">
+          <Link href="/mypage" className="mr-4">
             <div className="flex gap-2 items-center">
               <div className="w-8 h-8 rounded-full  overflow-hidden">
                 <Image
@@ -53,8 +55,14 @@ export default async function MainHeader() {
               <p>{user.user_metadata.username}</p>
             </div>
           </Link>
+          <Link href="/cart">
+            <Button className="flex items-center gap-2 cursor-pointer bg-blue-300 hover:bg-blue-400">
+              <ShoppingBasket />
+              <span>장바구니</span>
+            </Button>
+          </Link>
           <form action={logout}>
-            <button className="cursor-pointer">로그아웃</button>
+            <Button className="cursor-pointer">로그아웃</Button>
           </form>
         </div>
       )}

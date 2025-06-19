@@ -1,3 +1,4 @@
+import ProductActionPanel from '@/components/product-action-panel';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
@@ -35,35 +36,7 @@ export default async function ProductDetailPage({
             className="object-cover"
           />
         </div>
-        <div className="flex-1 flex flex-col justify-between">
-          <div className="h-[80%] flex flex-col items-start justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold">{product.name}</h2>
-              <p className="text-sm text-gray-400">{product.brand}</p>
-            </div>
-
-            <div className="w-full flex flex-col items-start">
-              <p>{product.description}</p>
-              <div className="w-full mt-8 flex items-center justify-between">
-                <input
-                  type="number"
-                  min={1}
-                  className="px-4 border h-10"
-                  defaultValue={1}
-                />
-                <p className="font-bold">{product.price.toLocaleString()}원</p>
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <button className="w-1/2 h-16 bg-neutral-300 rounded">
-              장바구니
-            </button>
-            <button className="w-1/2 h-16 bg-blue-950 text-white rounded">
-              구매하기
-            </button>
-          </div>
-        </div>
+        <ProductActionPanel product={product} />
       </div>
       <div>
         {/* reviews */}

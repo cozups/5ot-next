@@ -2,10 +2,10 @@ export type Clothes = {
   id: string;
   created_at: string;
   name: string;
-  price: number;
+  price: string;
   description: string;
   image: string;
   brand: string;
   category: string;
-  rate: number;
+  rate: string;
 };
