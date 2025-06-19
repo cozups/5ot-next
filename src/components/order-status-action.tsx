@@ -28,6 +28,7 @@ export default function OrderStatusAction({
         <SelectItem value="processing">처리 중</SelectItem>
         <SelectItem value="delivering">배송 중</SelectItem>
         <SelectItem value="done">완료</SelectItem>
+        <SelectItem value="canceled">취소</SelectItem>
       </SelectContent>
     </Select>
   );
