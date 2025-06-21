@@ -1,4 +1,5 @@
 import { deleteUser } from '@/actions/auth';
+import UpdateProfileForm from '@/components/update-profile-form';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,6 +12,13 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { parseToKorTime } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
@@ -52,7 +60,17 @@ export default async function MyPage() {
             </p>
           </div>
           <div className="self-end">
-            <Button>프로필 수정</Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="cursor-pointer">프로필 수정</Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>프로필 수정하기</DialogTitle>
+                </DialogHeader>
+                <UpdateProfileForm user={data.user} />
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>

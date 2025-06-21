@@ -43,12 +43,11 @@ export default async function MainHeader() {
         <div className="flex items-center gap-2">
           <Link href="/mypage" className="mr-4">
             <div className="flex gap-2 items-center">
-              <div className="w-8 h-8 rounded-full  overflow-hidden">
+              <div className="w-8 h-8 rounded-full  overflow-hidden relative">
                 <Image
-                  src="/images/user.png"
-                  width={32}
-                  height={32}
-                  className="w-full"
+                  src={user.user_metadata.image || '/images/user.png'}
+                  fill
+                  className="w-full object-cover"
                   alt="user profile image"
                 />
               </div>

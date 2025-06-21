@@ -33,6 +33,13 @@ export interface LoginFormState extends FormState {
   values?: z.infer<typeof loginFormSchema>;
 }
 
+export interface UpdateFormState extends FormState {
+  values?: {
+    username: string;
+    image: File;
+  };
+}
+
 export async function createUser(
   prevState: JoinFormState,
   formData: FormData
@@ -66,6 +73,8 @@ export async function createUser(
       data: {
         username: raw.username,
         role: 'normal',
+        image: '',
+        phone: raw.phoneNumber,
       },
     },
   });
@@ -146,4 +155,73 @@ export async function deleteUser(id: string) {
   }
 
   redirect('/');
+}
+
+export async function updateUser(
+  id: string,
+  prevState: UpdateFormState,
+  formData: FormData
+): Promise<UpdateFormState> {
+  const raw = {
+    username: formData.get('username')?.toString() || '',
+    image: formData.get('image') as File,
+  };
+
+  console.log(raw);
+
+  if (raw.username.trim().length < 1) {
+    return {
+      success: false,
+      errors: {
+        username: ['이름을 반드시 입력해주세요'],
+      },
+    };
+  }
+
+  const supabase = await createClient();
+  const dataToUpdate: { username: string; image?: string } = {
+    username: raw.username,
+  };
+  if (raw.image.size > 0) {
+    // 이미지 저장 or 기존 이미지 대체
+    const filename = `images/user${id.split('-')[0]}.${
+      raw.image.type.split('/')[1]
+    }`;
+
+    const { data: uploadedImage, error: imageUpdateError } =
+      await supabase.storage
+        .from('profile')
+        .update(filename, raw.image, { upsert: true });
+
+    if (imageUpdateError) {
+      return {
+        success: false,
+        errors: {
+          imageUpload: ['이미지 업데이트에 실패했습니다.'],
+        },
+      };
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('profile').getPublicUrl(uploadedImage.path);
+    dataToUpdate.image = publicUrl;
+  }
+
+  const { error: dataUpdateError } = await supabase.auth.updateUser({
+    data: dataToUpdate,
+  });
+
+  if (dataUpdateError) {
+    return {
+      success: false,
+      errors: {
+        dataUpdate: ['정보 업데이트에 실패했습니다.'],
+      },
+    };
+  }
+
+  // 데이터 수정
+
+  return { success: true };
 }
