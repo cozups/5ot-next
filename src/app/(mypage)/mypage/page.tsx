@@ -23,6 +23,7 @@ import { parseToKorTime } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import OrderList from '@/components/order-list';
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -35,6 +36,12 @@ export default async function MyPage() {
   if (data.user.user_metadata.role === 'admin') {
     redirect('/admin');
   }
+
+  const { data: orderList } = await supabase
+    .from('orders')
+    .select(`*, profiles:user_id (name)`)
+    .order('created_at', { ascending: true })
+    .eq('user_id', data.user.id);
 
   return (
     <div>
@@ -77,12 +84,8 @@ export default async function MyPage() {
 
       {/* 구매 내역 */}
       <h2 className="text-2xl font-bold my-6">구매 내역</h2>
-      <div>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div key={i} className="rounded shadow-md p-2">
-            {i}
-          </div>
-        ))}
+      <div className="min-h-48">
+        <OrderList role="normal" list={orderList} />
       </div>
 
       <AlertDialog>
