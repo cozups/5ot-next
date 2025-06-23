@@ -1,6 +1,6 @@
 'use client';
 
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import Image from 'next/image';
 import { Input } from '../ui/input';
 import {
@@ -21,7 +21,7 @@ export default function UpdateProductForm({
   product,
   children,
 }: {
-  product: Clothes;
+  product: Products;
   children: React.ReactNode;
 }) {
   const [formState, formAction] = useActionState(

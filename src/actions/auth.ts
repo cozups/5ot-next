@@ -2,6 +2,7 @@
 
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod/v4';
 
@@ -167,7 +168,6 @@ export async function updateUser(
     image: formData.get('image') as File,
   };
 
-
   if (raw.username.trim().length < 1) {
     return {
       success: false,
@@ -207,6 +207,7 @@ export async function updateUser(
     dataToUpdate.image = publicUrl;
   }
 
+  // 데이터 수정
   const { error: dataUpdateError } = await supabase.auth.updateUser({
     data: dataToUpdate,
   });
@@ -220,7 +221,6 @@ export async function updateUser(
     };
   }
 
-  // 데이터 수정
-
+  revalidatePath('/', 'layout');
   return { success: true };
 }

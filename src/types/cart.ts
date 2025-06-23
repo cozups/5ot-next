@@ -1,7 +1,7 @@
-import { Clothes } from './clothes';
+import { Products } from './products';
 
 export interface Cart {
-  product: Clothes;
+  product: Products;
   qty: string;
   isSelected: boolean;
 }

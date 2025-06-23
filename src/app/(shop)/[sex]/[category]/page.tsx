@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
@@ -18,7 +18,7 @@ export default async function ProductListPage({
   const { sex, category } = await params;
   const supabase = await createClient();
   const { data } = await supabase
-    .from('clothes')
+    .from('products')
     .select()
     .eq('category', `${sex}/${category}`);
 
@@ -29,7 +29,7 @@ export default async function ProductListPage({
       </h2>
       <div className="grid grid-cols-3 gap-6">
         {/* product list */}
-        {data?.map((product: Clothes) => (
+        {data?.map((product: Products) => (
           <Link key={product.name} href={`/${sex}/${category}/${product.id}`}>
             <div className="cursor-pointer transition-scale duration-200 hover:scale-105">
               <div className="w-full aspect-square rounded-xl relative overflow-hidden">

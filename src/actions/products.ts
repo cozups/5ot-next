@@ -1,6 +1,6 @@
 'use server';
 
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
@@ -90,7 +90,7 @@ export async function addProduct(
     .getPublicUrl(data.path);
 
   // DB에 저장
-  const { error: productUploadError } = await supabase.from('clothes').insert({
+  const { error: productUploadError } = await supabase.from('products').insert({
     name: raw.name,
     brand: raw.brand,
     price: raw.price,
@@ -112,7 +112,7 @@ export async function addProduct(
   return { success: true };
 }
 
-export async function deleteProduct(product: Clothes) {
+export async function deleteProduct(product: Products) {
   const supabase = await createClient();
 
   // 이미지 삭제
@@ -130,7 +130,7 @@ export async function deleteProduct(product: Clothes) {
 
   // 데이터 삭제
   const { error } = await supabase
-    .from('clothes')
+    .from('products')
     .delete()
     .eq('id', product.id);
 
@@ -142,7 +142,7 @@ export async function deleteProduct(product: Clothes) {
 }
 
 export async function updateProduct(
-  originalData: Clothes,
+  originalData: Products,
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
@@ -205,7 +205,7 @@ export async function updateProduct(
     description: raw.description,
   };
   const { error: productUpdateError } = await supabase
-    .from('clothes')
+    .from('products')
     .update(
       updatedImagePath.length > 0
         ? Object.assign(dataToUpdate, { image: updatedImagePath })

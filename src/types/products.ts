@@ -1,4 +1,4 @@
-export type Clothes = {
+export type Products = {
   id: string;
   created_at: string;
   name: string;

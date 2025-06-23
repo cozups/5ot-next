@@ -1,11 +1,11 @@
-import { Clothes } from './clothes';
+import { Products } from './products';
 
 export interface Order {
   id: string;
   created_at: string;
   user_id: string;
   products: {
-    product: Clothes;
+    product: Products;
     qty: string;
   }[];
   status: string;
@@ -17,6 +17,6 @@ export interface Order {
 }
 
 export interface Purchase {
-  product: Clothes;
+  product: Products;
   qty: string;
 }

@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '../ui/table';
 import Image from 'next/image';
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 
 interface CategoryProductViewProps {
   category: string;
@@ -19,7 +19,7 @@ export default async function CategoryProductView({
 }: CategoryProductViewProps) {
   const supabase = await createClient();
   const { data } = await supabase
-    .from('clothes')
+    .from('products')
     .select()
     .eq('category', category);
 
@@ -40,7 +40,7 @@ export default async function CategoryProductView({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((product: Clothes) => (
+            {data.map((product: Products) => (
               <TableRow key={product.id} className="text-center">
                 <TableCell className="flex gap-2 items-center">
                   <div className="w-16 h-16 bg-black relative">

@@ -1,5 +1,5 @@
 import ProductActionPanel from '@/components/product/product-action-panel';
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
@@ -15,10 +15,10 @@ export default async function ProductDetailPage({
   const { productId } = await params;
   const supabase = await createClient();
   const { data: product } = await supabase
-    .from('clothes')
+    .from('products')
     .select()
     .eq('id', productId)
-    .single<Clothes>();
+    .single<Products>();
 
   if (!product) {
     notFound();
@@ -56,7 +56,16 @@ export default async function ProductDetailPage({
               제출하기
             </button>
           </form>
-          <div className="flex flex-col gap-6 mt-8">
+          <ul className="flex flex-col gap-6 mt-8">
+            <li>
+              <div className="flex items-center gap-4">
+                <p className="font-semibold">작성자</p>
+                <div className="flex items-center gap-2">
+                  <Star fill="orange" className="w-4 h-4" /> 5
+                </div>
+              </div>
+              <div>리뷰 내용</div>
+            </li>
             <div>
               <div className="flex items-center gap-4">
                 <p className="font-semibold">작성자</p>
@@ -75,16 +84,7 @@ export default async function ProductDetailPage({
               </div>
               <div>리뷰 내용</div>
             </div>
-            <div>
-              <div className="flex items-center gap-4">
-                <p className="font-semibold">작성자</p>
-                <div className="flex items-center gap-2">
-                  <Star fill="orange" className="w-4 h-4" /> 5
-                </div>
-              </div>
-              <div>리뷰 내용</div>
-            </div>
-          </div>
+          </ul>
         </div>
       </div>
     </div>

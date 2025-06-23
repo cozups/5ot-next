@@ -1,6 +1,6 @@
 'use client';
 
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import { useRef } from 'react';
 import { Button } from '../ui/button';
 import { ShoppingBasket } from 'lucide-react';
@@ -19,7 +19,7 @@ import {
 import { Cart } from '@/types/cart';
 import Link from 'next/link';
 
-export default function ProductActionPanel({ product }: { product: Clothes }) {
+export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 

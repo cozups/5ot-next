@@ -13,13 +13,13 @@ import {
 } from '@/components/ui/table';
 import UpdateProductButton from '@/components/product/update-product-button';
 import UpdateProductForm from '@/components/product/update-product-form';
-import { Clothes } from '@/types/clothes';
+import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 
 export default async function ProductManagementPage() {
   const supabase = await createClient();
-  const { data: productList } = await supabase.from('clothes').select();
+  const { data: productList } = await supabase.from('products').select();
 
   return (
     <div className="w-full">
@@ -43,7 +43,7 @@ export default async function ProductManagementPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {productList?.map((product: Clothes) => (
+              {productList?.map((product: Products) => (
                 <TableRow key={product.id}>
                   <TableCell className="flex items-center gap-2">
                     <div className="w-16 aspect-square relative">
