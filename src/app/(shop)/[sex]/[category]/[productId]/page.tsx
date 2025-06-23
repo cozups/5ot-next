@@ -1,9 +1,12 @@
-import ProductActionPanel from '@/components/product/product-action-panel';
-import { Products } from '@/types/products';
-import { createClient } from '@/utils/supabase/server';
-import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
+
+import { createClient } from '@/utils/supabase/server';
+import ProductActionPanel from '@/components/product/product-action-panel';
+import ReviewItem from '@/components/product/review-Item';
+import { Products, Review } from '@/types/products';
+import ReviewForm from '@/components/product/review-form';
+import { createReview } from '@/actions/products';
 
 export default async function ProductDetailPage({
   params,
@@ -19,6 +22,12 @@ export default async function ProductDetailPage({
     .select()
     .eq('id', productId)
     .single<Products>();
+
+  const { data: reviewList } = await supabase
+    .from('reviews')
+    .select(`*, products:product_id(*), profiles:user_id(*)`);
+
+  console.log(reviewList);
 
   if (!product) {
     notFound();
@@ -40,50 +49,12 @@ export default async function ProductDetailPage({
       </div>
       <div>
         {/* reviews */}
+        <ReviewForm action={createReview.bind(null, product.id)} />
         <div>
-          <div className="flex items-center gap-2 mt-4">
-            <Star fill="orange" className="w-4 h-4" /> 5
-          </div>
-          <form action="" className="my-4">
-            <textarea
-              name="review"
-              id="review"
-              className="w-full border"
-              placeholder="리뷰를 작성해 주세요."
-              rows={4}
-            ></textarea>
-            <button className="py-1 px-2 bg-neutral-300 rounded">
-              제출하기
-            </button>
-          </form>
           <ul className="flex flex-col gap-6 mt-8">
-            <li>
-              <div className="flex items-center gap-4">
-                <p className="font-semibold">작성자</p>
-                <div className="flex items-center gap-2">
-                  <Star fill="orange" className="w-4 h-4" /> 5
-                </div>
-              </div>
-              <div>리뷰 내용</div>
-            </li>
-            <div>
-              <div className="flex items-center gap-4">
-                <p className="font-semibold">작성자</p>
-                <div className="flex items-center gap-2">
-                  <Star fill="orange" className="w-4 h-4" /> 5
-                </div>
-              </div>
-              <div>리뷰 내용</div>
-            </div>
-            <div>
-              <div className="flex items-center gap-4">
-                <p className="font-semibold">작성자</p>
-                <div className="flex items-center gap-2">
-                  <Star fill="orange" className="w-4 h-4" /> 5
-                </div>
-              </div>
-              <div>리뷰 내용</div>
-            </div>
+            {reviewList?.map((review: Review) => (
+              <ReviewItem key={review.id} review={review} />
+            ))}
           </ul>
         </div>
       </div>

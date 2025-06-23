@@ -4,6 +4,7 @@ import './globals.css';
 import MainHeader from '@/components/main-header';
 import Footer from '@/components/footer';
 import clsx from 'clsx';
+import { Toaster } from '@/components/ui/sonner';
 
 const NotoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
@@ -31,6 +32,7 @@ export default function RootLayout({
         <MainHeader />
         {children}
         <Footer />
+        <Toaster position="bottom-right" />
       </body>
     </html>
   );
