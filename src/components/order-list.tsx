@@ -27,8 +27,6 @@ export default function OrderList({
     canceled: '취소',
   };
 
-  console.log(list);
-
   return (
     <>
       <Table>

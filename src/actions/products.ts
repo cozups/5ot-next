@@ -77,7 +77,6 @@ export async function addProduct(
     .upload(imageName, raw.image);
 
   if (error) {
-    console.log(error);
     return {
       success: false,
       errors: {
@@ -179,7 +178,6 @@ export async function updateProduct(
 
   if (raw.image?.size > 0) {
     const filePath = originalData.image.split('/products/')[1];
-    console.log(raw.image, filePath);
     const { data, error } = await supabase.storage
       .from('products')
       .update(filePath, raw.image, {
@@ -187,7 +185,6 @@ export async function updateProduct(
       });
 
     if (error) {
-      console.log('image update error', error);
       return {
         success: false,
         errors: {

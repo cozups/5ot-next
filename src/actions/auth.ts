@@ -167,7 +167,6 @@ export async function updateUser(
     image: formData.get('image') as File,
   };
 
-  console.log(raw);
 
   if (raw.username.trim().length < 1) {
     return {
