@@ -79,7 +79,7 @@ export default function OrderForm({
       purchase.setData([]);
       router.push('/');
     }
-  }, [formState.success, router, mode, purchase]);
+  }, [formState.success, router, mode]);
 
   return (
     <form action={formAction} className="h-full flex flex-col justify-between">
