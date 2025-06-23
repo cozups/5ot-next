@@ -281,3 +281,57 @@ export async function createReview(
 
   return { success: true };
 }
+
+export async function updateReview(
+  id: string,
+  prevState: ReviewFormState,
+  formData: FormData
+): Promise<ReviewFormState> {
+  const raw = {
+    star: formData.get('star')?.toString() || '',
+    content: formData.get('content')?.toString() || '',
+  };
+
+  if (!raw.content.trim().length) {
+    return {
+      success: false,
+      errors: {
+        content: ['리뷰 내용을 입력해주세요.'],
+      },
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { error: updateError } = await supabase
+    .from('reviews')
+    .update(raw)
+    .eq('id', id);
+
+  if (updateError) {
+    return {
+      success: false,
+      errors: {
+        updateError: ['리뷰를 업데이트하지 못했습니다.'],
+      },
+    };
+  }
+
+  revalidatePath('/');
+  return { success: true };
+}
+
+export async function deleteReview(id: string) {
+  const supabase = await createClient();
+
+  const { error: deleteError } = await supabase
+    .from('reviews')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    throw new Error('리뷰를 삭제하지 못했습니다.');
+  }
+
+  revalidatePath('/');
+}

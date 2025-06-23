@@ -27,8 +27,6 @@ export default async function ProductDetailPage({
     .from('reviews')
     .select(`*, products:product_id(*), profiles:user_id(*)`);
 
-  console.log(reviewList);
-
   if (!product) {
     notFound();
   }
