@@ -23,7 +23,7 @@ import { parseToKorTime } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import OrderList from '@/components/order-list';
+import OrderList from '@/components/order/order-list';
 
 export default async function MyPage() {
   const supabase = await createClient();

@@ -1,4 +1,4 @@
-import ProductActionPanel from '@/components/product-action-panel';
+import ProductActionPanel from '@/components/product/product-action-panel';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';

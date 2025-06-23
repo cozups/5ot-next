@@ -1,6 +1,6 @@
 import { deleteProduct } from '@/actions/products';
 import DeleteButton from '@/components/delete-button';
-import ProductForm from '@/components/product-form';
+import ProductForm from '@/components/product/product-form';
 import { Button } from '@/components/ui/button';
 import { DialogClose, DialogFooter } from '@/components/ui/dialog';
 import {
@@ -11,8 +11,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import UpdateProductButton from '@/components/update-product-button';
-import UpdateProductForm from '@/components/update-product-form';
+import UpdateProductButton from '@/components/product/update-product-button';
+import UpdateProductForm from '@/components/product/update-product-form';
 import { Clothes } from '@/types/clothes';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';

@@ -92,3 +92,42 @@ export async function updateOrderStatus(id: string, status: string) {
 
   revalidatePath('/admin/order');
 }
+
+export async function updateOrderData(
+  id: string,
+  prevState: FormState,
+  formData: FormData
+) {
+  const raw = {
+    receiver: formData.get('receiver')?.toString() || '',
+    phoneNumber: formData.get('phoneNumber')?.toString() || '',
+    address: formData.get('address')?.toString() || '',
+    deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
+  };
+
+  const result = formSchema.safeParse(raw);
+
+  if (!result.success) {
+    return {
+      success: false,
+      errors: z.flattenError(result.error).fieldErrors,
+      values: raw,
+    };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.from('orders').update(raw).eq('id', id);
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        updateData: ['데이터 업데이트에 실패했습니다.'],
+      },
+      values: raw,
+    };
+  }
+
+  revalidatePath('/mypage');
+  return { success: true };
+}

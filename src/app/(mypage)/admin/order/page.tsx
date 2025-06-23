@@ -1,4 +1,4 @@
-import OrderList from '@/components/order-list';
+import OrderList from '@/components/order/order-list';
 
 import { Order } from '@/types/orders';
 import { createClient } from '@/utils/supabase/server';

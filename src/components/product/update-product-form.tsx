@@ -2,14 +2,14 @@
 
 import { Clothes } from '@/types/clothes';
 import Image from 'next/image';
-import { Input } from './ui/input';
+import { Input } from '../ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select';
+} from '../ui/select';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { FormState, updateProduct } from '@/actions/products';
 import { Category } from '@/types/category';

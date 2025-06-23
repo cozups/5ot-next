@@ -2,7 +2,7 @@
 
 import { Clothes } from '@/types/clothes';
 import { useRef } from 'react';
-import { Button } from './ui/button';
+import { Button } from '../ui/button';
 import { ShoppingBasket } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from './ui/alert-dialog';
+} from '../ui/alert-dialog';
 import { Cart } from '@/types/cart';
 import Link from 'next/link';
 

@@ -6,7 +6,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from './ui/table';
+} from '../ui/table';
 import Image from 'next/image';
 import { Clothes } from '@/types/clothes';
 

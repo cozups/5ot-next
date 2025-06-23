@@ -8,8 +8,22 @@ import {
 } from '@/components/ui/table';
 import { Order } from '@/types/orders';
 import OrderStatusAction from './order-status-action';
-import DeleteButton from './delete-button';
-import { deleteOrder, updateOrderStatus } from '@/actions/orders';
+import DeleteButton from '../delete-button';
+import {
+  deleteOrder,
+  updateOrderData,
+  updateOrderStatus,
+} from '@/actions/orders';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../ui/dialog';
+import { Button } from '../ui/button';
+import { Pencil } from 'lucide-react';
+import OrderForm from './order-form';
 
 export default function OrderList({
   list,
@@ -74,6 +88,25 @@ export default function OrderList({
                   )}
                 </TableCell>
                 <TableCell>
+                  {role === 'normal' && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button className="mr-1">
+                          <Pencil />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>배송 정보 수정하기</DialogTitle>
+                        </DialogHeader>
+                        <OrderForm
+                          action={updateOrderData.bind(null, order.id)}
+                          mode="update"
+                          orderId={order.id}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  )}
                   <DeleteButton action={deleteOrder.bind(null, order.id)} />
                 </TableCell>
               </TableRow>

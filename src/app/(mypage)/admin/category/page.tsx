@@ -1,5 +1,5 @@
 import { createCategory, deleteCategory } from '@/actions/category';
-import CategoryProductView from '@/components/category-product-view';
+import CategoryProductView from '@/components/category/category-product-view';
 import DeleteButton from '@/components/delete-button';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

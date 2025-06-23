@@ -1,8 +1,6 @@
 'use client';
 
-import { createOrder, FormState } from '@/actions/orders';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { createOrder } from '@/actions/orders';
 import {
   Table,
   TableBody,
@@ -11,23 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Textarea } from '@/components/ui/textarea';
 import { Purchase } from '@/types/orders';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
-import _ from 'lodash';
-import { Cart } from '@/types/cart';
-
-const initialState: FormState = { success: false };
+import { useEffect, useState } from 'react';
+import OrderForm from '@/components/order/order-form';
 
 export default function PurchasePage() {
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
-  const [formState, formAction] = useActionState(
-    createOrder.bind(null, purchaseData),
-    initialState
-  );
-  const router = useRouter();
 
   useEffect(() => {
     const purchaseStorage: Purchase[] = JSON.parse(
@@ -35,30 +23,6 @@ export default function PurchasePage() {
     );
     setPurchaseData(purchaseStorage);
   }, []);
-
-  useEffect(() => {
-    if (formState.success) {
-      sessionStorage.removeItem('purchase');
-
-      // cart 업데이트
-      const cartStorage: Cart[] = JSON.parse(
-        sessionStorage.getItem('cart') || '[]'
-      );
-      const updated = _.differenceWith(
-        cartStorage,
-        purchaseData,
-        (cart, purchase) => cart.product.id === purchase.product.id
-      );
-      if (updated.length === 0) {
-        sessionStorage.removeItem('cart');
-      } else {
-        sessionStorage.setItem('cart', JSON.stringify(updated));
-      }
-
-      setPurchaseData([]);
-      router.push('/');
-    }
-  }, [formState.success, router]);
 
   const totalPrice = purchaseData.reduce(
     (acc, data) => acc + parseInt(data.product.price) * parseInt(data.qty),
@@ -110,64 +74,14 @@ export default function PurchasePage() {
         </div>
         {/* 구매 폼 */}
         <div className="bg-slate-100 rounded-2xl p-6">
-          <form
-            action={formAction}
-            className="h-full flex flex-col justify-between"
-          >
-            <div className="flex flex-col gap-4">
-              <div>
-                <label htmlFor="receiver">받는 분</label>
-                <Input
-                  type="text"
-                  name="receiver"
-                  id="receiver"
-                  className="bg-white"
-                />
-                {formState.errors?.receiver?.map((error) => (
-                  <p className="text-sm text-red-400" key={error}>
-                    {error}
-                  </p>
-                ))}
-              </div>
-              <div>
-                <label htmlFor="phoneNumber">전화번호</label>
-                <Input
-                  type="text"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  className="bg-white"
-                />
-                {formState.errors?.phoneNumber?.map((error) => (
-                  <p className="text-sm text-red-400" key={error}>
-                    {error}
-                  </p>
-                ))}
-              </div>
-              <div>
-                <label htmlFor="address">주소</label>
-                <Input
-                  type="text"
-                  id="address"
-                  name="address"
-                  className="bg-white"
-                />
-                {formState.errors?.address?.map((error) => (
-                  <p className="text-sm text-red-400" key={error}>
-                    {error}
-                  </p>
-                ))}
-              </div>
-              <div>
-                <label htmlFor="deliveryRequest">배송 요청사항</label>
-                <Textarea
-                  id="deliveryRequest"
-                  name="deliveryRequest"
-                  className="bg-white h-28 overflow-auto"
-                />
-              </div>
-            </div>
-            <Button className="cursor-pointer self-end mt-4">주문하기</Button>
-          </form>
+          <OrderForm
+            action={createOrder.bind(null, purchaseData)}
+            mode="purchase"
+            purchase={{
+              data: purchaseData,
+              setData: setPurchaseData,
+            }}
+          />
         </div>
       </div>
     </div>
