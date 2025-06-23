@@ -25,7 +25,8 @@ export default async function ProductDetailPage({
 
   const { data: reviewList } = await supabase
     .from('reviews')
-    .select(`*, products:product_id(*), profiles:user_id(*)`);
+    .select(`*, products:product_id(*), profiles:user_id(*)`)
+    .eq('product_id', productId);
 
   if (!product) {
     notFound();
