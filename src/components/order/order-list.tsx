@@ -68,7 +68,7 @@ export default function OrderList({
                 <TableCell>
                   <div>
                     <p>
-                      {order.receiver} ({order.phoneNumber})
+                      {order.receiver} ({order.phone})
                     </p>
                     <p>{order.address}</p>
                     <p className="text-gray-400 mt-2">

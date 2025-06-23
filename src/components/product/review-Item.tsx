@@ -26,13 +26,15 @@ export default async function ReviewItem({ review }: { review: Review }) {
         </div>
         {isAllowed && (
           <div className="flex gap-1">
-            <UpdateButton title="리뷰 수정하기">
-              <ReviewForm
-                mode="update"
-                action={updateReview.bind(null, review.id)}
-                data={review}
-              />
-            </UpdateButton>
+            {user?.id === review.user_id && (
+              <UpdateButton title="리뷰 수정하기">
+                <ReviewForm
+                  mode="update"
+                  action={updateReview.bind(null, review.id)}
+                  data={review}
+                />
+              </UpdateButton>
+            )}
             <DeleteButton action={deleteReview.bind(null, review.id)} />
           </div>
         )}

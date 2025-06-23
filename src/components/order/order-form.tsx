@@ -100,15 +100,15 @@ export default function OrderForm({
           ))}
         </div>
         <div>
-          <label htmlFor="phoneNumber">전화번호</label>
+          <label htmlFor="phone">전화번호</label>
           <Input
             type="text"
-            id="phoneNumber"
-            name="phoneNumber"
+            id="phone"
+            name="phone"
             className="bg-white"
-            defaultValue={defaultData?.phoneNumber}
+            defaultValue={defaultData?.phone}
           />
-          {formState.errors?.phoneNumber?.map((error) => (
+          {formState.errors?.phone?.map((error) => (
             <p className="text-sm text-red-400" key={error}>
               {error}
             </p>

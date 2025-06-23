@@ -279,6 +279,7 @@ export async function createReview(
     };
   }
 
+  revalidatePath('/');
   return { success: true };
 }
 

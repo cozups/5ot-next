@@ -40,17 +40,17 @@ export default function JoinPage() {
           </div>
 
           <div className="flex flex-col">
-            <label htmlFor="phoneNumber" className="font-semibold">
+            <label htmlFor="phone" className="font-semibold">
               전화번호
             </label>
             <input
               type="text"
-              id="phoneNumber"
-              name="phoneNumber"
+              id="phone"
+              name="phone"
               className="border-b-2"
-              defaultValue={state.values?.phoneNumber}
+              defaultValue={state.values?.phone}
             />
-            {state.errors?.phoneNumber?.map((msg) => (
+            {state.errors?.phone?.map((msg) => (
               <p key={msg} className="text-sm text-red-600">
                 {msg}
               </p>

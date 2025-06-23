@@ -7,7 +7,7 @@ import { z } from 'zod/v4';
 
 const formSchema = z.object({
   receiver: z.string().trim().min(1, '받는 분의 이름을 작성해주세요.'),
-  phoneNumber: z
+  phone: z
     .string()
     .startsWith('010', '전화번호는 반드시 010으로 시작해야 합니다.')
     .length(11, '전화번호는 11자이어야 합니다.'),
@@ -27,7 +27,7 @@ export async function createOrder(
 ) {
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
-    phoneNumber: formData.get('phoneNumber')?.toString() || '',
+    phone: formData.get('phone')?.toString() || '',
     address: formData.get('address')?.toString() || '',
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
@@ -51,7 +51,7 @@ export async function createOrder(
     status: 'processing',
     address: raw.address,
     receiver: raw.receiver,
-    phoneNumber: raw.phoneNumber,
+    phone: raw.phone,
     deliveryRequest: raw.deliveryRequest,
   });
 
@@ -100,7 +100,7 @@ export async function updateOrderData(
 ) {
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
-    phoneNumber: formData.get('phoneNumber')?.toString() || '',
+    phone: formData.get('phone')?.toString() || '',
     address: formData.get('address')?.toString() || '',
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };

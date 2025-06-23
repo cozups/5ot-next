@@ -8,7 +8,7 @@ import { z } from 'zod/v4';
 
 const joinFormSchema = z.object({
   username: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
-  phoneNumber: z
+  phone: z
     .string()
     .startsWith('010', '전화번호는 반드시 010으로 시작해야 합니다.')
     .length(11, '전화번호는 11자이어야 합니다.'),
@@ -47,7 +47,7 @@ export async function createUser(
 ): Promise<JoinFormState> {
   const raw = {
     username: formData.get('username')?.toString() || '',
-    phoneNumber: formData.get('phoneNumber')?.toString() || '',
+    phone: formData.get('phone')?.toString() || '',
     userEmail: formData.get('userEmail')?.toString() || '',
     password: formData.get('password')?.toString() || '',
   };
@@ -69,13 +69,13 @@ export async function createUser(
   await supabase.auth.signUp({
     email: raw.userEmail,
     password: raw.password,
-    phone: raw.phoneNumber,
+    phone: raw.phone,
     options: {
       data: {
         username: raw.username,
         role: 'normal',
         image: '',
-        phone: raw.phoneNumber,
+        phone: raw.phone,
       },
     },
   });

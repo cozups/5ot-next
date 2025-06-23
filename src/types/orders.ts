@@ -11,7 +11,7 @@ export interface Order {
   status: string;
   address: string;
   receiver: string;
-  phoneNumber: string;
+  phone: string;
   deliveryRequest: string;
   profiles?: { name: string };
 }
