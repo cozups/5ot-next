@@ -6,6 +6,7 @@ import { createClient } from '@/utils/supabase/server';
 import { logout } from '@/actions/auth';
 import { ShoppingBasket } from 'lucide-react';
 import { Button } from './ui/button';
+import SearchBar from './search-bar';
 
 const FontPacifico = Pacifico({
   subsets: ['latin'],
@@ -19,14 +20,17 @@ export default async function MainHeader() {
 
   return (
     <div className={clsx('w-full h-20 flex justify-between items-center px-8')}>
-      <h1
-        className={clsx(
-          FontPacifico.className,
-          'text-4xl  hover:text-neutral-500 transition-colors duration-100 text-black'
-        )}
-      >
-        <Link href="/">5ot</Link>
-      </h1>
+      <div className="flex items-end gap-6">
+        <h1
+          className={clsx(
+            FontPacifico.className,
+            'text-4xl  hover:text-neutral-500 transition-colors duration-100 text-black'
+          )}
+        >
+          <Link href="/">5ot</Link>
+        </h1>
+        <SearchBar />
+      </div>
       {!user && (
         <nav>
           <ul className={clsx('flex gap-2 text-black')}>

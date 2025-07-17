@@ -336,3 +336,13 @@ export async function deleteReview(id: string) {
 
   revalidatePath('/');
 }
+
+export async function findByProductName(name: string): Promise<Products[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase.rpc('search_product_by_compact_name', {
+    search_text: name.trim(),
+  });
+
+  return data || [];
+}
