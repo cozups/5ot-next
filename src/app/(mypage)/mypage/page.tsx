@@ -33,10 +33,6 @@ export default async function MyPage() {
     redirect('/login');
   }
 
-  if (data.user.user_metadata.role === 'admin') {
-    redirect('/admin');
-  }
-
   const { data: orderList } = await supabase
     .from('orders')
     .select(`*, profiles:user_id (name)`)
