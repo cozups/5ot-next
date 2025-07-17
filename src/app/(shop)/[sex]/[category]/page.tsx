@@ -1,33 +1,67 @@
 import Link from 'next/link';
 
 import { Products } from '@/types/products';
-import { createClient } from '@/utils/supabase/server';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import { getProductsByPagination } from '@/actions/products';
 
 interface ProductListPageProps {
   params: Promise<{
     sex: string;
     category: string;
   }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function ProductListPage({
   params,
+  searchParams,
 }: ProductListPageProps) {
+  const itemsPerPage = 8;
+  const { page } = await searchParams;
+  const currentPage = Number(page) || 1;
+
   const { sex, category } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('products')
-    .select()
-    .eq('category', `${sex}/${category}`);
+  const { data, count: totalCount } = await getProductsByPagination(
+    `${sex}/${category}`,
+    {
+      pageNum: currentPage,
+      itemsPerPage,
+    }
+  );
+
+  const totalPage = totalCount ? Math.ceil(totalCount / itemsPerPage) : 1;
+  const groupSize = 10;
+  const groupIndex = Math.floor((currentPage - 1) / groupSize);
+
+  const getPaginationList = () => {
+    const startPage = groupIndex * groupSize + 1;
+    const endPage = Math.min(startPage + groupSize - 1, totalPage);
+
+    return Array.from(
+      { length: endPage - startPage + 1 },
+      (_, i) => startPage + i
+    );
+  };
+
+  const paginationList = getPaginationList();
+
+  console.log(paginationList);
 
   return (
     <div>
       <h2 className="text-3xl font-bold my-4">
         {sex === 'men' ? '남성' : '여성'} {category}
       </h2>
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-4 grid-rows-2 gap-6">
         {/* product list */}
         {data?.map((product: Products) => (
           <Link key={product.name} href={`/${sex}/${category}/${product.id}`}>
@@ -57,6 +91,26 @@ export default async function ProductListPage({
           </Link>
         ))}
       </div>
+      <Pagination className="my-8">
+        <PaginationContent>
+          {groupIndex > 0 && (
+            <PaginationPrevious href={`?page=${paginationList[0] - 1}`} />
+          )}
+          {paginationList.map((pageNum: number) => (
+            <PaginationItem key={`page-${pageNum}`}>
+              <PaginationLink
+                href={`?page=${pageNum}`}
+                isActive={pageNum === currentPage}
+              >
+                {pageNum}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+          {groupIndex < Math.floor(totalPage / groupSize) && (
+            <PaginationNext href={`?page=${paginationList[9] + 1}`} />
+          )}
+        </PaginationContent>
+      </Pagination>
     </div>
   );
 }
