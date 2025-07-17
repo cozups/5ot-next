@@ -346,3 +346,20 @@ export async function findByProductName(name: string): Promise<Products[]> {
 
   return data || [];
 }
+
+export async function getProductsByPagination(
+  query: string,
+  options: { pageNum: number; itemsPerPage: number }
+) {
+  const from = (options.pageNum - 1) * options.itemsPerPage;
+  const to = from + options.itemsPerPage - 1;
+
+  const supabase = await createClient();
+  const { data, count } = await supabase
+    .from('products')
+    .select('*', { count: 'exact' })
+    .eq('category', query)
+    .range(from, to);
+
+  return { data, count };
+}
