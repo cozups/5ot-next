@@ -6,7 +6,7 @@ import ProductActionPanel from '@/components/product/product-action-panel';
 import ReviewItem from '@/components/product/review-Item';
 import { Products, Review } from '@/types/products';
 import ReviewForm from '@/components/product/review-form';
-import { createReview } from '@/actions/products';
+import { createReview } from '@/actions/reviews';
 
 export default async function ProductDetailPage({
   params,

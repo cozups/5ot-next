@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ReviewFormState } from '@/actions/products';
+import { ReviewFormState } from '@/actions/reviews';
 import { useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Review } from '@/types/products';

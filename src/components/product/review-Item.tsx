@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
 import UpdateButton from '../update-button';
 import ReviewForm from './review-form';
-import { deleteReview, updateReview } from '@/actions/products';
+import { deleteReview, updateReview } from '@/actions/reviews';
 import DeleteButton from '../delete-button';
 
 export default async function ReviewItem({ review }: { review: Review }) {
