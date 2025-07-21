@@ -2,39 +2,78 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { z } from 'zod/v4';
 
-export async function createCategory(formData: FormData) {
-  const name = (formData.get('categoryName') as string) || '';
-  const sex = (formData.get('categorySex') as string) || '';
+const categoryFormSchema = z.object({
+  name: z.string().trim().min(1, '카테고리 이름을 적어주세요.'),
+  sex: z.string().trim().min(1, '카테고리 성별을 골라주세요.'),
+});
 
-  if (name.trim().length <= 0) {
-    throw new Error('카테고리 이름을 제대로 입력해주세요.');
-  }
-
-  if (sex.length === 0) {
-    throw new Error('카테고리 성별을 골라주세요.');
-  }
-  const supabase = await createClient();
-
-  const { error } = await supabase.from('category').insert({ name, sex });
-
-  if (error) {
-    throw new Error('카테고리 생성에 실패했습니다.');
-  }
-
-  revalidatePath('/admin/category');
+export interface FormState {
+  success: boolean;
+  errors?: Record<string, string[]>;
+  values?: z.infer<typeof categoryFormSchema>;
 }
 
-export async function deleteCategory(id: string) {
-  const supabase = await createClient();
+export async function createCategory(
+  prevState: FormState,
+  formData: FormData
+): Promise<FormState> {
+  const raw = {
+    name: (formData.get('categoryName') as string) || '',
+    sex: (formData.get('categorySex') as string) || '',
+  };
 
-  const { error } = await supabase.from('category').delete().eq('id', id);
+  const result = categoryFormSchema.safeParse(raw);
 
-  if (error) {
-    throw new Error('카테고리 삭제에 실패했습니다.');
+  if (!result.success) {
+    return {
+      success: false,
+      errors: z.flattenError(result.error).fieldErrors,
+      values: raw,
+    };
   }
 
-  // TODO: 카테고리에 엮인 옷들 삭제
+  const supabase = await createClient();
+
+  const { error: insertError } = await supabase
+    .from('category')
+    .insert({ name: raw.name, sex: raw.sex });
+
+  if (insertError) {
+    return {
+      success: false,
+      errors: {
+        insertError: [insertError.message],
+      },
+    };
+  }
 
   revalidatePath('/admin/category');
+  return { success: true };
+}
+
+export async function deleteCategory(
+  id: string
+): Promise<{ success: boolean; errors?: Record<string, string[]> }> {
+  const supabase = await createClient();
+
+  const { error: deleteError } = await supabase
+    .from('category')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    return {
+      success: false,
+      errors: {
+        deleteError: [deleteError.message],
+      },
+    };
+  }
+
+  revalidatePath('/admin/category');
+  return {
+    success: true,
+  };
 }

@@ -1,15 +1,9 @@
-import { createCategory, deleteCategory } from '@/actions/category';
+import { deleteCategory } from '@/actions/category';
 import CategoryProductView from '@/components/category/category-product-view';
+import CreateCategoryForm from '@/components/category/create-category-form';
 import DeleteButton from '@/components/delete-button';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { createClient } from '@/utils/supabase/server';
 import Link from 'next/link';
@@ -34,27 +28,7 @@ export default async function CategoryManagementPage({
         <div>
           {/* 카테고리 추가 */}
           <div className="bg-slate-200 py-4 px-6 rounded-2xl my-8 mx-auto">
-            <form action={createCategory} className="flex flex-col gap-4">
-              <p className="text-lg font-semibold">카테고리 추가</p>
-              <div className="flex items-center gap-4">
-                <Input type="text" name="categoryName" className="bg-white" />
-                <Select name="categorySex">
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="성별" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="men">남성</SelectItem>
-                    <SelectItem value="women">여성</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button
-                variant="outline"
-                className="cursor-pointer self-end w-fit"
-              >
-                추가
-              </Button>
-            </form>
+            <CreateCategoryForm />
           </div>
 
           {/* 카테고리 데이터*/}

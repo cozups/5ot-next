@@ -13,8 +13,31 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { Trash } from 'lucide-react';
+import { toast } from 'sonner';
 
-export default function DeleteButton({ action }: { action: () => void }) {
+export default function DeleteButton({
+  action,
+}: {
+  action: () => Promise<{
+    success: boolean;
+    errors?: Record<string, string[]>;
+  }>;
+}) {
+  const onClickDelete = async () => {
+    const result = await action();
+
+    if (result.success) {
+      toast.success('성공적으로 삭제되었습니다.');
+    }
+    if (result.errors) {
+      Object.values(result.errors)
+        .flat()
+        .forEach((error) => {
+          toast.error('삭제에 실패하였습니다.', { description: error });
+        });
+    }
+  };
+
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -31,7 +54,7 @@ export default function DeleteButton({ action }: { action: () => void }) {
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={action}>삭제</AlertDialogAction>
+          <AlertDialogAction onClick={onClickDelete}>삭제</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
