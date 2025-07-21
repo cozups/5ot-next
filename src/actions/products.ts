@@ -29,12 +29,7 @@ export interface FormState {
   };
 }
 
-export interface ReviewFormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-}
-
-export async function addProduct(
+export async function insertProduct(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
@@ -96,6 +91,13 @@ export async function addProduct(
     .getPublicUrl(data.path);
 
   // DB에 저장
+  const { data: category } = await supabase
+    .from('category')
+    .select()
+    .eq('sex', raw.sex)
+    .eq('name', raw.category)
+    .overrideTypes<Category[]>();
+
   const { error: productUploadError } = await supabase.from('products').insert({
     name: raw.name,
     brand: raw.brand,
@@ -103,6 +105,7 @@ export async function addProduct(
     image: uploadedPath.publicUrl,
     category: `${raw.sex}/${raw.category}`,
     description: raw.description,
+    cat_id: category![0].id,
   });
 
   if (productUploadError) {
@@ -118,7 +121,9 @@ export async function addProduct(
   return { success: true };
 }
 
-export async function deleteProduct(product: Products) {
+export async function deleteProduct(
+  product: Products
+): Promise<{ success: boolean; errors?: Record<string, string[]> }> {
   const supabase = await createClient();
 
   // 이미지 삭제
@@ -130,21 +135,32 @@ export async function deleteProduct(product: Products) {
       .remove([filePath]);
 
     if (deleteImageError) {
-      throw new Error('이미지 삭제에 실패했습니다.');
+      return {
+        success: false,
+        errors: {
+          deleteImageError: [deleteImageError.message],
+        },
+      };
     }
   }
 
   // 데이터 삭제
-  const { error } = await supabase
+  const { error: deleteProductError } = await supabase
     .from('products')
     .delete()
     .eq('id', product.id);
 
-  if (error) {
-    throw new Error('데이터 삭제에 실패했습니다.');
+  if (deleteProductError) {
+    return {
+      success: false,
+      errors: {
+        deleteProductError: [deleteProductError.message],
+      },
+    };
   }
 
   revalidatePath('/admin/product');
+  return { success: true };
 }
 
 export async function updateProduct(
@@ -185,17 +201,17 @@ export async function updateProduct(
   // 이미지 업데이트
   if (raw.image?.size > 0) {
     const filePath = originalData.image.split('/products/')[1];
-    const { data, error } = await supabase.storage
+    const { data, error: imageUpdateError } = await supabase.storage
       .from('products')
       .update(filePath, raw.image, {
         upsert: true,
       });
 
-    if (error) {
+    if (imageUpdateError) {
       return {
         success: false,
         errors: {
-          imageUpdate: ['이미지 업데이트에 실패했습니다.'],
+          imageUpdateError: [imageUpdateError.message],
         },
       };
     }
@@ -233,119 +249,13 @@ export async function updateProduct(
     return {
       success: false,
       errors: {
-        updateError: ['제품을 업데이트 하지 못했습니다.'],
+        productUpdateError: [productUpdateError.message],
       },
     };
   }
 
   revalidatePath('/admin/product');
   return { success: true };
-}
-
-export async function createReview(
-  productId: string,
-  prevState: ReviewFormState,
-  formData: FormData
-): Promise<ReviewFormState> {
-  const raw = {
-    star: formData.get('star')?.toString() || '',
-    content: formData.get('content')?.toString() || '',
-  };
-
-  if (!raw.content.trim().length) {
-    return {
-      success: false,
-      errors: {
-        content: ['리뷰 내용을 입력해주세요.'],
-      },
-    };
-  }
-
-  const supabase = await createClient();
-  const { data: userData, error: userDataError } =
-    await supabase.auth.getUser();
-
-  if (userDataError) {
-    return {
-      success: false,
-      errors: {
-        content: ['유저 데이터를 불러오지 못했습니다.'],
-      },
-    };
-  }
-
-  const { error: insertError } = await supabase.from('reviews').insert({
-    star: raw.star,
-    content: raw.content,
-    product_id: productId,
-    user_id: userData.user.id,
-  });
-
-  if (insertError) {
-    return {
-      success: false,
-      errors: {
-        insertError: ['리뷰를 추가하지 못했습니다.'],
-      },
-    };
-  }
-
-  revalidatePath('/');
-  return { success: true };
-}
-
-export async function updateReview(
-  id: string,
-  prevState: ReviewFormState,
-  formData: FormData
-): Promise<ReviewFormState> {
-  const raw = {
-    star: formData.get('star')?.toString() || '',
-    content: formData.get('content')?.toString() || '',
-  };
-
-  if (!raw.content.trim().length) {
-    return {
-      success: false,
-      errors: {
-        content: ['리뷰 내용을 입력해주세요.'],
-      },
-    };
-  }
-
-  const supabase = await createClient();
-
-  const { error: updateError } = await supabase
-    .from('reviews')
-    .update(raw)
-    .eq('id', id);
-
-  if (updateError) {
-    return {
-      success: false,
-      errors: {
-        updateError: ['리뷰를 업데이트하지 못했습니다.'],
-      },
-    };
-  }
-
-  revalidatePath('/');
-  return { success: true };
-}
-
-export async function deleteReview(id: string) {
-  const supabase = await createClient();
-
-  const { error: deleteError } = await supabase
-    .from('reviews')
-    .delete()
-    .eq('id', id);
-
-  if (deleteError) {
-    throw new Error('리뷰를 삭제하지 못했습니다.');
-  }
-
-  revalidatePath('/');
 }
 
 export async function findByProductName(name: string): Promise<Products[]> {

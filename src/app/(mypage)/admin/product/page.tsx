@@ -1,8 +1,6 @@
 import { deleteProduct } from '@/actions/products';
 import DeleteButton from '@/components/delete-button';
 import ProductForm from '@/components/product/product-form';
-import { Button } from '@/components/ui/button';
-import { DialogClose, DialogFooter } from '@/components/ui/dialog';
 import {
   Table,
   TableBody,
@@ -11,11 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import UpdateProductButton from '@/components/product/update-product-button';
-import UpdateProductForm from '@/components/product/update-product-form';
 import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
+import UpdateProductDialog from '@/components/product/update-product-dialog';
 
 export default async function ProductManagementPage() {
   const supabase = await createClient();
@@ -64,18 +61,7 @@ export default async function ProductManagementPage() {
                   <TableCell>{product.price.toLocaleString()}원</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <UpdateProductButton>
-                        <UpdateProductForm product={product}>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button variant="secondary">취소</Button>
-                            </DialogClose>
-                            <DialogClose asChild>
-                              <Button type="submit">수정</Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </UpdateProductForm>
-                      </UpdateProductButton>
+                      <UpdateProductDialog product={product} />
                       <DeleteButton
                         action={deleteProduct.bind(null, product)}
                       />

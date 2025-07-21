@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { addProduct, FormState } from '@/actions/products';
+import { insertProduct, FormState } from '@/actions/products';
 import {
   Select,
   SelectContent,
@@ -14,11 +14,12 @@ import {
 import { createClient } from '@/utils/supabase/client';
 import { Category } from '@/types/category';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 const initialState: FormState = { success: false };
 
 export default function ProductForm() {
-  const [formState, formAction] = useActionState(addProduct, initialState);
+  const [formState, formAction] = useActionState(insertProduct, initialState);
   const [sex, setSex] = useState<string>('men');
   const [category, setCategory] = useState<Category[]>([]);
   const [pickedImage, setPickedImage] = useState<string | null>(null);
@@ -41,6 +42,19 @@ export default function ProductForm() {
     if (formState.success) {
       formRef.current?.reset();
       setPickedImage(null);
+      toast.success('제품이 추가되었습니다.');
+    }
+
+    if (formState.errors?.insertError) {
+      toast.error('제품 추가 중 문제가 발생하였습니다.', {
+        description: formState.errors.insertError[0],
+      });
+    }
+
+    if (formState.errors?.imageUpload) {
+      toast.error('제품 이미지 업로드 중 문제가 발생하였습니다.', {
+        description: formState.errors.imageUpload[0],
+      });
     }
   }, [formState]);
 
