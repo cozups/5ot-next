@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
 import { generateRandomId } from '@/lib/utils';
+import { Category } from '@/types/category';
 
 const formSchema = z.object({
   name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
@@ -181,6 +182,7 @@ export async function updateProduct(
   const supabase = await createClient();
   let updatedImagePath = '';
 
+  // 이미지 업데이트
   if (raw.image?.size > 0) {
     const filePath = originalData.image.split('/products/')[1];
     const { data, error } = await supabase.storage
@@ -202,13 +204,22 @@ export async function updateProduct(
       .data.publicUrl;
   }
 
+  const { data: category } = await supabase
+    .from('category')
+    .select()
+    .eq('sex', raw.sex)
+    .eq('name', raw.category)
+    .overrideTypes<Category[]>();
+
   const dataToUpdate = {
     name: raw.name,
     brand: raw.brand,
     price: raw.price,
     category: `${raw.sex}/${raw.category}`,
     description: raw.description,
+    cat_id: category![0].id,
   };
+
   const { error: productUpdateError } = await supabase
     .from('products')
     .update(
