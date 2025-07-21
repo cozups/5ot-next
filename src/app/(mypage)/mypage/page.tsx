@@ -1,29 +1,11 @@
-import { deleteUser } from '@/actions/auth';
-import UpdateProfileForm from '@/components/update-profile-form';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { parseToKorTime } from '@/lib/utils';
-import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
+
+import { parseToKorTime } from '@/lib/utils';
+import { createClient } from '@/utils/supabase/server';
 import OrderList from '@/components/order/order-list';
+import DeleteUserDialog from '@/components/delete-user-dialog';
+import UpdateProfileDialog from '@/components/update-profile-dialog';
 
 export default async function MyPage() {
   const supabase = await createClient();
@@ -63,17 +45,7 @@ export default async function MyPage() {
             </p>
           </div>
           <div className="self-end">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="cursor-pointer">프로필 수정</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>프로필 수정하기</DialogTitle>
-                </DialogHeader>
-                <UpdateProfileForm user={data.user} />
-              </DialogContent>
-            </Dialog>
+            <UpdateProfileDialog user={data.user} />
           </div>
         </div>
       </div>
@@ -84,27 +56,7 @@ export default async function MyPage() {
         <OrderList role="normal" list={orderList} />
       </div>
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <form action={deleteUser.bind(null, data.user.id)}>
-            <button className="text-gray-600 underline text-sm mt-4 cursor-pointer">
-              회원 탈퇴하기
-            </button>
-          </form>
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>정말로 탈퇴하시겠습니까?</AlertDialogTitle>
-            <AlertDialogDescription>
-              영구적으로 회원님의 정보가 삭제됩니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>취소</AlertDialogCancel>
-            <AlertDialogAction>탈퇴하기</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteUserDialog user={data.user} />
     </div>
   );
 }

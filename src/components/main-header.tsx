@@ -1,12 +1,13 @@
-import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
+import clsx from 'clsx';
 import { Pacifico } from 'next/font/google';
-import { createClient } from '@/utils/supabase/server';
-import { logout } from '@/actions/auth';
 import { ShoppingBasket } from 'lucide-react';
+
+import { createClient } from '@/utils/supabase/server';
 import { Button } from './ui/button';
 import SearchBar from './search-bar';
+import LogoutButton from './logout-button';
 
 const FontPacifico = Pacifico({
   subsets: ['latin'],
@@ -64,9 +65,7 @@ export default async function MainHeader() {
               <span>장바구니</span>
             </Button>
           </Link>
-          <form action={logout}>
-            <Button className="cursor-pointer">로그아웃</Button>
-          </form>
+          <LogoutButton />
         </div>
       )}
     </div>

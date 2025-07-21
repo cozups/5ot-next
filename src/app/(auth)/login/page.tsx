@@ -2,7 +2,9 @@
 
 import { LoginFormState, loginUser } from '@/actions/auth';
 import Link from 'next/link';
-import { useActionState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 const initialState: LoginFormState = {
   success: false,
@@ -10,6 +12,19 @@ const initialState: LoginFormState = {
 
 export default function LoginPage() {
   const [state, formAction] = useActionState(loginUser, initialState);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success('로그인 되었습니다.');
+      router.replace('/');
+    }
+    if (state.errors?.loginError) {
+      toast.error('로그인에 실패했습니다.', {
+        description: state.errors.loginError[0],
+      });
+    }
+  }, [state, router]);
 
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center">
@@ -57,11 +72,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {state.errors?.result?.map((msg) => (
-          <p key={msg} className="text-sm text-red-600">
-            {msg}
-          </p>
-        ))}
         <button className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">
           로그인 하기
         </button>

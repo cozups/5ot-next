@@ -2,8 +2,8 @@
 
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
+import { User } from '@supabase/supabase-js';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod/v4';
 
 const joinFormSchema = z.object({
@@ -66,7 +66,7 @@ export async function createUser(
   // 데이터 전송 및 유저 가입
   const supabase = await createClient();
 
-  await supabase.auth.signUp({
+  const { error: signUpError } = await supabase.auth.signUp({
     email: raw.userEmail,
     password: raw.password,
     phone: raw.phone,
@@ -80,8 +80,19 @@ export async function createUser(
     },
   });
 
-  // 리다이렉션
-  redirect('/');
+  if (signUpError) {
+    return {
+      success: false,
+      errors: {
+        signUpError: [signUpError.message],
+      },
+      values: raw,
+    };
+  }
+
+  return {
+    success: true,
+  };
 }
 
 export async function loginUser(
@@ -107,25 +118,26 @@ export async function loginUser(
   // 로그인 요청
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error: loginError } = await supabase.auth.signInWithPassword({
     email: raw.userEmail,
     password: raw.password,
   });
 
-  if (error) {
+  if (loginError) {
     const errorMessage =
-      error.code === 'invalid_credentials'
+      loginError.code === 'invalid_credentials'
         ? 'ID 혹은 패스워드가 일치하지 않습니다.'
         : '로그인에 실패했습니다.';
     return {
       success: false,
-      errors: { result: [errorMessage] },
+      errors: { loginError: [errorMessage] },
       values: raw,
     };
   }
 
-  // 리다이렉트
-  redirect('/');
+  return {
+    success: true,
+  };
 }
 
 export async function logout() {
@@ -134,32 +146,62 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw new Error(error.message);
+    return {
+      success: false,
+      errors: {
+        logoutError: [error.message],
+      },
+    };
   }
 
-  redirect('/');
+  return {
+    success: true,
+  };
 }
 
-export async function deleteUser(id: string) {
+export async function deleteUser(user: User) {
   const supabase = await createClient();
 
-  const { error: logoutError } = await supabase.auth.signOut();
+  const { error: deleterUserError } = await supabaseAdmin.auth.admin.deleteUser(
+    user.id
+  );
 
-  if (logoutError) {
-    throw new Error(logoutError.message);
+  if (deleterUserError) {
+    return {
+      success: false,
+      errors: {
+        deleteUserError: [deleterUserError.message],
+      },
+    };
   }
 
-  const { error } = await supabaseAdmin.auth.admin.deleteUser(id);
+  // 유저의 프로필 이미지를 스토리지에서 삭제
+  const image = user.user_metadata.image;
+  if (image) {
+    const path = image.split('/public/profile/')[1];
+    const { error: deleteImageError } = await supabase.storage
+      .from('profile')
+      .remove(path);
 
-  if (error) {
-    throw new Error('회원 탈퇴에 실패했습니다.');
+    if (deleteImageError) {
+      return {
+        success: false,
+        errors: {
+          deleteImageError: [deleteImageError.message],
+        },
+      };
+    }
   }
 
-  redirect('/');
+  // 로그인 세션 삭제
+  await logout();
+  return {
+    success: true,
+  };
 }
 
 export async function updateUser(
-  id: string,
+  user: User,
   prevState: UpdateFormState,
   formData: FormData
 ): Promise<UpdateFormState> {
@@ -183,10 +225,30 @@ export async function updateUser(
   };
   if (raw.image.size > 0) {
     // 이미지 저장 or 기존 이미지 대체
-    const filename = `images/user${id.split('-')[0]}.${
-      raw.image.type.split('/')[1]
-    }`;
+    const extension = raw.image.type.split('/')[1];
+    const filename = `images/user${user.id.split('-')[0]}.${extension}`;
 
+    // 이전 이미지와 새로운 이미지의 확장자가 다른 경우, 이전 이미지를 삭제 해야함
+    const oldImage = user.user_metadata.image;
+    const oldImageExtension = oldImage ? oldImage.split('.')[1] : null;
+
+    if (oldImageExtension !== extension) {
+      const path = oldImage.split('/public/profile/')[1];
+      const { error: deleteImageError } = await supabase.storage
+        .from('profile')
+        .remove(path);
+
+      if (deleteImageError) {
+        return {
+          success: false,
+          errors: {
+            deleteImageError: [deleteImageError.message],
+          },
+        };
+      }
+    }
+
+    // 이미지 업데이트
     const { data: uploadedImage, error: imageUpdateError } =
       await supabase.storage
         .from('profile')
@@ -196,7 +258,7 @@ export async function updateUser(
       return {
         success: false,
         errors: {
-          imageUpload: ['이미지 업데이트에 실패했습니다.'],
+          imageUpdateError: [imageUpdateError.message],
         },
       };
     }
@@ -216,7 +278,7 @@ export async function updateUser(
     return {
       success: false,
       errors: {
-        dataUpdate: ['정보 업데이트에 실패했습니다.'],
+        dataUpdateError: [dataUpdateError.message],
       },
     };
   }

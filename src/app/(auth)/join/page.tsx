@@ -3,7 +3,9 @@
 import Link from 'next/link';
 
 import { createUser, JoinFormState } from '@/actions/auth';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 const initialState: JoinFormState = {
   success: false,
@@ -11,6 +13,21 @@ const initialState: JoinFormState = {
 
 export default function JoinPage() {
   const [state, formAction] = useActionState(createUser, initialState);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success('회원가입에 성공했습니다.', {
+        description: '자동으로 로그인 되었습니다.',
+      });
+      router.push('/');
+    }
+    if (state.errors?.signUpError) {
+      toast.error('회원가입에 실패했습니다.', {
+        description: state.errors.signUpError[0],
+      });
+    }
+  }, [state, router]);
 
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center">
