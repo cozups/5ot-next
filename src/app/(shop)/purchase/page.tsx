@@ -1,6 +1,12 @@
 'use client';
 
-import { createOrder } from '@/actions/orders';
+import { useActionState, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import _ from 'lodash';
+import { toast } from 'sonner';
+
+import { createOrder, OrderFormState } from '@/actions/orders';
 import {
   Table,
   TableBody,
@@ -10,12 +16,19 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Purchase } from '@/types/orders';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import OrderForm from '@/components/order/order-form';
+import { toastError } from '@/lib/utils';
+import { Cart } from '@/types/cart';
+
+const initialState: OrderFormState = { success: false };
 
 export default function PurchasePage() {
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
+  const [formState, formAction] = useActionState(
+    createOrder.bind(null, purchaseData),
+    initialState
+  );
+  const router = useRouter();
 
   useEffect(() => {
     const purchaseStorage: Purchase[] = JSON.parse(
@@ -23,6 +36,39 @@ export default function PurchasePage() {
     );
     setPurchaseData(purchaseStorage);
   }, []);
+
+  useEffect(() => {
+    // 구매에 성공한 경우
+    if (formState.success) {
+      sessionStorage.removeItem('purchase');
+
+      // cart 업데이트 (cart에 저장된 아이템들 중 구매 예정인 아이템 제거)
+      const cartStorage: Cart[] = JSON.parse(
+        sessionStorage.getItem('cart') || '[]'
+      );
+      const updated = _.differenceWith(
+        cartStorage,
+        purchaseData,
+        (cart, purchase) => cart.product.id === purchase.product.id
+      );
+
+      if (updated.length === 0) {
+        // cart 아이템 모두 구매한 경우
+        sessionStorage.removeItem('cart');
+      } else {
+        // cart 아이템 중 일부만 구매한 경우
+        sessionStorage.setItem('cart', JSON.stringify(updated));
+      }
+
+      toast.success('주문이 완료되었습니다.');
+      setPurchaseData([]);
+      router.push('/');
+    }
+
+    if (formState.errors) {
+      toastError('주문 중 문제가 발생하였습니다.', formState.errors);
+    }
+  }, [formState, router]);
 
   const totalPrice = purchaseData.reduce(
     (acc, data) => acc + parseInt(data.product.price) * parseInt(data.qty),
@@ -75,12 +121,9 @@ export default function PurchasePage() {
         {/* 구매 폼 */}
         <div className="bg-slate-100 rounded-2xl p-6">
           <OrderForm
-            action={createOrder.bind(null, purchaseData)}
+            action={formAction}
+            formState={formState}
             mode="purchase"
-            purchase={{
-              data: purchaseData,
-              setData: setPurchaseData,
-            }}
           />
         </div>
       </div>

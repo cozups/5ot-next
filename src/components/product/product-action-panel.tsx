@@ -18,6 +18,7 @@ import {
 } from '../ui/alert-dialog';
 import { Cart } from '@/types/cart';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
@@ -31,6 +32,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
     const index = cartStorage.findIndex((cart) => cart.product.id === id);
 
     if (index > -1) {
+      toast.warning('이미 장바구니에 추가되어 있는 제품입니다.');
       return;
     }
 
@@ -41,6 +43,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
         { product, qty: countRef.current?.value, isSelected: false },
       ])
     );
+    toast.success('장바구니에 제품이 추가되었습니다.');
   };
 
   const redirectToCart = () => {

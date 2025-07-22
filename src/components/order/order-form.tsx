@@ -1,88 +1,27 @@
 'use client';
 
-import {
-  Dispatch,
-  SetStateAction,
-  useActionState,
-  useEffect,
-  useState,
-} from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Textarea } from '../ui/textarea';
-import { FormState } from '@/actions/orders';
-import { Cart } from '@/types/cart';
-import { Order, Purchase } from '@/types/orders';
-import _ from 'lodash';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { DialogFooter } from '../ui/dialog';
-import { DialogClose } from '@radix-ui/react-dialog';
+import { OrderFormState } from '@/actions/orders';
+import { Order } from '@/types/orders';
+import { DialogFooter, DialogClose } from '../ui/dialog';
 
 interface OrderFormProps {
-  action: (prevState: FormState, formData: FormData) => Promise<FormState>;
+  action: (payload: FormData) => void;
   mode: 'purchase' | 'update';
-  purchase?: {
-    data: Purchase[];
-    setData: Dispatch<SetStateAction<Purchase[]>>;
-  };
-  orderId?: string;
+  defaultData?: Order | null;
+  formState: OrderFormState;
 }
-
-const initialState: FormState = { success: false };
 
 export default function OrderForm({
   action,
   mode,
-  purchase,
-  orderId,
+  defaultData,
+  formState,
 }: OrderFormProps) {
-  const [formState, formAction] = useActionState(action, initialState);
-  const router = useRouter();
-  const [defaultData, setDefaultData] = useState<Order | null>(null);
-
-  useEffect(() => {
-    if (mode === 'update' && orderId) {
-      const getOrderData = async () => {
-        const supabase = createClient();
-        const { data } = await supabase
-          .from('orders')
-          .select()
-          .eq('id', orderId);
-
-        setDefaultData(data?.[0]);
-      };
-
-      getOrderData();
-    }
-  }, [orderId, mode]);
-
-  useEffect(() => {
-    if (mode === 'purchase' && formState.success && purchase) {
-      sessionStorage.removeItem('purchase');
-
-      // cart 업데이트
-      const cartStorage: Cart[] = JSON.parse(
-        sessionStorage.getItem('cart') || '[]'
-      );
-      const updated = _.differenceWith(
-        cartStorage,
-        purchase?.data,
-        (cart, purchase) => cart.product.id === purchase.product.id
-      );
-      if (updated.length === 0) {
-        sessionStorage.removeItem('cart');
-      } else {
-        sessionStorage.setItem('cart', JSON.stringify(updated));
-      }
-
-      purchase.setData([]);
-      router.push('/');
-    }
-  }, [formState.success, router, mode]);
-
   return (
-    <form action={formAction} className="h-full flex flex-col justify-between">
+    <form action={action} className="h-full flex flex-col justify-between">
       <div className="flex flex-col gap-4">
         <div>
           <label htmlFor="receiver">받는 분</label>
@@ -157,7 +96,9 @@ export default function OrderForm({
         </DialogFooter>
       )}
       {mode === 'purchase' && (
-        <Button className="cursor-pointer self-end mt-4">제출하기</Button>
+        <Button type="submit" className="cursor-pointer self-end mt-4">
+          제출하기
+        </Button>
       )}
     </form>
   );

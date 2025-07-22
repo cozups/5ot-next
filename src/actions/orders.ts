@@ -1,11 +1,12 @@
 'use server';
 
 import { Purchase } from '@/types/orders';
+import { ApiResponse } from '@/types/response';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
 
-const formSchema = z.object({
+const orderFormSchema = z.object({
   receiver: z.string().trim().min(1, '받는 분의 이름을 작성해주세요.'),
   phone: z
     .string()
@@ -14,15 +15,12 @@ const formSchema = z.object({
   address: z.string().trim().min(1, '주소를 반드시 작성해주세요.'),
 });
 
-export interface FormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-  values?: z.infer<typeof formSchema>;
-}
+type OrderFormSchema = z.infer<typeof orderFormSchema>;
+export type OrderFormState = ApiResponse<OrderFormSchema>;
 
 export async function createOrder(
   products: Purchase[],
-  prevState: FormState,
+  prevState: OrderFormState,
   formData: FormData
 ) {
   const raw = {
@@ -32,7 +30,7 @@ export async function createOrder(
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
-  const result = formSchema.safeParse(raw);
+  const result = orderFormSchema.safeParse(raw);
 
   if (!result.success) {
     return {
@@ -58,7 +56,7 @@ export async function createOrder(
   if (insertError) {
     return {
       success: false,
-      errors: { insertError: ['데이터 전송에 실패했습니다.'] },
+      errors: { insertError: [insertError.message] },
       values: raw,
     };
   }
@@ -72,10 +70,18 @@ export async function deleteOrder(id: string) {
   const { error } = await supabase.from('orders').delete().eq('id', id);
 
   if (error) {
-    throw new Error('주문 삭제에 실패했습니다.');
+    return {
+      success: false,
+      errors: {
+        deleteError: [error.message],
+      },
+    };
   }
 
   revalidatePath('/admin/order');
+  return {
+    success: true,
+  };
 }
 
 export async function updateOrderStatus(id: string, status: string) {
@@ -87,15 +93,23 @@ export async function updateOrderStatus(id: string, status: string) {
     .eq('id', id);
 
   if (error) {
-    throw new Error('주문 상태 업데이트에 실패했습니다.');
+    return {
+      success: false,
+      errors: {
+        updateError: [error.message],
+      },
+    };
   }
 
   revalidatePath('/admin/order');
+  return {
+    success: true,
+  };
 }
 
 export async function updateOrderData(
   id: string,
-  prevState: FormState,
+  prevState: OrderFormState,
   formData: FormData
 ) {
   const raw = {
@@ -105,7 +119,7 @@ export async function updateOrderData(
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
-  const result = formSchema.safeParse(raw);
+  const result = orderFormSchema.safeParse(raw);
 
   if (!result.success) {
     return {
@@ -116,13 +130,16 @@ export async function updateOrderData(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from('orders').update(raw).eq('id', id);
+  const { error: updateDataError } = await supabase
+    .from('orders')
+    .update(raw)
+    .eq('id', id);
 
-  if (error) {
+  if (updateDataError) {
     return {
       success: false,
       errors: {
-        updateData: ['데이터 업데이트에 실패했습니다.'],
+        updateDataError: [updateDataError.message],
       },
       values: raw,
     };
@@ -130,4 +147,23 @@ export async function updateOrderData(
 
   revalidatePath('/mypage');
   return { success: true };
+}
+
+export async function getOrderById(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('orders').select().eq('id', id);
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getDataError: [error.message],
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data,
+  };
 }
