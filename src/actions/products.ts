@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
 import { generateRandomId } from '@/lib/utils';
 import { Category } from '@/types/category';
+import { ApiResponse } from '@/types/response';
 
 const formSchema = z.object({
   name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
@@ -16,23 +17,15 @@ const formSchema = z.object({
   sex: z.string().trim().min(1, '성별을 선택해주세요'),
 });
 
-export interface FormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-  values?: {
-    name: string;
-    brand: string;
-    price: string;
-    category: string;
-    sex: string;
-    description: string;
-  };
-}
+export type ProductFormState = ApiResponse<
+  typeof formSchema,
+  Products[] | null
+>;
 
 export async function insertProduct(
-  prevState: FormState,
+  prevState: ProductFormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<ProductFormState> {
   const raw = {
     name: formData.get('name')?.toString() || '',
     brand: formData.get('brand')?.toString() || '',
@@ -165,9 +158,9 @@ export async function deleteProduct(
 
 export async function updateProduct(
   originalData: Products,
-  prevState: FormState,
+  prevState: ProductFormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<ProductFormState> {
   const raw = {
     name: formData.get('name')?.toString() || '',
     brand: formData.get('brand')?.toString() || '',
@@ -258,7 +251,7 @@ export async function updateProduct(
   return { success: true };
 }
 
-export async function findByProductName(name: string): Promise<Products[]> {
+export async function getProductByName(name: string): Promise<Products[]> {
   const supabase = await createClient();
 
   const { data } = await supabase.rpc('search_product_by_compact_name', {
@@ -283,4 +276,20 @@ export async function getProductsByPagination(
     .range(from, to);
 
   return { data, count };
+}
+
+export async function getProductById(
+  id: string
+): Promise<ApiResponse<null, Products | null>> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('products')
+    .select()
+    .eq('id', id)
+    .single<Products>();
+
+  return {
+    success: true,
+    data,
+  };
 }

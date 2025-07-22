@@ -1,12 +1,11 @@
 'use server';
 
+import { Review } from '@/types/products';
+import { ApiResponse } from '@/types/response';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
-export interface ReviewFormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-}
+export type ReviewFormState = ApiResponse<null, Review[] | null>;
 
 export async function createReview(
   productId: string,
@@ -108,8 +107,29 @@ export async function deleteReview(id: string) {
     .eq('id', id);
 
   if (deleteError) {
-    throw new Error('리뷰를 삭제하지 못했습니다.');
+    return {
+      success: false,
+      errors: {
+        deleteError: [deleteError.message],
+      },
+    };
   }
 
   revalidatePath('/');
+  return { success: true };
+}
+
+export async function getReviews(productId: string): Promise<ReviewFormState> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from('reviews')
+    .select(`*, products:product_id(*), profiles:user_id(*)`)
+    .eq('product_id', productId)
+    .overrideTypes<Review[]>();
+
+  return {
+    success: true,
+    data,
+  };
 }

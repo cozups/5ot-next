@@ -6,7 +6,7 @@ import { Search } from 'lucide-react';
 import _ from 'lodash';
 
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { findByProductName } from '@/actions/products';
+import { getProductByName } from '@/actions/products';
 import { Products } from '@/types/products';
 
 export default function SearchBar() {
@@ -18,7 +18,7 @@ export default function SearchBar() {
   const debounceSearch = useCallback(
     _.debounce(async (query: string) => {
       if (query.trim().length > 0) {
-        const searchedProducts = await findByProductName(query);
+        const searchedProducts = await getProductByName(query);
         setSearchResults(searchedProducts);
       }
     }, 300),

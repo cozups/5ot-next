@@ -1,10 +1,9 @@
 import { Review } from '@/types/products';
 import { Star } from 'lucide-react';
 import { createClient } from '@/utils/supabase/server';
-import UpdateButton from '../update-button';
-import ReviewForm from './review-form';
-import { deleteReview, updateReview } from '@/actions/reviews';
+import { deleteReview } from '@/actions/reviews';
 import DeleteButton from '../delete-button';
+import UpdateReviewDialog from './update-review-dialog';
 
 export default async function ReviewItem({ review }: { review: Review }) {
   const supabase = await createClient();
@@ -27,13 +26,7 @@ export default async function ReviewItem({ review }: { review: Review }) {
         {isAllowed && (
           <div className="flex gap-1">
             {user?.id === review.user_id && (
-              <UpdateButton title="리뷰 수정하기">
-                <ReviewForm
-                  mode="update"
-                  action={updateReview.bind(null, review.id)}
-                  data={review}
-                />
-              </UpdateButton>
+              <UpdateReviewDialog review={review} />
             )}
             <DeleteButton action={deleteReview.bind(null, review.id)} />
           </div>

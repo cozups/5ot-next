@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../ui/select';
-import { FormState, updateProduct } from '@/actions/products';
+import { ProductFormState, updateProduct } from '@/actions/products';
 import { Category } from '@/types/category';
 import { createClient } from '@/utils/supabase/client';
 import { Button } from '../ui/button';
@@ -29,7 +29,7 @@ import {
 import { Input } from '../ui';
 import { toast } from 'sonner';
 
-const initialState: FormState = { success: false };
+const initialState: ProductFormState = { success: false };
 
 export default function UpdateProductDialog({
   product,

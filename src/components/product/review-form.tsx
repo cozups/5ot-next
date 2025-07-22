@@ -10,19 +10,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ReviewFormState } from '@/actions/reviews';
-import { useActionState, useEffect } from 'react';
-import { toast } from 'sonner';
 import { Review } from '@/types/products';
 import { DialogClose, DialogFooter } from '../ui/dialog';
+import { useActionState, useEffect } from 'react';
+import { createReview, ReviewFormState } from '@/actions/reviews';
+import { toastError } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ReviewFormProps {
   mode?: 'write' | 'update';
-  action: (
-    prevState: ReviewFormState,
-    formData: FormData
-  ) => Promise<ReviewFormState>;
+  action?: (payload: FormData) => void;
   data?: Review;
+  productId?: string;
 }
 
 const initialState: ReviewFormState = { success: false };
@@ -31,19 +30,30 @@ export default function ReviewForm({
   mode = 'write',
   action,
   data,
+  productId,
 }: ReviewFormProps) {
-  const [formState, formAction] = useActionState(action, initialState);
+  const [formState, formAction] = useActionState(
+    createReview.bind(null, productId ? productId : ''),
+    initialState
+  );
 
   useEffect(() => {
-    if (formState.errors) {
-      Object.entries(formState.errors).map(([, errors]) => {
-        errors.map((e) => toast.error(e));
-      });
+    if (mode === 'write') {
+      if (formState.success) {
+        toast.success('리뷰가 작성되었습니다.');
+      }
+
+      if (formState.errors) {
+        toastError('리뷰 작성 중 문제가 발생했습니다.', formState.errors);
+      }
     }
-  }, [formState.errors]);
+  }, [formState, mode]);
 
   return (
-    <form action={formAction} className="my-2 flex flex-col gap-4">
+    <form
+      action={mode === 'write' ? formAction : action}
+      className="my-2 flex flex-col gap-4"
+    >
       <div className="flex items-center gap-2 mt-4">
         <Star fill="orange" className="w-4 h-4" />
         <Select name="star" defaultValue={mode === 'update' ? data?.star : '5'}>

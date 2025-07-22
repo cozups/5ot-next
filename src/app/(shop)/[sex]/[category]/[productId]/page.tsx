@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
-import { createClient } from '@/utils/supabase/server';
 import ProductActionPanel from '@/components/product/product-action-panel';
 import ReviewItem from '@/components/product/review-Item';
-import { Products, Review } from '@/types/products';
+import { Review } from '@/types/products';
 import ReviewForm from '@/components/product/review-form';
-import { createReview } from '@/actions/reviews';
+import { getReviews } from '@/actions/reviews';
+import { getProductById } from '@/actions/products';
+import { toastError } from '@/lib/utils';
 
 export default async function ProductDetailPage({
   params,
@@ -16,17 +17,18 @@ export default async function ProductDetailPage({
   }>;
 }) {
   const { productId } = await params;
-  const supabase = await createClient();
-  const { data: product } = await supabase
-    .from('products')
-    .select()
-    .eq('id', productId)
-    .single<Products>();
+  const { errors: productErrors, data: product } = await getProductById(
+    productId
+  );
+  const { errors: reviewErrors, data: reviews } = await getReviews(productId);
 
-  const { data: reviewList } = await supabase
-    .from('reviews')
-    .select(`*, products:product_id(*), profiles:user_id(*)`)
-    .eq('product_id', productId);
+  if (productErrors) {
+    toastError('제품 정보를 불러오던 중 문제가 발생했습니다.', productErrors);
+  }
+
+  if (reviewErrors) {
+    toastError('리뷰를 불러오던 중 문제가 발생했습니다.', reviewErrors);
+  }
 
   if (!product) {
     notFound();
@@ -48,10 +50,10 @@ export default async function ProductDetailPage({
       </div>
       <div>
         {/* reviews */}
-        <ReviewForm action={createReview.bind(null, product.id)} />
+        <ReviewForm productId={product.id} />
         <div>
           <ul className="flex flex-col gap-6 mt-8">
-            {reviewList?.map((review: Review) => (
+            {reviews?.map((review: Review) => (
               <ReviewItem key={review.id} review={review} />
             ))}
           </ul>
