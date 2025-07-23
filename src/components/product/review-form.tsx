@@ -56,7 +56,7 @@ export default function ReviewForm({
     >
       <div className="flex items-center gap-2 mt-4">
         <Star fill="orange" className="w-4 h-4" />
-        <Select name="star" defaultValue={mode === 'update' ? data?.star : '5'}>
+        <Select name="star" defaultValue={data ? data.star.toString() : '5'}>
           <SelectTrigger>
             <SelectValue placeholder="평점" />
           </SelectTrigger>
