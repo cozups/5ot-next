@@ -12,7 +12,7 @@ const orderFormSchema = z.object({
     .string()
     .startsWith('010', '전화번호는 반드시 010으로 시작해야 합니다.')
     .length(11, '전화번호는 11자이어야 합니다.'),
-  address: z.string().trim().min(1, '주소를 반드시 작성해주세요.'),
+  baseAddress: z.string().trim().min(1, '주소를 반드시 작성해주세요.'),
 });
 
 type OrderFormSchema = z.infer<typeof orderFormSchema>;
@@ -26,10 +26,8 @@ export async function createOrder(
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
     phone: formData.get('phone')?.toString() || '',
-    address:
-      (formData.get('base-address')?.toString() || '') +
-      ', ' +
-      (formData.get('detail-address')?.toString() || ''),
+    baseAddress: formData.get('base-address')?.toString() || '',
+    detailAddress: formData.get('detail-address')?.toString() || '',
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
@@ -50,7 +48,9 @@ export async function createOrder(
     user_id: authData.user?.id,
     products,
     status: 'processing',
-    address: raw.address,
+    address: raw.detailAddress
+      ? raw.baseAddress + ', ' + raw.detailAddress
+      : raw.baseAddress,
     receiver: raw.receiver,
     phone: raw.phone,
     deliveryRequest: raw.deliveryRequest,
@@ -118,10 +118,8 @@ export async function updateOrderData(
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
     phone: formData.get('phone')?.toString() || '',
-    address:
-      (formData.get('base-address')?.toString() || '') +
-      ', ' +
-      (formData.get('detail-address')?.toString() || ''),
+    baseAddress: formData.get('base-address')?.toString() || '',
+    detailAddress: formData.get('detail-address')?.toString() || '',
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
@@ -138,7 +136,14 @@ export async function updateOrderData(
   const supabase = await createClient();
   const { error: updateDataError } = await supabase
     .from('orders')
-    .update(raw)
+    .update({
+      receiver: formData.get('receiver')?.toString() || '',
+      phone: formData.get('phone')?.toString() || '',
+      address: raw.detailAddress
+        ? raw.baseAddress + ', ' + raw.detailAddress
+        : raw.baseAddress,
+      deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
+    })
     .eq('id', id);
 
   if (updateDataError) {

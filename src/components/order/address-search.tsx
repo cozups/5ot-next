@@ -56,8 +56,12 @@ export default function AddressSearch({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <Input value={address.base} className="bg-white" disabled />
-        <Input name="base-address" value={address.base} className="hidden" />
+        <Input defaultValue={address.base} className="bg-white" disabled />
+        <Input
+          name="base-address"
+          defaultValue={address.base}
+          className="hidden"
+        />
         <Dialog open={isOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setIsOpen(true)}>주소 찾기</Button>
