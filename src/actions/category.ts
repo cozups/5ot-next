@@ -1,5 +1,6 @@
 'use server';
 
+import { ApiResponse } from '@/types/response';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
@@ -9,16 +10,12 @@ const categoryFormSchema = z.object({
   sex: z.string().trim().min(1, '카테고리 성별을 골라주세요.'),
 });
 
-export interface FormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-  values?: z.infer<typeof categoryFormSchema>;
-}
+export type CategoryFormState = ApiResponse<typeof categoryFormSchema, null>;
 
 export async function createCategory(
-  prevState: FormState,
+  prevState: CategoryFormState,
   formData: FormData
-): Promise<FormState> {
+): Promise<CategoryFormState> {
   const raw = {
     name: (formData.get('categoryName') as string) || '',
     sex: (formData.get('categorySex') as string) || '',

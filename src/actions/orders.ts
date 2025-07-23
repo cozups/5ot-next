@@ -22,11 +22,7 @@ export async function createOrder(
   products: Purchase[],
   prevState: OrderFormState,
   formData: FormData
-) {
-  console.log(
-    formData.get('base-address')?.toString(),
-    formData.get('detail-address')?.toString()
-  );
+): Promise<OrderFormState> {
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
     phone: formData.get('phone')?.toString() || '',

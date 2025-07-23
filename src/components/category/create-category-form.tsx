@@ -1,6 +1,6 @@
 'use client';
 
-import { createCategory, FormState } from '@/actions/category';
+import { createCategory, CategoryFormState } from '@/actions/category';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 
-const initialState: FormState = { success: false };
+const initialState: CategoryFormState = { success: false };
 
 export default function CreateCategoryForm() {
   const [formState, formAction] = useActionState(createCategory, initialState);

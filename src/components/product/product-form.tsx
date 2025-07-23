@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { insertProduct, FormState } from '@/actions/products';
+import { insertProduct, ProductFormState } from '@/actions/products';
 import {
   Select,
   SelectContent,
@@ -16,7 +16,7 @@ import { Category } from '@/types/category';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
-const initialState: FormState = { success: false };
+const initialState: ProductFormState = { success: false };
 
 export default function ProductForm() {
   const [formState, formAction] = useActionState(insertProduct, initialState);

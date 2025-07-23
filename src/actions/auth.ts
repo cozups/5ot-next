@@ -1,5 +1,6 @@
 'use server';
 
+import { ApiResponse } from '@/types/response';
 import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
 import { User } from '@supabase/supabase-js';
@@ -21,25 +22,17 @@ const loginFormSchema = z.object({
   password: z.string().trim().min(6, '6자 이상의 암호를 입력해주세요.'),
 });
 
-export interface FormState {
-  success: boolean;
-  errors?: Record<string, string[]>;
-}
+export type JoinFormState = ApiResponse<typeof joinFormSchema, null>;
 
-export interface JoinFormState extends FormState {
-  values?: z.infer<typeof joinFormSchema>;
-}
+export type LoginFormState = ApiResponse<typeof loginFormSchema, null>;
 
-export interface LoginFormState extends FormState {
-  values?: z.infer<typeof loginFormSchema>;
-}
-
-export interface UpdateFormState extends FormState {
-  values?: {
+export type UpdateFormState = ApiResponse<
+  {
     username: string;
     image: File;
-  };
-}
+  },
+  null
+>;
 
 export async function createUser(
   prevState: JoinFormState,
