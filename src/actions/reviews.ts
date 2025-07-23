@@ -40,7 +40,7 @@ export async function createReview(
   }
 
   const { error: insertError } = await supabase.from('reviews').insert({
-    star: raw.star,
+    star: Number(raw.star),
     content: raw.content,
     product_id: productId,
     user_id: userData.user.id,
@@ -50,7 +50,7 @@ export async function createReview(
     return {
       success: false,
       errors: {
-        insertError: ['리뷰를 추가하지 못했습니다.'],
+        insertError: [insertError.message],
       },
     };
   }

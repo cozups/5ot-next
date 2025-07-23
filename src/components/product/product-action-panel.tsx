@@ -3,7 +3,7 @@
 import { Products } from '@/types/products';
 import { useRef } from 'react';
 import { Button } from '../ui/button';
-import { ShoppingBasket } from 'lucide-react';
+import { ShoppingBasket, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   AlertDialog,
@@ -64,6 +64,10 @@ export default function ProductActionPanel({ product }: { product: Products }) {
         <div>
           <h2 className="text-2xl font-semibold">{product.name}</h2>
           <p className="text-sm text-gray-400">{product.brand}</p>
+          <p className="flex items-center gap-1">
+            <Star className="w-4 h-4" fill="orange" />{' '}
+            <span>{product.rate.toFixed(2)}</span>
+          </p>
         </div>
 
         <div className="w-full flex flex-col items-start">

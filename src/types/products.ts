@@ -7,7 +7,7 @@ export type Products = {
   image: string;
   brand: string;
   category: string;
-  rate: string;
+  rate: number;
 };
 
 export type Review = {
@@ -16,7 +16,7 @@ export type Review = {
   user_id: string;
   product_id: string;
   content: string;
-  star: string;
+  star: number;
   profiles?: { name: string };
   products: Products;
 };

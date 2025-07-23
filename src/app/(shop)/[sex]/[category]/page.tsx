@@ -77,9 +77,7 @@ export default async function ProductListPage({
               <div className="flex justify-between mt-3">
                 <div className="flex items-center gap-1">
                   <Star fill="orange" className="w-4 h-4" />
-                  <span className="text-sm">
-                    {parseInt(product.rate).toFixed(2)}
-                  </span>
+                  <span className="text-sm">{product.rate.toFixed(2)}</span>
                 </div>
                 <div>
                   <span>{product.price.toLocaleString()}원</span>
