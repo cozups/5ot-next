@@ -19,10 +19,12 @@ import { Purchase } from '@/types/orders';
 import OrderForm from '@/components/order/order-form';
 import { toastError } from '@/lib/utils';
 import { Cart } from '@/types/cart';
+import { useCartStore } from '@/store';
 
 const initialState: OrderFormState = { success: false };
 
 export default function PurchasePage() {
+  const { data: cartData, setData: setCartData } = useCartStore();
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
   const [formState, formAction] = useActionState(
     createOrder.bind(null, purchaseData),
@@ -43,11 +45,8 @@ export default function PurchasePage() {
       sessionStorage.removeItem('purchase');
 
       // cart 업데이트 (cart에 저장된 아이템들 중 구매 예정인 아이템 제거)
-      const cartStorage: Cart[] = JSON.parse(
-        localStorage.getItem('cart') || '[]'
-      );
       const updated = _.differenceWith(
-        cartStorage,
+        cartData,
         purchaseData,
         (cart, purchase) => cart.product.id === purchase.product.id
       );
@@ -55,9 +54,11 @@ export default function PurchasePage() {
       if (updated.length === 0) {
         // cart 아이템 모두 구매한 경우
         localStorage.removeItem('cart');
+        setCartData([]);
       } else {
         // cart 아이템 중 일부만 구매한 경우
         localStorage.setItem('cart', JSON.stringify(updated));
+        setCartData(updated);
       }
 
       toast.success('주문이 완료되었습니다.');

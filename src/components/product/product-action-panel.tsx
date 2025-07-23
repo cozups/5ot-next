@@ -19,30 +19,28 @@ import {
 import { Cart } from '@/types/cart';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useCartStore } from '@/store';
 
 export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const { data: cartData, setData: setCartData } = useCartStore();
 
   const onAddCart = (id: string) => {
-    const cartStorage: Cart[] = JSON.parse(
-      localStorage.getItem('cart') || '[]'
-    );
-
-    const index = cartStorage.findIndex((cart) => cart.product.id === id);
+    const index = cartData.findIndex((cart) => cart.product.id === id);
 
     if (index > -1) {
       toast.warning('이미 장바구니에 추가되어 있는 제품입니다.');
       return;
     }
 
-    localStorage.setItem(
-      'cart',
-      JSON.stringify([
-        ...cartStorage,
-        { product, qty: countRef.current?.value, isSelected: false },
-      ])
-    );
+    const addedCart = [
+      ...cartData,
+      { product, qty: countRef.current?.value || '1', isSelected: false },
+    ];
+
+    localStorage.setItem('cart', JSON.stringify(addedCart));
+    setCartData(addedCart);
     toast.success('장바구니에 제품이 추가되었습니다.');
   };
 
@@ -65,7 +63,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
           <h2 className="text-2xl font-semibold">{product.name}</h2>
           <p className="text-sm text-gray-400">{product.brand}</p>
           <p className="flex items-center gap-1">
-            <Star className="w-4 h-4" fill="orange" />{' '}
+            <Star className="w-4 h-4" fill="orange" />
             <span>{product.rate.toFixed(2)}</span>
           </p>
         </div>

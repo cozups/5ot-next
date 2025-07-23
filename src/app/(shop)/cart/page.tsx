@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useCartStore } from '@/store';
 import { Cart } from '@/types/cart';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
@@ -19,15 +20,8 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function CartPage() {
-  const [cartData, setCartData] = useState<Cart[]>([]);
+  const { data: cartData, setData: setCartData } = useCartStore();
   const router = useRouter();
-
-  useEffect(() => {
-    const cartStorage: Cart[] = JSON.parse(
-      localStorage.getItem('cart') || '[]'
-    );
-    setCartData(cartStorage);
-  }, []);
 
   const toggleCart = (id: string) => {
     const updated = cartData.map((cart) =>
@@ -60,9 +54,11 @@ export default function CartPage() {
 
     if (!updated.length) {
       localStorage.removeItem('cart');
+      setCartData([]);
       return;
     }
     localStorage.setItem('cart', JSON.stringify(updated));
+    setCartData(updated);
   };
 
   const onClickPurchase = () => {

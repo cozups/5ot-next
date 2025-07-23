@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/server';
 import { Button } from './ui/button';
 import SearchBar from './search-bar';
 import LogoutButton from './logout-button';
+import CartCount from './ui/cart-count';
 
 const FontPacifico = Pacifico({
   subsets: ['latin'],
@@ -60,10 +61,13 @@ export default async function MainHeader() {
             </div>
           </Link>
           <Link href="/cart">
-            <Button className="flex items-center gap-2 cursor-pointer bg-blue-300 hover:bg-blue-400">
-              <ShoppingBasket />
-              <span>장바구니</span>
-            </Button>
+            <div className="relative">
+              <CartCount />
+              <Button className="flex items-center gap-2 cursor-pointer bg-blue-300 hover:bg-blue-400">
+                <ShoppingBasket />
+                <span>장바구니</span>
+              </Button>
+            </div>
           </Link>
           <LogoutButton />
         </div>
