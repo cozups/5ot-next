@@ -1,6 +1,6 @@
 'use server';
 
-import { Purchase } from '@/types/orders';
+import { Order, Purchase } from '@/types/orders';
 import { ApiResponse } from '@/types/response';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
@@ -16,17 +16,24 @@ const orderFormSchema = z.object({
 });
 
 type OrderFormSchema = z.infer<typeof orderFormSchema>;
-export type OrderFormState = ApiResponse<OrderFormSchema>;
+export type OrderFormState = ApiResponse<OrderFormSchema, Order>;
 
 export async function createOrder(
   products: Purchase[],
   prevState: OrderFormState,
   formData: FormData
 ) {
+  console.log(
+    formData.get('base-address')?.toString(),
+    formData.get('detail-address')?.toString()
+  );
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
     phone: formData.get('phone')?.toString() || '',
-    address: formData.get('address')?.toString() || '',
+    address:
+      (formData.get('base-address')?.toString() || '') +
+      ', ' +
+      (formData.get('detail-address')?.toString() || ''),
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
@@ -111,11 +118,14 @@ export async function updateOrderData(
   id: string,
   prevState: OrderFormState,
   formData: FormData
-) {
+): Promise<OrderFormState> {
   const raw = {
     receiver: formData.get('receiver')?.toString() || '',
     phone: formData.get('phone')?.toString() || '',
-    address: formData.get('address')?.toString() || '',
+    address:
+      (formData.get('base-address')?.toString() || '') +
+      ', ' +
+      (formData.get('detail-address')?.toString() || ''),
     deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
   };
 
