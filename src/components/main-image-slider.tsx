@@ -22,7 +22,7 @@ export default function MainImageSlider() {
       <CarouselContent className="h-full -mt-0">
         <CarouselItem className="relative">
           <Image
-            src="/images/main-clothes-1.avif"
+            src="/images/main-1.jpg"
             fill
             className="object-cover"
             alt=""
@@ -30,7 +30,7 @@ export default function MainImageSlider() {
         </CarouselItem>
         <CarouselItem className="relative">
           <Image
-            src="/images/main-clothes-2.avif"
+            src="/images/main-2.jpg"
             fill
             className="object-cover"
             alt=""
@@ -38,7 +38,7 @@ export default function MainImageSlider() {
         </CarouselItem>
         <CarouselItem className="relative">
           <Image
-            src="/images/main-clothes-3.avif"
+            src="/images/main-3.jpg"
             fill
             className="object-cover"
             alt=""
