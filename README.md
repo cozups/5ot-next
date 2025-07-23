@@ -1,5 +1,8 @@
 # 5ot-Next
 
+![5ot-next](https://github.com/user-attachments/assets/69ddc643-6a7e-416e-b087-8a303d8b2750)
+
+
 이 프로젝트는 과거 팀 프로젝트 [5ot](https://github.com/cozups/5ot)을 Next.js 기반으로 전환하고 개선하는 과정에서 진행되었습니다.
 
 - 기존 프로젝트는 Express를 기반으로 서버를 구동하고, views 라우터를 이용해 화면을 렌더링하는 방식이었습니다.
