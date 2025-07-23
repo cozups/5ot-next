@@ -24,7 +24,7 @@ export default function CartPage() {
 
   useEffect(() => {
     const cartStorage: Cart[] = JSON.parse(
-      sessionStorage.getItem('cart') || '[]'
+      localStorage.getItem('cart') || '[]'
     );
     setCartData(cartStorage);
   }, []);
@@ -33,7 +33,7 @@ export default function CartPage() {
     const updated = cartData.map((cart) =>
       cart.product.id === id ? { ...cart, isSelected: !cart.isSelected } : cart
     );
-    sessionStorage.setItem('cart', JSON.stringify(updated));
+    localStorage.setItem('cart', JSON.stringify(updated));
     setCartData(updated);
   };
 
@@ -49,7 +49,7 @@ export default function CartPage() {
     if (index > -1) {
       const updated = [...cartData];
       updated[index] = { ...updated[index], qty: newQty };
-      sessionStorage.setItem('cart', JSON.stringify(updated));
+      localStorage.setItem('cart', JSON.stringify(updated));
       setCartData(updated);
     }
   };
@@ -59,10 +59,10 @@ export default function CartPage() {
     setCartData(updated);
 
     if (!updated.length) {
-      sessionStorage.removeItem('cart');
+      localStorage.removeItem('cart');
       return;
     }
-    sessionStorage.setItem('cart', JSON.stringify(updated));
+    localStorage.setItem('cart', JSON.stringify(updated));
   };
 
   const onClickPurchase = () => {

@@ -44,7 +44,7 @@ export default function PurchasePage() {
 
       // cart 업데이트 (cart에 저장된 아이템들 중 구매 예정인 아이템 제거)
       const cartStorage: Cart[] = JSON.parse(
-        sessionStorage.getItem('cart') || '[]'
+        localStorage.getItem('cart') || '[]'
       );
       const updated = _.differenceWith(
         cartStorage,
@@ -54,10 +54,10 @@ export default function PurchasePage() {
 
       if (updated.length === 0) {
         // cart 아이템 모두 구매한 경우
-        sessionStorage.removeItem('cart');
+        localStorage.removeItem('cart');
       } else {
         // cart 아이템 중 일부만 구매한 경우
-        sessionStorage.setItem('cart', JSON.stringify(updated));
+        localStorage.setItem('cart', JSON.stringify(updated));
       }
 
       toast.success('주문이 완료되었습니다.');

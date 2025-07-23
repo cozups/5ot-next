@@ -26,7 +26,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
 
   const onAddCart = (id: string) => {
     const cartStorage: Cart[] = JSON.parse(
-      sessionStorage.getItem('cart') || '[]'
+      localStorage.getItem('cart') || '[]'
     );
 
     const index = cartStorage.findIndex((cart) => cart.product.id === id);
@@ -36,7 +36,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
       return;
     }
 
-    sessionStorage.setItem(
+    localStorage.setItem(
       'cart',
       JSON.stringify([
         ...cartStorage,
