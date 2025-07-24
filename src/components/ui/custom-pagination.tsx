@@ -12,7 +12,7 @@ interface CustomPaginationProps {
   totalPage: number;
 }
 
-export default async function CustomPagination({
+export default function CustomPagination({
   currentPage,
   totalPage,
 }: CustomPaginationProps) {

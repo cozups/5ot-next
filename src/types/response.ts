@@ -8,8 +8,6 @@ export interface ApiResponse<T, U> {
 }
 
 export interface PaginationResponse<T> {
-  success: boolean;
-  errors?: Record<string, string[]>;
   data?: T | null;
   count?: number;
 }

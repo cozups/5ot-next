@@ -151,20 +151,13 @@ export async function getReviewsByPagination(
     .range(from, to);
 
   if (error) {
-    return {
-      success: false,
-      errors: {
-        getReviewsError: [error.message],
-      },
-    };
+    throw new Error(error.message);
   }
 
-  return { success: true, data, count: count || 0 };
+  return { data, count: count || 0 };
 }
 
-export async function getRecentReviews(
-  length: number
-): Promise<ReviewFormState> {
+export async function getRecentReviews(length: number) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -184,7 +177,6 @@ export async function getRecentReviews(
   }
 
   return {
-    success: true,
     data,
   };
 }

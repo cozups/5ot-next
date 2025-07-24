@@ -2,13 +2,11 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 
 import ProductActionPanel from '@/components/product/product-action-panel';
-import ReviewItem from '@/components/product/review-Item';
-import { Review } from '@/types/products';
 import ReviewForm from '@/components/product/review-form';
-import { getReviews, getReviewsByPagination } from '@/actions/reviews';
+import { getReviewsByPagination } from '@/actions/reviews';
 import { getProductById } from '@/actions/products';
-import { getTotalPage, toastError } from '@/lib/utils';
-import CustomPagination from '@/components/ui/custom-pagination';
+import { toastError } from '@/lib/utils';
+import ReviewList from '@/components/product/review-list';
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -28,22 +26,14 @@ export default async function ProductDetailPage({
   const { errors: productErrors, data: product } = await getProductById(
     productId
   );
-  const {
-    errors: reviewErrors,
-    data: reviews,
-    count: reviewTotalCount,
-  } = await getReviewsByPagination(productId, {
-    pageNum: currentPage,
-    itemsPerPage: 5,
-  });
-  const totalPage = getTotalPage(reviewTotalCount || 0, 5);
+  const { data: reviews, count: reviewTotalCount } =
+    await getReviewsByPagination(productId, {
+      pageNum: currentPage,
+      itemsPerPage: 5,
+    });
 
   if (productErrors) {
     toastError('제품 정보를 불러오던 중 문제가 발생했습니다.', productErrors);
-  }
-
-  if (reviewErrors) {
-    toastError('리뷰를 불러오던 중 문제가 발생했습니다.', reviewErrors);
   }
 
   if (!product) {
@@ -67,16 +57,11 @@ export default async function ProductDetailPage({
       <div>
         {/* reviews */}
         <ReviewForm productId={product.id} />
-        <div>
-          <ul className="flex flex-col gap-6 mt-8">
-            {reviews?.map((review: Review) => (
-              <ReviewItem key={review.id} review={review} panel />
-            ))}
-          </ul>
-        </div>
-        {!!reviewTotalCount && (
-          <CustomPagination currentPage={currentPage} totalPage={totalPage} />
-        )}
+        <ReviewList
+          initialData={{ data: reviews, count: reviewTotalCount }}
+          page={currentPage}
+          productId={productId}
+        />
       </div>
     </div>
   );

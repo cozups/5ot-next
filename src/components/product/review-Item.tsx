@@ -1,12 +1,15 @@
+'use client';
+
 import { Review } from '@/types/products';
 import { Star } from 'lucide-react';
-import { createClient } from '@/utils/supabase/server';
 import { deleteReview } from '@/actions/reviews';
 import DeleteButton from '../delete-button';
 import UpdateReviewDialog from './update-review-dialog';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { getUser } from '@/actions/auth';
 
-export default async function ReviewItem({
+export default function ReviewItem({
   review,
   panel = false,
   className,
@@ -17,10 +20,12 @@ export default async function ReviewItem({
   className?: string;
   showProducts?: boolean;
 }) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: user } = useQuery({
+    queryKey: ['user'],
+    queryFn: getUser,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const isAllowed =
     user?.user_metadata.role === 'admin' || user?.id === review.user_id;
 

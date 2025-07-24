@@ -5,6 +5,7 @@ import MainHeader from '@/components/main-header';
 import Footer from '@/components/footer';
 import clsx from 'clsx';
 import { Toaster } from '@/components/ui/sonner';
+import Providers from './providers';
 
 const NotoSansKr = Noto_Sans_KR({
   subsets: ['latin'],
@@ -30,7 +31,7 @@ export default function RootLayout({
         )}
       >
         <MainHeader />
-        {children}
+        <Providers>{children}</Providers>
         <Footer />
         <Toaster expand position="bottom-right" richColors />
       </body>

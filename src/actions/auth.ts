@@ -279,3 +279,27 @@ export async function updateUser(
   revalidatePath('/', 'layout');
   return { success: true };
 }
+
+export async function getUser() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return user;
+}
+
+export async function getUserList() {
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}

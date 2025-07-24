@@ -1,15 +1,15 @@
-import Image from 'next/image';
-
 import { getRecentReviews } from '@/actions/reviews';
 import ReviewItem from '@/components/product/review-Item';
 import { getOrderProcessRate } from '@/lib/utils';
 import { Order } from '@/types/orders';
-import { supabaseAdmin } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
+import UserList from '@/components/admin/user-list';
+import { getUserList } from '@/actions/auth';
+import ReviewList from '@/components/product/review-list';
 
 export default async function AdminPage() {
   const supabase = await createClient();
-  const { data: userListData } = await supabaseAdmin.auth.admin.listUsers();
+  const { data: userListData } = await getUserList();
 
   const { data: orders } = await supabase
     .from('orders')
@@ -38,42 +38,15 @@ export default async function AdminPage() {
           {/* 총 회원 수 */}
           <div className="h-96 bg-gray-100 rounded-2xl p-4 flex flex-col">
             <h2 className="text-xl font-semibold">회원</h2>
-            <div className="mt-4 flex flex-col gap-2 overflow-auto">
-              {userListData.users?.map((user) => (
-                <div
-                  key={user.id}
-                  className="h-12 bg-white rounded-xl flex items-center justify-between p-2 text-sm text-gray-600"
-                >
-                  <div className="w-1/3 grid grid-cols-3 items-center gap-2">
-                    <div className="w-8 h-8 rounded-full relative object-cover overflow-hidden">
-                      <Image
-                        src={user.user_metadata.image || '/images/user.png'}
-                        fill
-                        alt={`${user.user_metadata.username} image`}
-                      />
-                    </div>
-                    <p>{user.user_metadata.username}</p>
-                    <p className="text-xs">{user.user_metadata.email}</p>
-                  </div>
-                  <p>{user.user_metadata.role}</p>
-                </div>
-              ))}
-            </div>
+            <UserList initialData={userListData} />
           </div>
 
           {/* 후기 */}
-          <div className="h-96 bg-gray-100 rounded-2xl p-4 flex flex-col justify-between">
+          <div className="h-96 bg-gray-100 rounded-2xl p-4 flex flex-col">
             <h2 className="text-xl font-semibold">최근 리뷰</h2>
-            <ul className="mt-4 flex flex-col gap-2 overflow-auto">
-              {reviews?.map((review) => (
-                <ReviewItem
-                  key={review.id}
-                  review={review}
-                  className="bg-white"
-                  showProducts
-                />
-              ))}
-            </ul>
+            <div className="mt-4 flex flex-col gap-2 overflow-auto">
+              <ReviewList initialData={{ data: reviews, count: 0 }} recent />
+            </div>
           </div>
         </div>
       </div>

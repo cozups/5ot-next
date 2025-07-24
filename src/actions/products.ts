@@ -264,7 +264,7 @@ export async function getProductByName(name: string): Promise<Products[]> {
 export async function getProductsByPagination(
   query: string,
   options: { pageNum: number; itemsPerPage: number }
-): Promise<PaginationResponse<Products[]>> {
+) {
   const from = (options.pageNum - 1) * options.itemsPerPage;
   const to = from + options.itemsPerPage - 1;
 
@@ -277,15 +277,10 @@ export async function getProductsByPagination(
     .overrideTypes<Products[]>();
 
   if (error) {
-    return {
-      success: false,
-      errors: {
-        getProductsError: [error.message],
-      },
-    };
+    throw new Error(error.message);
   }
 
-  return { success: true, data, count: count || 0 };
+  return { data, count: count || 0 };
 }
 
 export async function getAllProductsByPagination(options: {
@@ -303,15 +298,10 @@ export async function getAllProductsByPagination(options: {
     .overrideTypes<Products[]>();
 
   if (error) {
-    return {
-      success: false,
-      errors: {
-        getProductsError: [error.message],
-      },
-    };
+    throw new Error(error.message);
   }
 
-  return { success: true, data, count: count || 0 };
+  return { data, count: count || 0 };
 }
 
 export async function getProductById(
