@@ -14,20 +14,25 @@ import {
 } from './ui/alert-dialog';
 import { Trash } from 'lucide-react';
 import { toast } from 'sonner';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 export default function DeleteButton({
   action,
+  queryKey,
 }: {
   action: () => Promise<{
     success: boolean;
     errors?: Record<string, string[]>;
   }>;
+  queryKey?: string[];
 }) {
+  const { invalidateCache } = useInvalidateCache(queryKey || []);
   const onClickDelete = async () => {
     const result = await action();
 
     if (result.success) {
       toast.success('성공적으로 삭제되었습니다.');
+      invalidateCache();
     }
     if (result.errors) {
       Object.values(result.errors)

@@ -21,7 +21,7 @@ export default function ProductList({
 }) {
   const itemsPerPage = 8;
   const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ['products', page],
+    queryKey: ['products', category, page],
     queryFn: async () => {
       const { data } = await getProductsByPagination(category, {
         pageNum: page,

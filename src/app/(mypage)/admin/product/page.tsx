@@ -15,6 +15,7 @@ import Image from 'next/image';
 import UpdateProductDialog from '@/components/product/update-product-dialog';
 import CustomPagination from '@/components/ui/custom-pagination';
 import { getTotalPage } from '@/lib/utils';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 interface ProductManagementPageProps {
   searchParams: Promise<{
@@ -81,6 +82,7 @@ export default async function ProductManagementPage({
                       <UpdateProductDialog product={product} />
                       <DeleteButton
                         action={deleteProduct.bind(null, product)}
+                        queryKey={['products']}
                       />
                     </div>
                   </TableCell>

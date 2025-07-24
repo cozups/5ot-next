@@ -8,6 +8,7 @@ import UpdateReviewDialog from './update-review-dialog';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { getUser } from '@/actions/auth';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 export default function ReviewItem({
   review,
@@ -25,6 +26,7 @@ export default function ReviewItem({
     queryFn: getUser,
     staleTime: 5 * 60 * 1000,
   });
+  const { invalidateCache } = useInvalidateCache(['reviews']);
 
   const isAllowed =
     user?.user_metadata.role === 'admin' || user?.id === review.user_id;
@@ -44,7 +46,10 @@ export default function ReviewItem({
             {user?.id === review.user_id && (
               <UpdateReviewDialog review={review} />
             )}
-            <DeleteButton action={deleteReview.bind(null, review.id)} />
+            <DeleteButton
+              action={deleteReview.bind(null, review.id)}
+              queryKey={['reviews']}
+            />
           </div>
         )}
         {showProducts && (

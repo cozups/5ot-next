@@ -15,6 +15,7 @@ import { createClient } from '@/utils/supabase/client';
 import { Category } from '@/types/category';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 const initialState: ProductFormState = { success: false };
 
@@ -24,6 +25,8 @@ export default function ProductForm() {
   const [category, setCategory] = useState<Category[]>([]);
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const { invalidateCache } = useInvalidateCache(['products']);
 
   useEffect(() => {
     const getCategory = async () => {
@@ -43,6 +46,7 @@ export default function ProductForm() {
       formRef.current?.reset();
       setPickedImage(null);
       toast.success('제품이 추가되었습니다.');
+      invalidateCache();
     }
 
     if (formState.errors?.insertError) {
@@ -56,7 +60,7 @@ export default function ProductForm() {
         description: formState.errors.imageUpload[0],
       });
     }
-  }, [formState]);
+  }, [formState, invalidateCache]);
 
   const onChangeSelect = (value: string) => {
     setSex(value);

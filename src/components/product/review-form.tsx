@@ -16,6 +16,9 @@ import { useActionState, useEffect } from 'react';
 import { createReview, ReviewFormState } from '@/actions/reviews';
 import { toastError } from '@/lib/utils';
 import { toast } from 'sonner';
+import { QueryClient, useMutation } from '@tanstack/react-query';
+import { queryClient } from '@/app/providers';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 interface ReviewFormProps {
   mode?: 'write' | 'update';
@@ -37,17 +40,20 @@ export default function ReviewForm({
     initialState
   );
 
+  const { invalidateCache } = useInvalidateCache(['reviews']);
+
   useEffect(() => {
     if (mode === 'write') {
       if (formState.success) {
         toast.success('리뷰가 작성되었습니다.');
+        invalidateCache();
       }
 
       if (formState.errors) {
         toastError('리뷰 작성 중 문제가 발생했습니다.', formState.errors);
       }
     }
-  }, [formState, mode]);
+  }, [formState, mode, invalidateCache]);
 
   return (
     <form

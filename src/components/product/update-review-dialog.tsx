@@ -15,6 +15,7 @@ import { Review } from '@/types/products';
 import { useActionState, useEffect } from 'react';
 import { toastError } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 interface UpdateButtonProps {
   review: Review;
@@ -28,15 +29,18 @@ export default function UpdateReviewDialog({ review }: UpdateButtonProps) {
     initialState
   );
 
+  const { invalidateCache } = useInvalidateCache(['reviews']);
+
   useEffect(() => {
     if (formState.success) {
       toast.success('리뷰가 수정되었습니다.');
+      invalidateCache();
     }
 
     if (formState.errors) {
       toastError('리뷰 수정 중 문제가 발생했습니다.', formState.errors);
     }
-  }, [formState]);
+  }, [formState, invalidateCache]);
 
   return (
     <Dialog>

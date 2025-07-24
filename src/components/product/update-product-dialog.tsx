@@ -28,6 +28,7 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui';
 import { toast } from 'sonner';
+import { useInvalidateCache } from '@/hooks/useInvalidateCache';
 
 const initialState: ProductFormState = { success: false };
 
@@ -49,6 +50,8 @@ export default function UpdateProductDialog({
   );
   const formRef = useRef<HTMLFormElement>(null);
 
+  const { invalidateCache } = useInvalidateCache(['products']);
+
   useEffect(() => {
     const getCategory = async () => {
       const supabase = createClient();
@@ -66,6 +69,7 @@ export default function UpdateProductDialog({
     if (formState.success) {
       formRef.current?.reset();
       toast.success('성공적으로 제품을 업데이트 했습니다.');
+      invalidateCache();
     }
 
     if (formState.errors?.imageUpdateError) {
@@ -79,7 +83,7 @@ export default function UpdateProductDialog({
         description: formState.errors.productUpdateError[0],
       });
     }
-  }, [formState]);
+  }, [formState, invalidateCache]);
 
   const onChangeSelect = (value: string) => {
     setSex(value);
