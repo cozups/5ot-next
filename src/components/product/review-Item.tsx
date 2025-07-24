@@ -4,8 +4,19 @@ import { createClient } from '@/utils/supabase/server';
 import { deleteReview } from '@/actions/reviews';
 import DeleteButton from '../delete-button';
 import UpdateReviewDialog from './update-review-dialog';
+import { cn } from '@/lib/utils';
 
-export default async function ReviewItem({ review }: { review: Review }) {
+export default async function ReviewItem({
+  review,
+  panel = false,
+  className,
+  showProducts = false,
+}: {
+  review: Review;
+  panel?: boolean;
+  className?: string;
+  showProducts?: boolean;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -14,7 +25,7 @@ export default async function ReviewItem({ review }: { review: Review }) {
     user?.user_metadata.role === 'admin' || user?.id === review.user_id;
 
   return (
-    <li className="bg-gray-100 rounded-xl p-4">
+    <li className={cn('bg-gray-100 rounded-xl p-4', className)}>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <p className="font-semibold">{review.profiles?.name}</p>
@@ -23,13 +34,16 @@ export default async function ReviewItem({ review }: { review: Review }) {
             {review.star}
           </div>
         </div>
-        {isAllowed && (
+        {panel && isAllowed && (
           <div className="flex gap-1">
             {user?.id === review.user_id && (
               <UpdateReviewDialog review={review} />
             )}
             <DeleteButton action={deleteReview.bind(null, review.id)} />
           </div>
+        )}
+        {showProducts && (
+          <p className="text-xs">[{review.products.name}] 구매</p>
         )}
       </div>
       <div className="mt-2">{review.content}</div>

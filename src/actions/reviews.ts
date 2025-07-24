@@ -161,3 +161,30 @@ export async function getReviewsByPagination(
 
   return { success: true, data, count: count || 0 };
 }
+
+export async function getRecentReviews(
+  length: number
+): Promise<ReviewFormState> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('reviews')
+    .select(`*, products:product_id(*), profiles:user_id(*)`)
+    .limit(length)
+    .order('created_at', { ascending: true })
+    .overrideTypes<Review[]>();
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getReviewsError: [error.message],
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data,
+  };
+}

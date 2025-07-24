@@ -70,7 +70,7 @@ export default async function ProductDetailPage({
         <div>
           <ul className="flex flex-col gap-6 mt-8">
             {reviews?.map((review: Review) => (
-              <ReviewItem key={review.id} review={review} />
+              <ReviewItem key={review.id} review={review} panel />
             ))}
           </ul>
         </div>

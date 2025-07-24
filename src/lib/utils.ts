@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { formatInTimeZone } from 'date-fns-tz';
 import { customAlphabet } from 'nanoid';
 import { toast } from 'sonner';
+import { Order } from '@/types/orders';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -33,4 +34,16 @@ export function getTotalPage(
   itemsPerPage: number
 ) {
   return totalCount ? Math.ceil(totalCount / itemsPerPage) : 1;
+}
+
+export function getOrderProcessRate(orders: Order[] | null) {
+  return (
+    (!!orders?.length &&
+      (orders.filter(
+        (order) => order.status === 'done' || order.status === 'canceled'
+      ).length /
+        orders.length) *
+        100) ||
+    0
+  );
 }

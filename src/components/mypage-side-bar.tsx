@@ -23,12 +23,8 @@ export default function MyPageSideBar() {
       { title: '주문 관리', link: '/admin/order' },
       { title: '카테고리 관리', link: '/admin/category' },
       { title: '제품 관리', link: '/admin/product' },
-      { title: '문의', link: '/admin/qna' },
     ],
-    normal: [
-      { title: '내 정보', link: '/mypage' },
-      { title: '문의하기', link: '/qna' },
-    ],
+    normal: [{ title: '내 정보', link: '/mypage' }],
   };
 
   return (
