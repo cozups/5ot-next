@@ -27,3 +27,10 @@ export function toastError(
     .flat()
     .forEach((error) => toast.error(errorTitle, { description: error }));
 }
+
+export function getTotalPage(
+  totalCount: number | undefined,
+  itemsPerPage: number
+) {
+  return totalCount ? Math.ceil(totalCount / itemsPerPage) : 1;
+}

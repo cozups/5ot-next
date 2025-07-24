@@ -3,15 +3,10 @@ import Link from 'next/link';
 import { Products } from '@/types/products';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+
 import { getProductsByPagination } from '@/actions/products';
+import CustomPagination from '@/components/ui/custom-pagination';
+import { cn, getTotalPage } from '@/lib/utils';
 
 interface ProductListPageProps {
   params: Promise<{
@@ -37,30 +32,24 @@ export default async function ProductListPage({
       itemsPerPage,
     }
   );
-
-  const totalPage = totalCount ? Math.ceil(totalCount / itemsPerPage) : 1;
-  const groupSize = 10;
-  const groupIndex = Math.floor((currentPage - 1) / groupSize);
-
-  const getPaginationList = () => {
-    const startPage = groupIndex * groupSize + 1;
-    const endPage = Math.min(startPage + groupSize - 1, totalPage);
-
-    return Array.from(
-      { length: endPage - startPage + 1 },
-      (_, i) => startPage + i
-    );
-  };
-
-  const paginationList = getPaginationList();
+  const totalPage = getTotalPage(totalCount || 0, itemsPerPage);
 
   return (
-    <div>
+    <div className="h-full">
       <h2 className="text-3xl font-bold my-4">
         {sex === 'men' ? '남성' : '여성'} {category}
       </h2>
-      <div className="grid grid-cols-4 grid-rows-2 gap-6">
+      <div
+        className={cn(
+          'grid grid-cols-4 grid-rows-2 gap-6',
+          data?.length === 0 &&
+            'grid-cols-1 grid-rows-1 justify-center items-center h-[calc(100%-5rem)] text-center'
+        )}
+      >
         {/* product list */}
+        {data?.length === 0 && (
+          <h2>해당 카테고리의 제품이 존재하지 않습니다.</h2>
+        )}
         {data?.map((product: Products) => (
           <Link key={product.name} href={`/${sex}/${category}/${product.id}`}>
             <div className="cursor-pointer transition-scale duration-200 hover:scale-105">
@@ -87,26 +76,9 @@ export default async function ProductListPage({
           </Link>
         ))}
       </div>
-      <Pagination className="my-8">
-        <PaginationContent>
-          {groupIndex > 0 && (
-            <PaginationPrevious href={`?page=${paginationList[0] - 1}`} />
-          )}
-          {paginationList.map((pageNum: number) => (
-            <PaginationItem key={`page-${pageNum}`}>
-              <PaginationLink
-                href={`?page=${pageNum}`}
-                isActive={pageNum === currentPage}
-              >
-                {pageNum}
-              </PaginationLink>
-            </PaginationItem>
-          ))}
-          {groupIndex < Math.floor(totalPage / groupSize) && (
-            <PaginationNext href={`?page=${paginationList[9] + 1}`} />
-          )}
-        </PaginationContent>
-      </Pagination>
+      {!!totalCount && (
+        <CustomPagination currentPage={currentPage} totalPage={totalPage} />
+      )}
     </div>
   );
 }

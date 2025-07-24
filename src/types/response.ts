@@ -6,3 +6,10 @@ export interface ApiResponse<T, U> {
   values?: z.infer<T>;
   data?: U;
 }
+
+export interface PaginationResponse<T> {
+  success: boolean;
+  errors?: Record<string, string[]>;
+  data?: T | null;
+  count?: number;
+}

@@ -6,7 +6,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod/v4';
 import { generateRandomId } from '@/lib/utils';
 import { Category } from '@/types/category';
-import { ApiResponse } from '@/types/response';
+import { ApiResponse, PaginationResponse } from '@/types/response';
 
 const formSchema = z.object({
   name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
@@ -264,18 +264,54 @@ export async function getProductByName(name: string): Promise<Products[]> {
 export async function getProductsByPagination(
   query: string,
   options: { pageNum: number; itemsPerPage: number }
-) {
+): Promise<PaginationResponse<Products[]>> {
   const from = (options.pageNum - 1) * options.itemsPerPage;
   const to = from + options.itemsPerPage - 1;
 
   const supabase = await createClient();
-  const { data, count } = await supabase
+  const { data, count, error } = await supabase
     .from('products')
     .select('*', { count: 'exact' })
     .eq('category', query)
-    .range(from, to);
+    .range(from, to)
+    .overrideTypes<Products[]>();
 
-  return { data, count };
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getProductsError: [error.message],
+      },
+    };
+  }
+
+  return { success: true, data, count: count || 0 };
+}
+
+export async function getAllProductsByPagination(options: {
+  pageNum: number;
+  itemsPerPage: number;
+}) {
+  const from = (options.pageNum - 1) * options.itemsPerPage;
+  const to = from + options.itemsPerPage - 1;
+
+  const supabase = await createClient();
+  const { data, count, error } = await supabase
+    .from('products')
+    .select('*', { count: 'exact' })
+    .range(from, to)
+    .overrideTypes<Products[]>();
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getProductsError: [error.message],
+      },
+    };
+  }
+
+  return { success: true, data, count: count || 0 };
 }
 
 export async function getProductById(

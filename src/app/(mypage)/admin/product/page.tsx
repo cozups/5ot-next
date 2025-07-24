@@ -1,4 +1,4 @@
-import { deleteProduct } from '@/actions/products';
+import { deleteProduct, getAllProductsByPagination } from '@/actions/products';
 import DeleteButton from '@/components/delete-button';
 import ProductForm from '@/components/product/product-form';
 import {
@@ -13,10 +13,27 @@ import { Products } from '@/types/products';
 import { createClient } from '@/utils/supabase/server';
 import Image from 'next/image';
 import UpdateProductDialog from '@/components/product/update-product-dialog';
+import CustomPagination from '@/components/ui/custom-pagination';
+import { getTotalPage } from '@/lib/utils';
 
-export default async function ProductManagementPage() {
-  const supabase = await createClient();
-  const { data: productList } = await supabase.from('products').select();
+interface ProductManagementPageProps {
+  searchParams: Promise<{
+    page: string;
+  }>;
+}
+
+export default async function ProductManagementPage({
+  searchParams,
+}: ProductManagementPageProps) {
+  const page = await searchParams;
+  const currentPage = Number(page) || 1;
+  const { data: productList, count: totalCount } =
+    await getAllProductsByPagination({
+      pageNum: currentPage,
+      itemsPerPage: 10,
+    });
+
+  const totalPage = getTotalPage(totalCount, 10);
 
   return (
     <div className="w-full">
@@ -73,6 +90,9 @@ export default async function ProductManagementPage() {
           </Table>
           {productList && productList.length < 1 && (
             <p className="text-center font-semibold">등록된 제품이 없습니다.</p>
+          )}
+          {!!productList?.length && (
+            <CustomPagination currentPage={currentPage} totalPage={totalPage} />
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use server';
 
 import { Review } from '@/types/products';
-import { ApiResponse } from '@/types/response';
+import { ApiResponse, PaginationResponse } from '@/types/response';
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
@@ -132,4 +132,32 @@ export async function getReviews(productId: string): Promise<ReviewFormState> {
     success: true,
     data,
   };
+}
+
+export async function getReviewsByPagination(
+  query: string,
+  options: { pageNum: number; itemsPerPage: number }
+): Promise<PaginationResponse<Review[]>> {
+  const from = (options.pageNum - 1) * options.itemsPerPage;
+  const to = from + options.itemsPerPage - 1;
+
+  const supabase = await createClient();
+  const { data, count, error } = await supabase
+    .from('reviews')
+    .select(`*, products:product_id(*), profiles:user_id(*)`, {
+      count: 'exact',
+    })
+    .eq('product_id', query)
+    .range(from, to);
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getReviewsError: [error.message],
+      },
+    };
+  }
+
+  return { success: true, data, count: count || 0 };
 }
