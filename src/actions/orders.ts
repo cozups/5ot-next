@@ -1,22 +1,22 @@
-'use server';
+"use server";
 
-import { Order, Purchase } from '@/types/orders';
-import { ApiResponse } from '@/types/response';
-import { createClient } from '@/utils/supabase/server';
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod/v4';
+import { Order, Purchase } from "@/types/orders";
+import { ApiResponse } from "@/types/response";
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+import { z } from "zod/v4";
 
 const orderFormSchema = z.object({
-  receiver: z.string().trim().min(1, '받는 분의 이름을 작성해주세요.'),
+  receiver: z.string().trim().min(1, "받는 분의 이름을 작성해주세요."),
   phone: z
     .string()
-    .startsWith('010', '전화번호는 반드시 010으로 시작해야 합니다.')
-    .length(11, '전화번호는 11자이어야 합니다.'),
-  baseAddress: z.string().trim().min(1, '주소를 반드시 작성해주세요.'),
+    .startsWith("010", "전화번호는 반드시 010으로 시작해야 합니다.")
+    .length(11, "전화번호는 11자이어야 합니다."),
+  baseAddress: z.string().trim().min(1, "주소를 반드시 작성해주세요."),
 });
 
 type OrderFormSchema = z.infer<typeof orderFormSchema>;
-export type OrderFormState = ApiResponse<OrderFormSchema, Order>;
+export type OrderFormState = ApiResponse<OrderFormSchema, Order[]>;
 
 export async function createOrder(
   products: Purchase[],
@@ -24,11 +24,11 @@ export async function createOrder(
   formData: FormData
 ): Promise<OrderFormState> {
   const raw = {
-    receiver: formData.get('receiver')?.toString() || '',
-    phone: formData.get('phone')?.toString() || '',
-    baseAddress: formData.get('base-address')?.toString() || '',
-    detailAddress: formData.get('detail-address')?.toString() || '',
-    deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
+    receiver: formData.get("receiver")?.toString() || "",
+    phone: formData.get("phone")?.toString() || "",
+    baseAddress: formData.get("base-address")?.toString() || "",
+    detailAddress: formData.get("detail-address")?.toString() || "",
+    deliveryRequest: formData.get("deliveryRequest")?.toString() || "",
   };
 
   const result = orderFormSchema.safeParse(raw);
@@ -44,13 +44,11 @@ export async function createOrder(
   const supabase = await createClient();
   const { data: authData } = await supabase.auth.getUser();
 
-  const { error: insertError } = await supabase.from('orders').insert({
+  const { error: insertError } = await supabase.from("orders").insert({
     user_id: authData.user?.id,
     products,
-    status: 'processing',
-    address: raw.detailAddress
-      ? raw.baseAddress + ', ' + raw.detailAddress
-      : raw.baseAddress,
+    status: "processing",
+    address: raw.detailAddress ? raw.baseAddress + ", " + raw.detailAddress : raw.baseAddress,
     receiver: raw.receiver,
     phone: raw.phone,
     deliveryRequest: raw.deliveryRequest,
@@ -70,7 +68,7 @@ export async function createOrder(
 export async function deleteOrder(id: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase.from('orders').delete().eq('id', id);
+  const { error } = await supabase.from("orders").delete().eq("id", id);
 
   if (error) {
     return {
@@ -81,7 +79,7 @@ export async function deleteOrder(id: string) {
     };
   }
 
-  revalidatePath('/admin/order');
+  revalidatePath("/admin/order");
   return {
     success: true,
   };
@@ -90,10 +88,7 @@ export async function deleteOrder(id: string) {
 export async function updateOrderStatus(id: string, status: string) {
   const supabase = await createClient();
 
-  const { error } = await supabase
-    .from('orders')
-    .update({ status })
-    .eq('id', id);
+  const { error } = await supabase.from("orders").update({ status }).eq("id", id);
 
   if (error) {
     return {
@@ -104,7 +99,7 @@ export async function updateOrderStatus(id: string, status: string) {
     };
   }
 
-  revalidatePath('/admin/order');
+  revalidatePath("/admin/order");
   return {
     success: true,
   };
@@ -116,11 +111,11 @@ export async function updateOrderData(
   formData: FormData
 ): Promise<OrderFormState> {
   const raw = {
-    receiver: formData.get('receiver')?.toString() || '',
-    phone: formData.get('phone')?.toString() || '',
-    baseAddress: formData.get('base-address')?.toString() || '',
-    detailAddress: formData.get('detail-address')?.toString() || '',
-    deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
+    receiver: formData.get("receiver")?.toString() || "",
+    phone: formData.get("phone")?.toString() || "",
+    baseAddress: formData.get("base-address")?.toString() || "",
+    detailAddress: formData.get("detail-address")?.toString() || "",
+    deliveryRequest: formData.get("deliveryRequest")?.toString() || "",
   };
 
   const result = orderFormSchema.safeParse(raw);
@@ -135,16 +130,14 @@ export async function updateOrderData(
 
   const supabase = await createClient();
   const { error: updateDataError } = await supabase
-    .from('orders')
+    .from("orders")
     .update({
-      receiver: formData.get('receiver')?.toString() || '',
-      phone: formData.get('phone')?.toString() || '',
-      address: raw.detailAddress
-        ? raw.baseAddress + ', ' + raw.detailAddress
-        : raw.baseAddress,
-      deliveryRequest: formData.get('deliveryRequest')?.toString() || '',
+      receiver: formData.get("receiver")?.toString() || "",
+      phone: formData.get("phone")?.toString() || "",
+      address: raw.detailAddress ? raw.baseAddress + ", " + raw.detailAddress : raw.baseAddress,
+      deliveryRequest: formData.get("deliveryRequest")?.toString() || "",
     })
-    .eq('id', id);
+    .eq("id", id);
 
   if (updateDataError) {
     return {
@@ -156,13 +149,16 @@ export async function updateOrderData(
     };
   }
 
-  revalidatePath('/mypage');
+  revalidatePath("/mypage");
   return { success: true };
 }
 
-export async function getOrderById(id: string) {
+export async function getOrders(): Promise<OrderFormState> {
   const supabase = await createClient();
-  const { data, error } = await supabase.from('orders').select().eq('id', id);
+  const { data, error } = await supabase
+    .from("orders")
+    .select(`*, profiles:user_id (name)`)
+    .order("created_at", { ascending: true });
 
   if (error) {
     return {
@@ -171,6 +167,43 @@ export async function getOrderById(id: string) {
         getDataError: [error.message],
       },
     };
+  }
+
+  return {
+    success: true,
+    data,
+  };
+}
+
+export async function getOrdersByUserId(userId: string): Promise<OrderFormState> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("orders")
+    .select(`*, profiles:user_id (name)`)
+    .order("created_at", { ascending: true })
+    .eq("user_id", userId);
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        getDataError: [error.message],
+      },
+    };
+  }
+
+  return {
+    success: true,
+    data,
+  };
+}
+
+export async function getOrderById(id: string): Promise<ApiResponse<null, Order>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("orders").select().eq("id", id).single();
+
+  if (error) {
+    throw new Error(error.message);
   }
 
   return {

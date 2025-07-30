@@ -1,11 +1,5 @@
-import {
-  ChangeEvent,
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
-import DaumPostcode, { type Address } from 'react-daum-postcode';
+import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import DaumPostcode, { type Address } from "react-daum-postcode";
 import {
   Button,
   Dialog,
@@ -15,8 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
   Input,
-} from '../ui';
-import { AddressResult } from './order-form';
+} from "../ui";
+import { AddressResult } from "./order-form";
 
 interface AddressSearchProps {
   address: AddressResult;
@@ -24,17 +18,11 @@ interface AddressSearchProps {
   defaultData?: string;
 }
 
-export default function AddressSearch({
-  address,
-  setAddress,
-  defaultData,
-}: AddressSearchProps) {
+export default function AddressSearch({ address, setAddress, defaultData }: AddressSearchProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    const [defaultBase, defaultDetail] = defaultData
-      ? defaultData.split(', ')
-      : ['', ''];
+    const [defaultBase, defaultDetail] = defaultData ? defaultData.split(", ") : ["", ""];
 
     setAddress({ base: defaultBase, detail: defaultDetail });
   }, [defaultData, setAddress]);
@@ -56,12 +44,8 @@ export default function AddressSearch({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        <Input defaultValue={address.base} className="bg-white" disabled />
-        <Input
-          name="base-address"
-          defaultValue={address.base}
-          className="hidden"
-        />
+        <Input value={address.base} className="bg-white" disabled />
+        <Input name="base-address" defaultValue={address.base} className="hidden" />
         <Dialog open={isOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => setIsOpen(true)}>주소 찾기</Button>

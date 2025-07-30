@@ -1,21 +1,14 @@
-import OrderList from '@/components/order/order-list';
-
-import { Order } from '@/types/orders';
-import { createClient } from '@/utils/supabase/server';
+import { getOrders } from "@/actions/orders";
+import OrderList from "@/components/order/order-list";
 
 export default async function OrderManagementPage() {
-  const supabase = await createClient();
-  const { data: orderList } = await supabase
-    .from('orders')
-    .select(`*, profiles:user_id (name)`)
-    .order('created_at', { ascending: true })
-    .overrideTypes<Order[]>();
+  const { data: orderList, errors } = await getOrders();
 
   return (
     <div className="h-[calc(100vh-10rem)]">
       <h1 className="text-3xl font-bold">주문 관리</h1>
       <div>
-        <OrderList role="admin" list={orderList} />
+        <OrderList initialData={orderList} errors={errors} admin />
       </div>
     </div>
   );

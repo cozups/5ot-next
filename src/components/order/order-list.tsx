@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+import { toastError } from "@/lib/utils";
 import {
   Table,
   TableBody,
@@ -5,27 +11,59 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Order } from '@/types/orders';
-import OrderStatusAction from './order-status-action';
-import DeleteButton from '../delete-button';
-import { deleteOrder, updateOrderStatus } from '@/actions/orders';
-import UpdateDeliveryDialog from './update-delivery-dialog';
+} from "@/components/ui/table";
+import { Order } from "@/types/orders";
+import OrderStatusAction from "./order-status-action";
+import DeleteButton from "../delete-button";
+import { deleteOrder, getOrders, updateOrderStatus } from "@/actions/orders";
+import UpdateDeliveryDialog from "./update-delivery-dialog";
+import OrderItemSkeleton from "../skeleton/order-item-skeleton";
+
+interface OrderListProps {
+  initialData: Order[] | undefined;
+  errors?: Record<string, string[]>;
+  admin: boolean;
+}
 
 export default function OrderList({
-  list,
-  role,
-}: {
-  list: Order[] | null;
-  role: string;
-}) {
-  const isExist = list && list.length > 0;
+  initialData,
+  errors,
+  admin = false,
+}: OrderListProps) {
+  const {
+    data: list,
+    error: fetchingError,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useQuery({
+    queryKey: ["orders", admin ? "admin" : "user"],
+    queryFn: async () => {
+      const { data } = await getOrders();
+
+      return data;
+    },
+    initialData,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (errors) {
+      toastError("주문 목록을 불러오던 중 문제가 발생하였습니다.", errors);
+    }
+  }, [errors]);
+
+  if (isError) {
+    toastError("주문 목록을 불러오던 중 문제가 발생하였습니다.", {
+      fetchError: [fetchingError.message],
+    });
+  }
 
   const status = {
-    processing: '처리 중',
-    done: '완료',
-    delivering: '배송 중',
-    canceled: '취소',
+    processing: "처리 중",
+    done: "완료",
+    delivering: "배송 중",
+    canceled: "취소",
   };
 
   return (
@@ -40,11 +78,12 @@ export default function OrderList({
             <TableHead>관리</TableHead>
           </TableRow>
         </TableHeader>
-        {isExist && (
+        {isLoading && <OrderItemSkeleton />}
+        {isSuccess && (
           <TableBody>
-            {list.map((order: Order) => (
+            {list?.map((order: Order) => (
               <TableRow key={order.id}>
-                <TableCell>{order.profiles!.name}</TableCell>
+                <TableCell>{order.profiles?.name}</TableCell>
                 <TableCell>
                   {order.products.map((item) => (
                     <p key={item.product.id}>
@@ -64,26 +103,29 @@ export default function OrderList({
                   </div>
                 </TableCell>
                 <TableCell>
-                  {role === 'admin' && (
+                  {admin && (
                     <OrderStatusAction
                       defaultValue={order.status}
                       action={updateOrderStatus.bind(null, order.id)}
                     />
                   )}
-                  {role === 'normal' && (
+                  {!admin && (
                     <p>{status[order.status as keyof typeof status]}</p>
                   )}
                 </TableCell>
                 <TableCell>
-                  {role === 'normal' && <UpdateDeliveryDialog order={order} />}
-                  <DeleteButton action={deleteOrder.bind(null, order.id)} />
+                  <UpdateDeliveryDialog order={order} admin={admin} />
+                  <DeleteButton
+                    action={deleteOrder.bind(null, order.id)}
+                    queryKey={["orders", admin ? "admin" : "user"]}
+                  />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         )}
       </Table>
-      {!isExist && (
+      {isSuccess && list?.length === 0 && (
         <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>
       )}
     </>
