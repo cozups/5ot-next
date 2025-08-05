@@ -4,14 +4,7 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import { toastError } from "@/lib/utils";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/types/orders";
 import OrderStatusAction from "./order-status-action";
 import DeleteButton from "../delete-button";
@@ -22,14 +15,10 @@ import OrderItemSkeleton from "../skeleton/order-item-skeleton";
 interface OrderListProps {
   initialData: Order[] | undefined;
   errors?: Record<string, string[]>;
-  admin: boolean;
+  admin?: boolean;
 }
 
-export default function OrderList({
-  initialData,
-  errors,
-  admin = false,
-}: OrderListProps) {
+export default function OrderList({ initialData, errors, admin = false }: OrderListProps) {
   const {
     data: list,
     error: fetchingError,
@@ -97,21 +86,14 @@ export default function OrderList({
                       {order.receiver} ({order.phone})
                     </p>
                     <p>{order.address}</p>
-                    <p className="text-gray-400 mt-2">
-                      {order.deliveryRequest}
-                    </p>
+                    <p className="text-gray-400 mt-2">{order.deliveryRequest}</p>
                   </div>
                 </TableCell>
                 <TableCell>
                   {admin && (
-                    <OrderStatusAction
-                      defaultValue={order.status}
-                      action={updateOrderStatus.bind(null, order.id)}
-                    />
+                    <OrderStatusAction defaultValue={order.status} action={updateOrderStatus.bind(null, order.id)} />
                   )}
-                  {!admin && (
-                    <p>{status[order.status as keyof typeof status]}</p>
-                  )}
+                  {!admin && <p>{status[order.status as keyof typeof status]}</p>}
                 </TableCell>
                 <TableCell>
                   <UpdateDeliveryDialog order={order} admin={admin} />
@@ -125,9 +107,7 @@ export default function OrderList({
           </TableBody>
         )}
       </Table>
-      {isSuccess && list?.length === 0 && (
-        <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>
-      )}
+      {isSuccess && list?.length === 0 && <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>}
     </>
   );
 }
