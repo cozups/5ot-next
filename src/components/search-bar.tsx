@@ -1,18 +1,19 @@
-'use client';
-import { useCallback, useRef, useState } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { Search } from 'lucide-react';
-import _ from 'lodash';
+"use client";
+import { useCallback, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { Search } from "lucide-react";
+import _ from "lodash";
 
-import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
-import { getProductByName } from '@/actions/products';
-import { Products } from '@/types/products';
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { getProductByName } from "@/actions/products";
+import { Products } from "@/types/products";
+import { cn } from "@/lib/utils";
 
 export default function SearchBar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [searchWord, setSearchWord] = useState<string>('');
+  const [searchWord, setSearchWord] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Products[]>([]);
 
   const debounceSearch = useCallback(
@@ -47,11 +48,11 @@ export default function SearchBar() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <div className="flex items-center gap-2">
-          <Search className="w-4 text-gray-500" />
+        <div className={cn("flex items-center gap-1", "md:gap-2")}>
+          <Search className={cn("w-3 text-gray-500", "md:w-4")} />
           <input
             type="text"
-            className="border-b border-b-gray-400 w-36"
+            className={cn("border-b border-b-gray-400 w-16", "md:w-36")}
             ref={inputRef}
             onChange={onInputChange}
             onClick={onClickInput}
@@ -71,13 +72,9 @@ export default function SearchBar() {
           }
         }}
       >
-        {searchWord === '' && (
-          <p className="text-sm text-gray-600">검색어를 입력해주세요.</p>
-        )}
-        {searchWord !== '' && searchResults.length === 0 && (
-          <p className="text-sm text-gray-600">
-            검색 결과가 존재하지 않습니다.
-          </p>
+        {searchWord === "" && <p className="text-sm text-gray-600">검색어를 입력해주세요.</p>}
+        {searchWord !== "" && searchResults.length === 0 && (
+          <p className="text-sm text-gray-600">검색 결과가 존재하지 않습니다.</p>
         )}
         {searchResults.length > 0 && (
           <ul>
