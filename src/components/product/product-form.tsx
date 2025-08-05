@@ -1,15 +1,17 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { insertProduct, ProductFormState } from "@/actions/products";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { createClient } from "@/utils/supabase/client";
 import { Category } from "@/types/category";
-import Image from "next/image";
-import { toast } from "sonner";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
+import { getCategoriesBySex } from "@/actions/category";
 
 const initialState: ProductFormState = { success: false };
 
@@ -22,23 +24,32 @@ export default function ProductForm() {
 
   const { invalidateCache } = useInvalidateCache(["products"]);
 
+  const { data, isError, error, isSuccess } = useQuery({
+    queryKey: ["category", sex],
+    queryFn: async () => {
+      const { data } = await getCategoriesBySex(sex);
+      return data;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  if (isError) {
+    toast.error("카테고리 목록을 불러오던 중 문제가 발생하였습니다.", {
+      description: error.message,
+    });
+  }
+
   useEffect(() => {
-    const getCategory = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("category").select().eq("sex", sex);
-
-      if (data) {
-        setCategory(data);
-      }
-    };
-
-    getCategory();
-  }, [sex]);
+    if (isSuccess && data) {
+      setCategory(data);
+    }
+  }, [data, isSuccess]);
 
   useEffect(() => {
     if (formState.success) {
       formRef.current?.reset();
       setPickedImage(null);
+      setSex("men");
       toast.success("제품이 추가되었습니다.");
       invalidateCache();
     }
