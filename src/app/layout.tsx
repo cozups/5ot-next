@@ -6,6 +6,9 @@ import Footer from "@/components/footer";
 import clsx from "clsx";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "./providers";
+import { cn } from "@/lib/utils";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import AppSidebar from "@/components/ui/app-sidebar";
 
 const NotoSansKr = Noto_Sans_KR({
   subsets: ["latin"],
@@ -25,12 +28,25 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={clsx(`${NotoSansKr.className} antialiased`, `w-screen relative`)}>
-        <MainHeader />
-        <Providers>
-          <div className="w-full h-full min-h-[calc(100vh-8rem)] lg:min-h-[calc(100vh-10rem)]">{children}</div>
-        </Providers>
-        <Footer />
-        <Toaster expand position="bottom-right" richColors />
+        <SidebarProvider defaultOpen={false}>
+          <AppSidebar />
+          <div className="w-full flex flex-col min-h-screen">
+            <MainHeader />
+            <Providers>
+              <div
+                className={cn(
+                  "w-full h-full min-h-[calc(100vh-8rem)] lg:min-h-[calc(100vh-10rem)]",
+                  "px-8 mx-auto",
+                  "lg:w-[64rem] lg:px-0 lg:py-8"
+                )}
+              >
+                {children}
+              </div>
+            </Providers>
+            <Footer />
+          </div>
+          <Toaster expand position="bottom-right" richColors />
+        </SidebarProvider>
       </body>
     </html>
   );

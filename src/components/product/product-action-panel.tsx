@@ -1,10 +1,13 @@
-'use client';
+"use client";
 
-import { Products } from '@/types/products';
-import { useRef } from 'react';
-import { Button } from '../ui/button';
-import { ShoppingBasket, Star } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { useRef } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { ShoppingBasket, Star } from "lucide-react";
+
+import { Products } from "@/types/products";
+import { Button } from "../ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,11 +18,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '../ui/alert-dialog';
-import { Cart } from '@/types/cart';
-import Link from 'next/link';
-import { toast } from 'sonner';
-import { useCartStore } from '@/store';
+} from "../ui/alert-dialog";
+import { useCartStore } from "@/store";
+import { cn } from "@/lib/utils";
 
 export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
@@ -30,30 +31,24 @@ export default function ProductActionPanel({ product }: { product: Products }) {
     const index = cartData.findIndex((cart) => cart.product.id === id);
 
     if (index > -1) {
-      toast.warning('이미 장바구니에 추가되어 있는 제품입니다.');
+      toast.warning("이미 장바구니에 추가되어 있는 제품입니다.");
       return;
     }
 
-    const addedCart = [
-      ...cartData,
-      { product, qty: countRef.current?.value || '1', isSelected: false },
-    ];
+    const addedCart = [...cartData, { product, qty: countRef.current?.value || "1", isSelected: false }];
 
-    localStorage.setItem('cart', JSON.stringify(addedCart));
+    localStorage.setItem("cart", JSON.stringify(addedCart));
     setCartData(addedCart);
-    toast.success('장바구니에 제품이 추가되었습니다.');
+    toast.success("장바구니에 제품이 추가되었습니다.");
   };
 
   const redirectToCart = () => {
-    router.push('/cart');
+    router.push("/cart");
   };
 
   const onClickPurchase = () => {
-    sessionStorage.setItem(
-      'purchase',
-      JSON.stringify([{ product, qty: countRef.current?.value }])
-    );
-    router.push('/purchase');
+    sessionStorage.setItem("purchase", JSON.stringify([{ product, qty: countRef.current?.value }]));
+    router.push("/purchase");
   };
 
   return (
@@ -69,24 +64,22 @@ export default function ProductActionPanel({ product }: { product: Products }) {
         </div>
 
         <div className="w-full flex flex-col items-start">
-          <p>{product.description}</p>
-          <div className="w-full mt-8 flex items-center justify-between">
-            <input
-              type="number"
-              min={1}
-              className="px-4 border h-10"
-              defaultValue={1}
-              ref={countRef}
-            />
+          <p className={cn("text-sm", "lg:text-base")}>{product.description}</p>
+          <div className={cn("w-full mt-2 flex items-center justify-between", "lg:mt-8")}>
+            <input type="number" min={1} className="px-2 border w-16 h-8" defaultValue={1} ref={countRef} />
             <p className="font-bold">{product.price.toLocaleString()}원</p>
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="mt-2 flex items-center gap-2">
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button
-              className="w-1/2 h-16 bg-neutral-400 rounded cursor-pointer hover:bg-neutral-500"
+              className={cn(
+                "w-1/2 h-12 bg-neutral-400 rounded cursor-pointer hover:bg-neutral-500 flex items-center justify-center",
+                "md:h-14",
+                "lg:h-16"
+              )}
               onClick={onAddCart.bind(null, product.id)}
             >
               <ShoppingBasket />
@@ -96,9 +89,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>장바구니로 이동하시겠습니까?</AlertDialogTitle>
-              <AlertDialogDescription>
-                상품을 더 둘러보시려면 아니오를 눌러주세요.
-              </AlertDialogDescription>
+              <AlertDialogDescription>상품을 더 둘러보시려면 아니오를 눌러주세요.</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>아니오</AlertDialogCancel>
@@ -109,7 +100,11 @@ export default function ProductActionPanel({ product }: { product: Products }) {
 
         <Link href="/purchase" className="block w-1/2">
           <Button
-            className="w-full h-16 bg-blue-950 hover:bg-blue-900 text-white rounded cursor-pointer"
+            className={cn(
+              "w-full h-12 bg-blue-950 hover:bg-blue-900 text-white rounded cursor-pointer flex items-center justify-center",
+              "md:h-14",
+              "lg:h-16"
+            )}
             onClick={onClickPurchase}
           >
             구매하기

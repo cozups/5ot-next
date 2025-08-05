@@ -12,8 +12,7 @@ export default async function Home() {
   const { data } = await supabase.from("products").select().order("created_at", { ascending: false }).limit(4);
 
   return (
-    <div className={cn("px-8", "lg:px-0 lg:grid lg:grid-cols-[1fr_4fr_1fr]")}>
-      <SideBar />
+    <div className={cn("mx-auto", "lg:w-[64rem]")}>
       <div className="w-full">
         <MainImageSlider />
         {data && data.length > 0 && (

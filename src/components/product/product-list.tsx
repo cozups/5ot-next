@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 
-import { Products } from '@/types/products';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { getProductsByPagination } from '@/actions/products';
-import { toast } from 'sonner';
-import { cn } from '@/lib/utils';
-import ProductItemSkeleton from '../skeleton/product-item-skeleton';
-import ProductItem from './product-item';
+import { Products } from "@/types/products";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { getProductsByPagination } from "@/actions/products";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import ProductItemSkeleton from "../skeleton/product-item-skeleton";
+import ProductItem from "./product-item";
 
 export default function ProductList({
   initialData,
@@ -21,7 +21,7 @@ export default function ProductList({
 }) {
   const itemsPerPage = 8;
   const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ['products', category, page],
+    queryKey: ["products", category, page],
     queryFn: async () => {
       const { data } = await getProductsByPagination(category, {
         pageNum: page,
@@ -35,7 +35,7 @@ export default function ProductList({
   });
 
   if (isError) {
-    toast.error('제품 로딩 중 문제가 발생했습니다.', {
+    toast.error("제품 로딩 중 문제가 발생했습니다.", {
       description: error.message,
     });
   }
@@ -43,16 +43,17 @@ export default function ProductList({
   return (
     <div
       className={cn(
-        'grid grid-cols-4 grid-rows-2 gap-6',
-        data?.length === 0 &&
-          'grid-cols-1 grid-rows-1 justify-center items-center h-[calc(100%-5rem)] text-center'
+        "w-full h-full grid grid-cols-2 grid-rows-4 gap-6",
+        data && data.length > 0 && "md:grid-cols-4 md:grid-rows-2",
+        data?.length === 0 && "grid-cols-1 grid-rows-1 justify-center items-center h-[calc(100%-5rem)] text-center"
       )}
     >
-      {data?.length === 0 && <h2>해당 카테고리의 제품이 존재하지 않습니다.</h2>}
-      {isLoading &&
-        Array.from({ length: 8 }).map((_, i) => (
-          <ProductItemSkeleton key={`${category}-${i}`} />
-        ))}
+      {data?.length === 0 && (
+        <div className="w-full h-96 flex justify-center items-center">
+          <h2>해당 카테고리의 제품이 존재하지 않습니다.</h2>
+        </div>
+      )}
+      {isLoading && Array.from({ length: 8 }).map((_, i) => <ProductItemSkeleton key={`${category}-${i}`} />)}
       {isSuccess &&
         data?.map((product: Products) => (
           <Link key={product.name} href={`/${category}/${product.id}`}>
