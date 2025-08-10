@@ -1,12 +1,13 @@
-import { deleteCategory } from '@/actions/category';
-import CategoryProductView from '@/components/category/category-product-view';
-import CreateCategoryForm from '@/components/category/create-category-form';
-import DeleteButton from '@/components/delete-button';
-import { Button } from '@/components/ui/button';
+import { deleteCategory } from "@/actions/category";
+import CategoryProductView from "@/components/category/category-product-view";
+import CreateCategoryForm from "@/components/category/create-category-form";
+import DeleteButton from "@/components/delete-button";
+import { Button } from "@/components/ui/button";
 
-import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
-import { createClient } from '@/utils/supabase/server';
-import Link from 'next/link';
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
 
 export default async function CategoryManagementPage({
   searchParams,
@@ -14,17 +15,17 @@ export default async function CategoryManagementPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   const supabase = await createClient();
-  const { data } = await supabase.from('category').select();
+  const { data } = await supabase.from("category").select();
 
-  const womenCategories = data?.filter((cat) => cat.sex === 'women');
-  const menCategories = data?.filter((cat) => cat.sex === 'men');
+  const womenCategories = data?.filter((cat) => cat.sex === "women");
+  const menCategories = data?.filter((cat) => cat.sex === "men");
 
-  const selected = ((await searchParams).selected as string) || '';
+  const selected = ((await searchParams).selected as string) || "";
 
   return (
     <div className="min-h-[calc(100vh-10rem)]">
-      <h1 className="text-3xl font-bold">카테고리 관리</h1>
-      <div className=" grid grid-cols-2 gap-8">
+      <h1 className="text-3xl font-bold my-2">카테고리 관리</h1>
+      <div className={cn("", "lg:grid lg:grid-cols-2 lg:gap-8")}>
         <div>
           {/* 카테고리 추가 */}
           <div className="bg-slate-200 py-4 px-6 rounded-2xl my-8 mx-auto">
@@ -42,15 +43,10 @@ export default async function CategoryManagementPage({
                     <TableRow key={cat.id}>
                       <TableCell>{cat.name}</TableCell>
                       <TableCell className="flex justify-end gap-2">
-                        <Link
-                          href={`?selected=${cat.sex}-${cat.name}`}
-                          className=""
-                        >
+                        <Link href={`?selected=${cat.sex}-${cat.name}`} className="">
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton
-                          action={deleteCategory.bind(null, cat.id)}
-                        />
+                        <DeleteButton action={deleteCategory.bind(null, cat.id)} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -64,15 +60,10 @@ export default async function CategoryManagementPage({
                     <TableRow key={cat.id}>
                       <TableCell>{cat.name}</TableCell>
                       <TableCell className="flex justify-end gap-2">
-                        <Link
-                          href={`?selected=${cat.sex}-${cat.name}`}
-                          className=""
-                        >
+                        <Link href={`?selected=${cat.sex}-${cat.name}`} className="">
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton
-                          action={deleteCategory.bind(null, cat.id)}
-                        />
+                        <DeleteButton action={deleteCategory.bind(null, cat.id)} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -83,8 +74,8 @@ export default async function CategoryManagementPage({
         </div>
 
         {/* 카테고리 별 제품 */}
-        <div className="w-full h-full bg-slate-50 rounded-2xl p-4">
-          <CategoryProductView category={selected.replace('-', '/')} />
+        <div className="w-full h-full bg-slate-50 rounded-2xl p-4 my-2">
+          <CategoryProductView category={selected.replace("-", "/")} />
         </div>
       </div>
     </div>

@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Category } from "@/types/category";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { getCategoriesBySex } from "@/actions/category";
+import { cn } from "@/lib/utils";
 
 const initialState: ProductFormState = { success: false };
 
@@ -89,28 +90,16 @@ export default function ProductForm() {
 
   return (
     <form action={formAction} className="bg-blue-50 px-6 py-4 rounded-2xl my-4" ref={formRef}>
-      <div className="w-full flex items-center gap-8 mb-4">
-        <div className="w-1/2 flex flex-col gap-4">
+      <div className={cn("w-full flex justify-center gap-8 mb-4 flex-col", "md:flex-row md:items-center")}>
+        <div className={cn("w-full flex flex-col gap-4", "md:w-1/2")}>
           <div>
             <label htmlFor="name">제품명</label>
-            <Input
-              type="text"
-              name="name"
-              id="name"
-              className="w-[80%] bg-white"
-              defaultValue={formState?.values?.name}
-            />
+            <Input type="text" name="name" id="name" className="bg-white" defaultValue={formState?.values?.name} />
             {<p className="text-red-500 text-sm">{formState?.errors?.name}</p>}
           </div>
           <div>
             <label htmlFor="brand">제조사</label>
-            <Input
-              type="text"
-              name="brand"
-              id="brand"
-              className="w-[80%] bg-white"
-              defaultValue={formState?.values?.brand}
-            />
+            <Input type="text" name="brand" id="brand" className="bg-white" defaultValue={formState?.values?.brand} />
             {<p className="text-red-500 text-sm">{formState?.errors?.brand}</p>}
           </div>
           <div>
@@ -121,7 +110,7 @@ export default function ProductForm() {
               id="price"
               min={0}
               defaultValue={formState?.values?.price}
-              className="w-[80%] bg-white"
+              className="bg-white"
             />
             {<p className="text-red-500 text-sm">{formState?.errors?.price}</p>}
           </div>
@@ -132,7 +121,7 @@ export default function ProductForm() {
               name="description"
               id="description"
               defaultValue={formState?.values?.description}
-              className="w-[80%] bg-white"
+              className="bg-white"
             />
             {<p className="text-red-500 text-sm">{formState?.errors?.description}</p>}
           </div>
@@ -169,12 +158,12 @@ export default function ProductForm() {
           </div>
           <div>
             <label htmlFor="image">제품 이미지</label>
-            <Input type="file" name="image" className="w-fit bg-white" id="image" onChange={onChangeImage} />
+            <Input type="file" name="image" className="bg-white" id="image" onChange={onChangeImage} />
             <p className="text-xs text-gray-500 mt-1">1MB 이하의 이미지만 삽입해주세요.</p>
             {<p className="text-red-500 text-sm">{formState?.errors?.image}</p>}
           </div>
         </div>
-        <div className="flex-1 aspect-square bg-slate-500 relative">
+        <div className={cn("w-36 aspect-square bg-slate-500 relative", "md:flex-1")}>
           {pickedImage && <Image src={pickedImage} fill alt="product image" className="object-cover" />}
         </div>
       </div>

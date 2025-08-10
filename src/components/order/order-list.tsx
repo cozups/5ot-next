@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { toastError } from "@/lib/utils";
+import { cn, toastError } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/types/orders";
 import OrderStatusAction from "./order-status-action";
@@ -57,7 +57,7 @@ export default function OrderList({ initialData, errors, admin = false }: OrderL
 
   return (
     <>
-      <Table>
+      <Table className={cn("text-xs", "lg:text-sm")}>
         <TableHeader>
           <TableRow>
             <TableHead>주문자</TableHead>

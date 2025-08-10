@@ -29,8 +29,10 @@ export default async function ProductListPage({ params, searchParams }: ProductL
         {sex === "men" ? "남성" : "여성"} {category}
       </h2>
       {/* product list */}
-      <ProductList page={currentPage} category={`${sex}/${category}`} initialData={data} />
-      {!!totalCount && <CustomPagination currentPage={currentPage} totalPage={totalPage} />}
+      <div>
+        <ProductList page={currentPage} category={`${sex}/${category}`} initialData={data} />
+        {!!totalCount && <CustomPagination currentPage={currentPage} totalPage={totalPage} />}
+      </div>
     </div>
   );
 }

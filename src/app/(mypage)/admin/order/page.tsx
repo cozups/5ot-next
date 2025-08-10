@@ -6,7 +6,7 @@ export default async function OrderManagementPage() {
 
   return (
     <div className="h-[calc(100vh-10rem)]">
-      <h1 className="text-3xl font-bold">주문 관리</h1>
+      <h1 className="text-3xl font-bold my-2">주문 관리</h1>
       <div>
         <OrderList initialData={orderList} errors={errors} admin />
       </div>

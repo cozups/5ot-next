@@ -24,7 +24,7 @@ export default async function ProductManagementPage({ searchParams }: ProductMan
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-bold">제품 관리</h1>
+      <h1 className="text-3xl font-bold my-2">제품 관리</h1>
       <div className="w-full">
         {/* 제품 추가 폼 */}
         <ProductForm />
