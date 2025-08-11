@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Pacifico } from "next/font/google";
-import { Menu, ShoppingBasket } from "lucide-react";
+import { ShoppingBasket } from "lucide-react";
 
 import { createClient } from "@/utils/supabase/server";
 import { Button } from "./ui/button";

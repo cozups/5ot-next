@@ -2,7 +2,6 @@ import { createClient } from "@/utils/supabase/server";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,

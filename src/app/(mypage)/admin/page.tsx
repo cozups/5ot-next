@@ -1,5 +1,4 @@
 import { getRecentReviews } from "@/actions/reviews";
-import ReviewItem from "@/components/product/review-Item";
 import { cn, getOrderProcessRate } from "@/lib/utils";
 import { Order } from "@/types/orders";
 import { createClient } from "@/utils/supabase/server";

@@ -1,6 +1,5 @@
-import { Cart } from '@/types/cart';
-import { Purchase } from '@/types/orders';
-import { create } from 'zustand';
+import { Cart } from "@/types/cart";
+import { create } from "zustand";
 
 export interface CartStore {
   data: Cart[];

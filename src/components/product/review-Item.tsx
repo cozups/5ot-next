@@ -1,14 +1,13 @@
-'use client';
+"use client";
 
-import { Review } from '@/types/products';
-import { Star } from 'lucide-react';
-import { deleteReview } from '@/actions/reviews';
-import DeleteButton from '../delete-button';
-import UpdateReviewDialog from './update-review-dialog';
-import { cn } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
-import { getUser } from '@/actions/auth';
-import { useInvalidateCache } from '@/hooks/useInvalidateCache';
+import { Review } from "@/types/products";
+import { Star } from "lucide-react";
+import { deleteReview } from "@/actions/reviews";
+import DeleteButton from "../delete-button";
+import UpdateReviewDialog from "./update-review-dialog";
+import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { getUser } from "@/actions/auth";
 
 export default function ReviewItem({
   review,
@@ -22,17 +21,15 @@ export default function ReviewItem({
   showProducts?: boolean;
 }) {
   const { data: user } = useQuery({
-    queryKey: ['user'],
+    queryKey: ["user"],
     queryFn: getUser,
     staleTime: 5 * 60 * 1000,
   });
-  const { invalidateCache } = useInvalidateCache(['reviews']);
 
-  const isAllowed =
-    user?.user_metadata.role === 'admin' || user?.id === review.user_id;
+  const isAllowed = user?.user_metadata.role === "admin" || user?.id === review.user_id;
 
   return (
-    <li className={cn('bg-gray-100 rounded-xl p-4', className)}>
+    <li className={cn("bg-gray-100 rounded-xl p-4", className)}>
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <p className="font-semibold">{review.profiles?.name}</p>
@@ -43,18 +40,11 @@ export default function ReviewItem({
         </div>
         {panel && isAllowed && (
           <div className="flex gap-1">
-            {user?.id === review.user_id && (
-              <UpdateReviewDialog review={review} />
-            )}
-            <DeleteButton
-              action={deleteReview.bind(null, review.id)}
-              queryKey={['reviews']}
-            />
+            {user?.id === review.user_id && <UpdateReviewDialog review={review} />}
+            <DeleteButton action={deleteReview.bind(null, review.id)} queryKey={["reviews"]} />
           </div>
         )}
-        {showProducts && (
-          <p className="text-xs">[{review.products.name}] 구매</p>
-        )}
+        {showProducts && <p className="text-xs">[{review.products.name}] 구매</p>}
       </div>
       <div className="mt-2">{review.content}</div>
     </li>

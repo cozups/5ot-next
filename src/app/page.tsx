@@ -1,11 +1,11 @@
+import Image from "next/image";
+import Link from "next/link";
+import clsx from "clsx";
+
 import MainImageSlider from "@/components/main-image-slider";
-import SideBar from "@/components/side-bar";
 import { cn } from "@/lib/utils";
 import { Products } from "@/types/products";
 import { createClient } from "@/utils/supabase/server";
-import clsx from "clsx";
-import Image from "next/image";
-import Link from "next/link";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -21,7 +21,13 @@ export default async function Home() {
             <div className={cn("grid grid-cols-2 gap-1", "md:gap-2", "lg:grid-cols-4 lg:gap-4")}>
               {data.map((product: Products) => (
                 <div key={product.id} className="w-full aspect-square rounded-lg relative overflow-hidden group">
-                  <Image src={product.image} alt={product.name} fill className="object-cover" />
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1200px) 50vw, 20vw"
+                  />
 
                   <Link href={`/${product.category}/${product.id}`}>
                     <div

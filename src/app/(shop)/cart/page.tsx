@@ -1,49 +1,34 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { useCartStore } from '@/store';
-import { Cart } from '@/types/cart';
-import { Trash } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useCartStore } from "@/store";
+import { Cart } from "@/types/cart";
+import { Trash } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function CartPage() {
   const { data: cartData, setData: setCartData } = useCartStore();
   const router = useRouter();
 
   const toggleCart = (id: string) => {
-    const updated = cartData.map((cart) =>
-      cart.product.id === id ? { ...cart, isSelected: !cart.isSelected } : cart
-    );
-    localStorage.setItem('cart', JSON.stringify(updated));
+    const updated = cartData.map((cart) => (cart.product.id === id ? { ...cart, isSelected: !cart.isSelected } : cart));
+    localStorage.setItem("cart", JSON.stringify(updated));
     setCartData(updated);
   };
 
-  const onChangeQty = (
-    cart: Cart,
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const onChangeQty = (cart: Cart, event: React.ChangeEvent<HTMLInputElement>) => {
     const newQty = event.target.value;
-    const index = cartData.findIndex(
-      (data) => data.product.id === cart.product.id
-    );
+    const index = cartData.findIndex((data) => data.product.id === cart.product.id);
 
     if (index > -1) {
       const updated = [...cartData];
       updated[index] = { ...updated[index], qty: newQty };
-      localStorage.setItem('cart', JSON.stringify(updated));
+      localStorage.setItem("cart", JSON.stringify(updated));
       setCartData(updated);
     }
   };
@@ -53,11 +38,11 @@ export default function CartPage() {
     setCartData(updated);
 
     if (!updated.length) {
-      localStorage.removeItem('cart');
+      localStorage.removeItem("cart");
       setCartData([]);
       return;
     }
-    localStorage.setItem('cart', JSON.stringify(updated));
+    localStorage.setItem("cart", JSON.stringify(updated));
     setCartData(updated);
   };
 
@@ -67,14 +52,11 @@ export default function CartPage() {
       product: item.product,
       qty: item.qty,
     }));
-    sessionStorage.setItem('purchase', JSON.stringify(data));
-    router.push('/purchase');
+    sessionStorage.setItem("purchase", JSON.stringify(data));
+    router.push("/purchase");
   };
   const selected = cartData.filter((cart) => cart.isSelected);
-  const totalPrice = selected.reduce(
-    (acc, data) => acc + parseInt(data.product.price) * parseInt(data.qty),
-    0
-  );
+  const totalPrice = selected.reduce((acc, data) => acc + parseInt(data.product.price) * parseInt(data.qty), 0);
 
   return (
     <div>
@@ -94,19 +76,11 @@ export default function CartPage() {
             {cartData.map((cart) => (
               <TableRow key={`${cart.product.id}-${cart.qty}`}>
                 <TableCell>
-                  <Checkbox
-                    defaultChecked={cart.isSelected}
-                    onCheckedChange={toggleCart.bind(null, cart.product.id)}
-                  />
+                  <Checkbox defaultChecked={cart.isSelected} onCheckedChange={toggleCart.bind(null, cart.product.id)} />
                 </TableCell>
                 <TableCell className="flex items-center gap-4">
                   <div className="w-16 aspect-square relative">
-                    <Image
-                      src={cart.product.image}
-                      fill
-                      alt={cart.product.name}
-                      className="object-cover"
-                    />
+                    <Image src={cart.product.image} fill alt={cart.product.name} className="object-cover" />
                   </div>
                   <p>{cart.product.name}</p>
                 </TableCell>
@@ -142,24 +116,14 @@ export default function CartPage() {
         <h2 className="text-lg font-semibold">합계</h2>
         <div className="flex flex-col">
           <div className="w-96 h-32 overflow-auto">
-            {selected.length === 0 && (
-              <p className="text-sm">선택된 상품이 없습니다.</p>
-            )}
+            {selected.length === 0 && <p className="text-sm">선택된 상품이 없습니다.</p>}
             {selected.length > 0 &&
               selected.map((data) => (
-                <div
-                  key={data.product.id}
-                  className="text-sm flex justify-between items-center"
-                >
+                <div key={data.product.id} className="text-sm flex justify-between items-center">
                   <p>
                     {data.product.name} X {data.qty}
                   </p>
-                  <p>
-                    {(
-                      parseInt(data.product.price) * parseInt(data.qty)
-                    ).toLocaleString()}
-                    원
-                  </p>
+                  <p>{(parseInt(data.product.price) * parseInt(data.qty)).toLocaleString()}원</p>
                 </div>
               ))}
           </div>

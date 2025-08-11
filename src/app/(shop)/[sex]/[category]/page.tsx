@@ -1,7 +1,7 @@
 import { getProductsByPagination } from "@/actions/products";
 import ProductList from "@/components/product/product-list";
 import CustomPagination from "@/components/ui/custom-pagination";
-import { cn, getTotalPage } from "@/lib/utils";
+import { getTotalPage } from "@/lib/utils";
 
 interface ProductListPageProps {
   params: Promise<{

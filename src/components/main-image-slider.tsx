@@ -22,13 +22,32 @@ export default function MainImageSlider() {
     >
       <CarouselContent className="h-full -mt-0">
         <CarouselItem className="relative">
-          <Image src="/images/main-1.jpg" fill className="object-cover" alt="" />
+          <Image
+            src="/images/main-1.jpg"
+            fill
+            className="object-cover"
+            alt="main-image-1"
+            priority
+            sizes="(max-width: 1200px) 100vw, 80vw"
+          />
         </CarouselItem>
         <CarouselItem className="relative">
-          <Image src="/images/main-2.jpg" fill className="object-cover" alt="" />
+          <Image
+            src="/images/main-2.jpg"
+            fill
+            className="object-cover"
+            alt="main-image-2"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 80vw"
+          />
         </CarouselItem>
         <CarouselItem className="relative">
-          <Image src="/images/main-3.jpg" fill className="object-cover" alt="" />
+          <Image
+            src="/images/main-3.jpg"
+            fill
+            className="object-cover"
+            alt="main-image-3"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 80vw"
+          />
         </CarouselItem>
       </CarouselContent>
     </Carousel>

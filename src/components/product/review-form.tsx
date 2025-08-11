@@ -1,27 +1,19 @@
-'use client';
+"use client";
 
-import { Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Review } from '@/types/products';
-import { DialogClose, DialogFooter } from '../ui/dialog';
-import { useActionState, useEffect } from 'react';
-import { createReview, ReviewFormState } from '@/actions/reviews';
-import { toastError } from '@/lib/utils';
-import { toast } from 'sonner';
-import { QueryClient, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/app/providers';
-import { useInvalidateCache } from '@/hooks/useInvalidateCache';
+import { Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Review } from "@/types/products";
+import { DialogClose, DialogFooter } from "../ui/dialog";
+import { useActionState, useEffect } from "react";
+import { createReview, ReviewFormState } from "@/actions/reviews";
+import { toastError } from "@/lib/utils";
+import { toast } from "sonner";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 
 interface ReviewFormProps {
-  mode?: 'write' | 'update';
+  mode?: "write" | "update";
   action?: (payload: FormData) => void;
   data?: Review;
   productId?: string;
@@ -29,40 +21,29 @@ interface ReviewFormProps {
 
 const initialState: ReviewFormState = { success: false };
 
-export default function ReviewForm({
-  mode = 'write',
-  action,
-  data,
-  productId,
-}: ReviewFormProps) {
-  const [formState, formAction] = useActionState(
-    createReview.bind(null, productId ? productId : ''),
-    initialState
-  );
+export default function ReviewForm({ mode = "write", action, data, productId }: ReviewFormProps) {
+  const [formState, formAction] = useActionState(createReview.bind(null, productId ? productId : ""), initialState);
 
-  const { invalidateCache } = useInvalidateCache(['reviews']);
+  const { invalidateCache } = useInvalidateCache(["reviews"]);
 
   useEffect(() => {
-    if (mode === 'write') {
+    if (mode === "write") {
       if (formState.success) {
-        toast.success('리뷰가 작성되었습니다.');
+        toast.success("리뷰가 작성되었습니다.");
         invalidateCache();
       }
 
       if (formState.errors) {
-        toastError('리뷰 작성 중 문제가 발생했습니다.', formState.errors);
+        toastError("리뷰 작성 중 문제가 발생했습니다.", formState.errors);
       }
     }
   }, [formState, mode, invalidateCache]);
 
   return (
-    <form
-      action={mode === 'write' ? formAction : action}
-      className="my-2 flex flex-col gap-4"
-    >
+    <form action={mode === "write" ? formAction : action} className="my-2 flex flex-col gap-4">
       <div className="flex items-center gap-2 mt-4">
         <Star fill="orange" className="w-4 h-4" />
-        <Select name="star" defaultValue={data ? data.star.toString() : '5'}>
+        <Select name="star" defaultValue={data ? data.star.toString() : "5"}>
           <SelectTrigger>
             <SelectValue placeholder="평점" />
           </SelectTrigger>
@@ -80,9 +61,9 @@ export default function ReviewForm({
         id="review"
         className="w-full border"
         placeholder="리뷰를 작성해 주세요."
-        defaultValue={mode === 'update' ? data?.content : ''}
+        defaultValue={mode === "update" ? data?.content : ""}
       ></Textarea>
-      {mode === 'update' && (
+      {mode === "update" && (
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="secondary">취소</Button>
@@ -94,7 +75,7 @@ export default function ReviewForm({
           </DialogClose>
         </DialogFooter>
       )}
-      {mode === 'write' && (
+      {mode === "write" && (
         <Button type="submit" className="cursor-pointer self-end">
           제출하기
         </Button>

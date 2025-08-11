@@ -1,46 +1,40 @@
-'use server';
+"use server";
 
-import { Products } from '@/types/products';
-import { createClient } from '@/utils/supabase/server';
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod/v4';
-import { generateRandomId } from '@/lib/utils';
-import { Category } from '@/types/category';
-import { ApiResponse, PaginationResponse } from '@/types/response';
+import { Products } from "@/types/products";
+import { createClient } from "@/utils/supabase/server";
+import { revalidatePath } from "next/cache";
+import { z } from "zod/v4";
+import { generateRandomId } from "@/lib/utils";
+import { Category } from "@/types/category";
+import { ApiResponse } from "@/types/response";
 
 const formSchema = z.object({
-  name: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
-  brand: z.string().trim().min(1, '제조사를 반드시 입력해주세요.'),
-  price: z.string().trim().min(1, '가격을 반드시 입력해주세요.'),
-  description: z.string().trim().min(1, '제품 설명을 적어주세요.'),
-  category: z.string().trim().min(1, '카테고리를 지정해주세요.'),
-  sex: z.string().trim().min(1, '성별을 선택해주세요'),
+  name: z.string().trim().min(1, "이름을 반드시 입력해주세요."),
+  brand: z.string().trim().min(1, "제조사를 반드시 입력해주세요."),
+  price: z.string().trim().min(1, "가격을 반드시 입력해주세요."),
+  description: z.string().trim().min(1, "제품 설명을 적어주세요."),
+  category: z.string().trim().min(1, "카테고리를 지정해주세요."),
+  sex: z.string().trim().min(1, "성별을 선택해주세요"),
 });
 
-export type ProductFormState = ApiResponse<
-  typeof formSchema,
-  Products[] | null
->;
+export type ProductFormState = ApiResponse<typeof formSchema, Products[] | null>;
 
-export async function insertProduct(
-  prevState: ProductFormState,
-  formData: FormData
-): Promise<ProductFormState> {
+export async function insertProduct(prevState: ProductFormState, formData: FormData): Promise<ProductFormState> {
   const raw = {
-    name: formData.get('name')?.toString() || '',
-    brand: formData.get('brand')?.toString() || '',
-    price: formData.get('price')?.toString() || '',
-    image: formData.get('image') as File,
-    description: formData.get('description')?.toString() || '',
-    category: formData.get('category')?.toString() || '',
-    sex: formData.get('sex')?.toString() || '',
+    name: formData.get("name")?.toString() || "",
+    brand: formData.get("brand")?.toString() || "",
+    price: formData.get("price")?.toString() || "",
+    image: formData.get("image") as File,
+    description: formData.get("description")?.toString() || "",
+    category: formData.get("category")?.toString() || "",
+    sex: formData.get("sex")?.toString() || "",
   };
 
   const result = formSchema.safeParse(raw);
   let errors: Record<string, string[]> = {};
 
   if (raw.image.size === 0) {
-    errors.image = ['이미지를 넣어주세요.'];
+    errors.image = ["이미지를 넣어주세요."];
   }
 
   if (!result.success) {
@@ -62,36 +56,30 @@ export async function insertProduct(
 
   // 이미지 업로드
   const supabase = await createClient();
-  const imageName = `images/${generateRandomId()}.${
-    raw.image.type.split('/')[1]
-  }`;
+  const imageName = `images/${generateRandomId()}.${raw.image.type.split("/")[1]}`;
 
-  const { data, error } = await supabase.storage
-    .from('products')
-    .upload(imageName, raw.image);
+  const { data, error } = await supabase.storage.from("products").upload(imageName, raw.image);
 
   if (error) {
     return {
       success: false,
       errors: {
-        imageUpload: ['이미지 업로드에 실패했습니다.'],
+        imageUpload: ["이미지 업로드에 실패했습니다."],
       },
     };
   }
 
-  const { data: uploadedPath } = supabase.storage
-    .from('products')
-    .getPublicUrl(data.path);
+  const { data: uploadedPath } = supabase.storage.from("products").getPublicUrl(data.path);
 
   // DB에 저장
   const { data: category } = await supabase
-    .from('category')
+    .from("category")
     .select()
-    .eq('sex', raw.sex)
-    .eq('name', raw.category)
+    .eq("sex", raw.sex)
+    .eq("name", raw.category)
     .overrideTypes<Category[]>();
 
-  const { error: productUploadError } = await supabase.from('products').insert({
+  const { error: productUploadError } = await supabase.from("products").insert({
     name: raw.name,
     brand: raw.brand,
     price: raw.price,
@@ -105,12 +93,12 @@ export async function insertProduct(
     return {
       success: false,
       errors: {
-        insertError: ['제품을 업로드 하지 못했습니다.'],
+        insertError: ["제품을 업로드 하지 못했습니다."],
       },
     };
   }
 
-  revalidatePath('/admin/product');
+  revalidatePath("/admin/product");
   return { success: true };
 }
 
@@ -120,12 +108,10 @@ export async function deleteProduct(
   const supabase = await createClient();
 
   // 이미지 삭제
-  const filePath = product.image?.split('/products/')[1];
+  const filePath = product.image?.split("/products/")[1];
 
   if (filePath) {
-    const { error: deleteImageError } = await supabase.storage
-      .from('products')
-      .remove([filePath]);
+    const { error: deleteImageError } = await supabase.storage.from("products").remove([filePath]);
 
     if (deleteImageError) {
       return {
@@ -138,10 +124,7 @@ export async function deleteProduct(
   }
 
   // 데이터 삭제
-  const { error: deleteProductError } = await supabase
-    .from('products')
-    .delete()
-    .eq('id', product.id);
+  const { error: deleteProductError } = await supabase.from("products").delete().eq("id", product.id);
 
   if (deleteProductError) {
     return {
@@ -152,7 +135,7 @@ export async function deleteProduct(
     };
   }
 
-  revalidatePath('/admin/product');
+  revalidatePath("/admin/product");
   return { success: true };
 }
 
@@ -162,13 +145,13 @@ export async function updateProduct(
   formData: FormData
 ): Promise<ProductFormState> {
   const raw = {
-    name: formData.get('name')?.toString() || '',
-    brand: formData.get('brand')?.toString() || '',
-    price: formData.get('price')?.toString() || '',
-    image: formData.get('image') as File,
-    description: formData.get('description')?.toString() || '',
-    category: formData.get('category')?.toString() || '',
-    sex: formData.get('sex')?.toString() || '',
+    name: formData.get("name")?.toString() || "",
+    brand: formData.get("brand")?.toString() || "",
+    price: formData.get("price")?.toString() || "",
+    image: formData.get("image") as File,
+    description: formData.get("description")?.toString() || "",
+    category: formData.get("category")?.toString() || "",
+    sex: formData.get("sex")?.toString() || "",
   };
 
   const result = formSchema.safeParse(raw);
@@ -189,16 +172,14 @@ export async function updateProduct(
   }
 
   const supabase = await createClient();
-  let updatedImagePath = '';
+  let updatedImagePath = "";
 
   // 이미지 업데이트
   if (raw.image?.size > 0) {
-    const filePath = originalData.image.split('/products/')[1];
-    const { data, error: imageUpdateError } = await supabase.storage
-      .from('products')
-      .update(filePath, raw.image, {
-        upsert: true,
-      });
+    const filePath = originalData.image.split("/products/")[1];
+    const { data, error: imageUpdateError } = await supabase.storage.from("products").update(filePath, raw.image, {
+      upsert: true,
+    });
 
     if (imageUpdateError) {
       return {
@@ -209,15 +190,14 @@ export async function updateProduct(
       };
     }
 
-    updatedImagePath = supabase.storage.from('products').getPublicUrl(data.path)
-      .data.publicUrl;
+    updatedImagePath = supabase.storage.from("products").getPublicUrl(data.path).data.publicUrl;
   }
 
   const { data: category } = await supabase
-    .from('category')
+    .from("category")
     .select()
-    .eq('sex', raw.sex)
-    .eq('name', raw.category)
+    .eq("sex", raw.sex)
+    .eq("name", raw.category)
     .overrideTypes<Category[]>();
 
   const dataToUpdate = {
@@ -230,13 +210,9 @@ export async function updateProduct(
   };
 
   const { error: productUpdateError } = await supabase
-    .from('products')
-    .update(
-      updatedImagePath.length > 0
-        ? Object.assign(dataToUpdate, { image: updatedImagePath })
-        : dataToUpdate
-    )
-    .eq('id', originalData.id);
+    .from("products")
+    .update(updatedImagePath.length > 0 ? Object.assign(dataToUpdate, { image: updatedImagePath }) : dataToUpdate)
+    .eq("id", originalData.id);
 
   if (productUpdateError) {
     return {
@@ -247,32 +223,29 @@ export async function updateProduct(
     };
   }
 
-  revalidatePath('/admin/product');
+  revalidatePath("/admin/product");
   return { success: true };
 }
 
 export async function getProductByName(name: string): Promise<Products[]> {
   const supabase = await createClient();
 
-  const { data } = await supabase.rpc('search_product_by_compact_name', {
+  const { data } = await supabase.rpc("search_product_by_compact_name", {
     search_text: name.trim(),
   });
 
   return data || [];
 }
 
-export async function getProductsByPagination(
-  query: string,
-  options: { pageNum: number; itemsPerPage: number }
-) {
+export async function getProductsByPagination(query: string, options: { pageNum: number; itemsPerPage: number }) {
   const from = (options.pageNum - 1) * options.itemsPerPage;
   const to = from + options.itemsPerPage - 1;
 
   const supabase = await createClient();
   const { data, count, error } = await supabase
-    .from('products')
-    .select('*', { count: 'exact' })
-    .eq('category', query)
+    .from("products")
+    .select("*", { count: "exact" })
+    .eq("category", query)
     .range(from, to)
     .overrideTypes<Products[]>();
 
@@ -283,17 +256,14 @@ export async function getProductsByPagination(
   return { data, count: count || 0 };
 }
 
-export async function getAllProductsByPagination(options: {
-  pageNum: number;
-  itemsPerPage: number;
-}) {
+export async function getAllProductsByPagination(options: { pageNum: number; itemsPerPage: number }) {
   const from = (options.pageNum - 1) * options.itemsPerPage;
   const to = from + options.itemsPerPage - 1;
 
   const supabase = await createClient();
   const { data, count, error } = await supabase
-    .from('products')
-    .select('*', { count: 'exact' })
+    .from("products")
+    .select("*", { count: "exact" })
     .range(from, to)
     .overrideTypes<Products[]>();
 
@@ -304,15 +274,9 @@ export async function getAllProductsByPagination(options: {
   return { data, count: count || 0 };
 }
 
-export async function getProductById(
-  id: string
-): Promise<ApiResponse<null, Products | null>> {
+export async function getProductById(id: string): Promise<ApiResponse<null, Products | null>> {
   const supabase = await createClient();
-  const { data } = await supabase
-    .from('products')
-    .select()
-    .eq('id', id)
-    .single<Products>();
+  const { data } = await supabase.from("products").select().eq("id", id).single<Products>();
 
   return {
     success: true,
