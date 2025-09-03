@@ -6,6 +6,11 @@ import UserList from "@/components/admin/user-list";
 import { getUserList } from "@/actions/auth";
 import ReviewList from "@/components/product/review-list";
 
+export const metadata = {
+  title: "관리자 페이지 | 5ot Next",
+  description: "관리자 페이지 입니다.",
+};
+
 export default async function AdminPage() {
   const supabase = await createClient();
   const { data: userListData } = await getUserList();

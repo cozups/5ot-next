@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils";
 import { Products } from "@/types/products";
 import { createClient } from "@/utils/supabase/server";
 
+export const metadata = {
+  title: "5ot Next",
+  description: "Welcome to 5ot-Next store",
+};
+
 export default async function Home() {
   const supabase = await createClient();
   const { data } = await supabase.from("products").select().order("created_at", { ascending: false }).limit(4);

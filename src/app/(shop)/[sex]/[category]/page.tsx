@@ -11,6 +11,14 @@ interface ProductListPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+export const generateMetadata = async ({ params }: ProductListPageProps) => {
+  const { sex, category } = await params;
+  return {
+    title: `${sex}/${category} | 5ot Next`,
+    description: `${sex}/${category} 카테고리 페이지 입니다.`,
+  };
+};
+
 export default async function ProductListPage({ params, searchParams }: ProductListPageProps) {
   const { sex, category } = await params;
   const { page } = await searchParams;

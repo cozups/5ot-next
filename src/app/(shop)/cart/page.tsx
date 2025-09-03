@@ -11,6 +11,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+export const metadata = {
+  title: "장바구니 | 5ot Next",
+  description: "장바구니 페이지 입니다.",
+};
+
 export default function CartPage() {
   const { data: cartData, setData: setCartData } = useCartStore();
   const router = useRouter();

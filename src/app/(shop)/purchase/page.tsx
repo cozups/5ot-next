@@ -13,6 +13,11 @@ import OrderForm from "@/components/order/order-form";
 import { toastError } from "@/lib/utils";
 import { useCartStore } from "@/store";
 
+export const metadata = {
+  title: "구매하기 | 5ot Next",
+  description: "구매하기 페이지 입니다.",
+};
+
 const initialState: OrderFormState = { success: false };
 
 export default function PurchasePage() {

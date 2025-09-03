@@ -15,6 +15,23 @@ interface ProductDetailPageProps {
   searchParams: Promise<{ page: string }>;
 }
 
+export const generateMetadata = async ({ params }: ProductDetailPageProps) => {
+  const { productId } = await params;
+  const { data: product, errors } = await getProductById(productId);
+
+  if (errors || !product) {
+    return {
+      title: "Product Not Found | 5ot Next",
+      description: "상품을 찾을 수 없습니다.",
+    };
+  }
+
+  return {
+    title: `${product.name} | 5ot Next`,
+    description: product.description,
+  };
+};
+
 export default async function ProductDetailPage({ params, searchParams }: ProductDetailPageProps) {
   const { productId } = await params;
   const { page } = await searchParams;

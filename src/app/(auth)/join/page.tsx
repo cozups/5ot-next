@@ -1,11 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import Link from "next/link";
 
-import { createUser, JoinFormState } from '@/actions/auth';
-import { useActionState, useEffect } from 'react';
-import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
+import { createUser, JoinFormState } from "@/actions/auth";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+export const metadata = {
+  title: "회원가입 | 5ot Next",
+  description: "회원가입 페이지 입니다.",
+};
 
 const initialState: JoinFormState = {
   success: false,
@@ -17,13 +22,13 @@ export default function JoinPage() {
 
   useEffect(() => {
     if (state.success) {
-      toast.success('회원가입에 성공했습니다.', {
-        description: '자동으로 로그인 되었습니다.',
+      toast.success("회원가입에 성공했습니다.", {
+        description: "자동으로 로그인 되었습니다.",
       });
-      router.push('/');
+      router.push("/");
     }
     if (state.errors?.signUpError) {
-      toast.error('회원가입에 실패했습니다.', {
+      toast.error("회원가입에 실패했습니다.", {
         description: state.errors.signUpError[0],
       });
     }
@@ -31,10 +36,7 @@ export default function JoinPage() {
 
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center">
-      <form
-        action={formAction}
-        className="border-2 w-[36rem] flex flex-col items-center py-8"
-      >
+      <form action={formAction} className="border-2 w-[36rem] flex flex-col items-center py-8">
         <h1 className="text-center text-2xl font-bold mb-8">Join</h1>
 
         <div className="w-72 flex flex-col gap-8 my-8">
@@ -60,13 +62,7 @@ export default function JoinPage() {
             <label htmlFor="phone" className="font-semibold">
               전화번호
             </label>
-            <input
-              type="text"
-              id="phone"
-              name="phone"
-              className="border-b-2"
-              defaultValue={state.values?.phone}
-            />
+            <input type="text" id="phone" name="phone" className="border-b-2" defaultValue={state.values?.phone} />
             {state.errors?.phone?.map((msg) => (
               <p key={msg} className="text-sm text-red-600">
                 {msg}
@@ -110,16 +106,10 @@ export default function JoinPage() {
             ))}
           </div>
         </div>
-        <button
-          type="submit"
-          className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer"
-        >
+        <button type="submit" className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">
           회원가입 하기
         </button>
-        <Link
-          href="/login"
-          className="text-center text-xs my-2 text-neutral-600 hover:underline"
-        >
+        <Link href="/login" className="text-center text-xs my-2 text-neutral-600 hover:underline">
           이미 회원이신가요? 로그인 하기
         </Link>
       </form>

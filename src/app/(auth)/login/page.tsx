@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import { LoginFormState, loginUser } from '@/actions/auth';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useActionState, useEffect } from 'react';
-import { toast } from 'sonner';
+import { LoginFormState, loginUser } from "@/actions/auth";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
+
+export const metadata = {
+  title: "로그인 | 5ot Next",
+  description: "로그인 페이지 입니다.",
+};
 
 const initialState: LoginFormState = {
   success: false,
@@ -16,11 +21,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (state.success) {
-      toast.success('로그인 되었습니다.');
-      router.replace('/');
+      toast.success("로그인 되었습니다.");
+      router.replace("/");
     }
     if (state.errors?.loginError) {
-      toast.error('로그인에 실패했습니다.', {
+      toast.error("로그인에 실패했습니다.", {
         description: state.errors.loginError[0],
       });
     }
@@ -28,10 +33,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-[calc(100vh-10rem)] flex items-center justify-center">
-      <form
-        action={formAction}
-        className="border-2 w-[36rem] flex flex-col items-center py-8"
-      >
+      <form action={formAction} className="border-2 w-[36rem] flex flex-col items-center py-8">
         <h1 className="text-center text-2xl font-bold mb-8">Login</h1>
 
         <div className="w-72 flex flex-col gap-8 my-8">
@@ -72,13 +74,8 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">
-          로그인 하기
-        </button>
-        <Link
-          href="/join"
-          className="text-center text-xs my-2 text-neutral-600 hover:underline"
-        >
+        <button className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">로그인 하기</button>
+        <Link href="/join" className="text-center text-xs my-2 text-neutral-600 hover:underline">
           회원이 아니신가요? 회원가입 하기
         </Link>
       </form>
