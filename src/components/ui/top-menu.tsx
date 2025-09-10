@@ -10,7 +10,7 @@ export default async function TopMenu({ className }: { className?: string }) {
   const { data } = await supabase.from("category").select().overrideTypes<Category[]>();
 
   return (
-    <Menubar className={cn("flex gap-8 border-0 shadow-none", className)}>
+    <Menubar className={cn("flex justify-center items-center gap-8 border-0 shadow-none", className)}>
       <MenubarMenu>
         <MenubarTrigger className="font-bold cursor-pointer">Men</MenubarTrigger>
         <MenubarContent>
