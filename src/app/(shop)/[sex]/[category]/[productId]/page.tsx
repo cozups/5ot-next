@@ -56,7 +56,13 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
       {/* product info */}
       <div className={cn("flex flex-col justify-between gap-4", "md:gap-16 md:flex-row")}>
         <div className={cn("w-full aspect-square rounded-xl relative overflow-hidden", "md:w-72", "lg:w-96")}>
-          <Image src={product.image} alt={product.name} fill className="object-cover" />
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 90vw, 33vw)"
+          />
         </div>
         <ProductActionPanel product={product} />
       </div>

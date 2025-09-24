@@ -164,7 +164,15 @@ export default function ProductForm() {
           </div>
         </div>
         <div className={cn("w-36 aspect-square bg-slate-500 relative", "md:flex-1")}>
-          {pickedImage && <Image src={pickedImage} fill alt="product image" className="object-cover" />}
+          {pickedImage && (
+            <Image
+              src={pickedImage}
+              fill
+              alt="product image"
+              className="object-cover"
+              sizes="(max-width: 768px) 33vw, 50vw)"
+            />
+          )}
         </div>
       </div>
       <Button>추가</Button>

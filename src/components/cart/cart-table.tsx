@@ -64,7 +64,7 @@ export default function CartTable() {
               </TableCell>
               <TableCell className="flex items-center gap-4">
                 <div className="w-16 aspect-square relative">
-                  <Image src={cart.product.image} fill alt={cart.product.name} className="object-cover" />
+                  <Image src={cart.product.image} fill alt={cart.product.name} className="object-cover" sizes="10vw" />
                 </div>
                 <p>{cart.product.name}</p>
               </TableCell>

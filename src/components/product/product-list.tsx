@@ -56,7 +56,7 @@ export default function ProductList({
       {isLoading && Array.from({ length: 8 }).map((_, i) => <ProductItemSkeleton key={`${category}-${i}`} />)}
       {isSuccess &&
         data?.map((product: Products) => (
-          <Link key={product.name} href={`/${category}/${product.id}`}>
+          <Link key={product.name} href={`/${category}/${product.id}`} prefetch>
             <ProductItem product={product} />
           </Link>
         ))}

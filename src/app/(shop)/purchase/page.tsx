@@ -80,7 +80,13 @@ export default function PurchasePage() {
                   <TableRow key={`${data.product.id}-${data.qty}`}>
                     <TableCell className="flex items-center gap-4">
                       <div className="w-16 aspect-square relative">
-                        <Image src={data.product.image} fill alt={data.product.name} className="object-cover" />
+                        <Image
+                          src={data.product.image}
+                          fill
+                          alt={data.product.name}
+                          className="object-cover"
+                          sizes="10vw"
+                        />
                       </div>
                       <p>{data.product.name}</p>
                     </TableCell>

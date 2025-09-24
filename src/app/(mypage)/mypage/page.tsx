@@ -37,8 +37,10 @@ export default async function MyPage() {
           <Image
             src={user?.user_metadata.image || "/images/user.png"}
             fill
-            alt="profile image"
+            alt={`${user?.user_metadata.username}'s profile image`}
             className="object-cover"
+            sizes="20vw"
+            priority
           />
         </div>
         <div className="flex flex-1 flex-col justify-between">

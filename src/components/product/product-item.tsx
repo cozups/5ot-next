@@ -1,6 +1,6 @@
-import { Products } from '@/types/products';
-import { Star } from 'lucide-react';
-import Image from 'next/image';
+import { Products } from "@/types/products";
+import { Star } from "lucide-react";
+import Image from "next/image";
 
 export default function ProductItem({ product }: { product: Products }) {
   return (
@@ -11,6 +11,7 @@ export default function ProductItem({ product }: { product: Products }) {
           fill
           alt={product.name}
           className="object-cover"
+          sizes="(max-width: 768px) 45vw, 25vw)"
         />
       </div>
       <p className="text-lg font-semibold mt-2">{product.name}</p>

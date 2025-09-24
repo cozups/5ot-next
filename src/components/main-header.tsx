@@ -65,6 +65,7 @@ export default async function MainHeader() {
                     fill
                     className="w-full object-cover"
                     alt="user profile image"
+                    sizes="5vw"
                   />
                 </div>
                 <p className="text-sm md:text-base">{user.user_metadata.username}</p>

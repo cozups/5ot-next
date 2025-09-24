@@ -45,7 +45,7 @@ export default function ProductListTable({ initialData, currentPage }: ProductLi
             <TableCell className="flex items-center gap-2">
               <div className="w-16 aspect-square relative">
                 {product.image && (
-                  <Image src={product.image} alt={`${product.name} image`} fill className="object-cover" />
+                  <Image src={product.image} alt={`${product.name} image`} fill className="object-cover" sizes="10vw" />
                 )}
               </div>
               <p>{product.name}</p>

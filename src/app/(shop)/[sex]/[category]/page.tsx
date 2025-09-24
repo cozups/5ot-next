@@ -11,6 +11,8 @@ interface ProductListPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+const ITEMS_PER_PAGE = 8;
+
 export const generateMetadata = async ({ params }: ProductListPageProps) => {
   const { sex, category } = await params;
   return {
@@ -23,13 +25,12 @@ export default async function ProductListPage({ params, searchParams }: ProductL
   const { sex, category } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
-  const itemsPerPage = 8;
 
   const { data, count: totalCount } = await getProductsByPagination(`${sex}/${category}`, {
     pageNum: currentPage,
-    itemsPerPage,
+    itemsPerPage: ITEMS_PER_PAGE,
   });
-  const totalPage = getTotalPage(totalCount || 0, itemsPerPage);
+  const totalPage = getTotalPage(totalCount || 0, ITEMS_PER_PAGE);
 
   return (
     <div className="h-full">
