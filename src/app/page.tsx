@@ -1,11 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
-import clsx from "clsx";
-
-import MainImageSlider from "@/components/main-image-slider";
+import MainImageSlider from "@/components/home/main-image-slider";
+import RecentProducts from "@/components/home/recent-products";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Products } from "@/types/products";
-import { createClient } from "@/utils/supabase/server";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "5ot Next",
@@ -13,43 +10,27 @@ export const metadata = {
 };
 
 export default async function Home() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("products").select().order("created_at", { ascending: false }).limit(4);
-
   return (
     <div className={cn("mx-auto", "lg:w-[64rem]")}>
       <div className="w-full">
         <MainImageSlider />
-        {data && data.length > 0 && (
-          <div>
-            <h2 className="my-4 text-2xl font-bold">new</h2>
-            <div className={cn("grid grid-cols-2 gap-1", "md:gap-2", "lg:grid-cols-4 lg:gap-4")}>
-              {data.map((product: Products) => (
-                <div key={product.id} className="w-full aspect-square rounded-lg relative overflow-hidden group">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1200px) 50vw, 20vw"
+        <div>
+          <h2 className="my-4 text-2xl font-bold">new</h2>
+          <Suspense
+            fallback={
+              <div className={cn("grid grid-cols-2 gap-1", "md:gap-2", "lg:grid-cols-4 lg:gap-4")}>
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <Skeleton
+                    key={`recent-products-skeleton-${index}`}
+                    className="w-full aspect-square rounded-lg mb-1"
                   />
-
-                  <Link href={`/${product.category}/${product.id}`}>
-                    <div
-                      className={clsx(
-                        "bg-[rgba(0,0,0,0.25)] absolute top-0 left-0 w-full h-full cursor-pointer",
-                        "flex items-center justify-center",
-                        "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      )}
-                    >
-                      <p className="text-white font-semibold">{product.name}</p>
-                    </div>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+                ))}
+              </div>
+            }
+          >
+            <RecentProducts />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
