@@ -84,7 +84,7 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
               fill
               className="object-cover"
               alt="profile image"
-              sizes="(max-width: 768px) 50vw, 25vw)"
+              sizes="(max-width: 768px) 50vw, 25vw"
             />
             {!isChanged && (
               <div className="w-full h-full absolute top-0 left-0 bg-[rgba(0,0,0,0.25)] cursor-pointer rounded-full flex items-center justify-center">

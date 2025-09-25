@@ -111,7 +111,7 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
                   fill
                   alt="product image"
                   className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 20vw)"
+                  sizes="(max-width: 768px) 50vw, 20vw"
                 />
               )}
             </div>

@@ -11,7 +11,7 @@ export default function ProductItem({ product }: { product: Products }) {
           fill
           alt={product.name}
           className="object-cover"
-          sizes="(max-width: 768px) 45vw, 25vw)"
+          sizes="(max-width: 768px) 45vw, 25vw"
         />
       </div>
       <p className="text-lg font-semibold mt-2">{product.name}</p>

@@ -61,7 +61,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
             alt={product.name}
             fill
             className="object-cover"
-            sizes="(max-width: 768px) 90vw, 33vw)"
+            sizes="(max-width: 768px) 90vw, 33vw"
           />
         </div>
         <ProductActionPanel product={product} />

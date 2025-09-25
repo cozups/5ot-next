@@ -170,7 +170,7 @@ export default function ProductForm() {
               fill
               alt="product image"
               className="object-cover"
-              sizes="(max-width: 768px) 33vw, 50vw)"
+              sizes="(max-width: 768px) 33vw, 50vw"
             />
           )}
         </div>
