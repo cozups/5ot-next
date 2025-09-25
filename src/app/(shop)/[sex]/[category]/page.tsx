@@ -1,7 +1,6 @@
-import { getProductsByPagination } from "@/actions/products";
 import ProductList from "@/components/product/product-list";
-import CustomPagination from "@/components/ui/custom-pagination";
-import { getTotalPage } from "@/lib/utils";
+import ProductItemSkeleton from "@/components/skeleton/product-item-skeleton";
+import { Suspense } from "react";
 
 interface ProductListPageProps {
   params: Promise<{
@@ -10,8 +9,6 @@ interface ProductListPageProps {
   }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
-
-const ITEMS_PER_PAGE = 8;
 
 export const generateMetadata = async ({ params }: ProductListPageProps) => {
   const { sex, category } = await params;
@@ -26,22 +23,24 @@ export default async function ProductListPage({ params, searchParams }: ProductL
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
 
-  const { data, count: totalCount } = await getProductsByPagination(`${sex}/${category}`, {
-    pageNum: currentPage,
-    itemsPerPage: ITEMS_PER_PAGE,
-  });
-  const totalPage = getTotalPage(totalCount || 0, ITEMS_PER_PAGE);
-
   return (
     <div className="h-full">
       <h2 className="text-3xl font-bold my-4">
         {sex === "men" ? "남성" : "여성"} {category}
       </h2>
+
       {/* product list */}
-      <div>
-        <ProductList page={currentPage} category={`${sex}/${category}`} initialData={data} />
-        {!!totalCount && <CustomPagination currentPage={currentPage} totalPage={totalPage} />}
-      </div>
+      <Suspense
+        fallback={
+          <div className="grid grid-cols-4 grid-rows-2 gap-6">
+            {Array.from({ length: 8 }).map(() => (
+              <ProductItemSkeleton key={Math.random() * 1000} />
+            ))}
+          </div>
+        }
+      >
+        <ProductList category={`${sex}/${category}`} currentPage={currentPage} />
+      </Suspense>
     </div>
   );
 }
