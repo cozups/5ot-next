@@ -3,8 +3,9 @@ import { cn, getOrderProcessRate } from "@/lib/utils";
 import { Order } from "@/types/orders";
 import { createClient } from "@/utils/supabase/server";
 import UserList from "@/components/admin/user-list";
-import { getUserList } from "@/actions/auth";
+import { getUser, getUserList } from "@/actions/auth";
 import ReviewList from "@/components/product/review-list";
+import { UserProvider } from "@/store/user";
 
 export const metadata = {
   title: "관리자 페이지 | 5ot Next",
@@ -14,6 +15,7 @@ export const metadata = {
 export default async function AdminPage() {
   const supabase = await createClient();
   const { data: userListData } = await getUserList();
+  const user = await getUser();
 
   const { data: orders } = await supabase.from("orders").select().overrideTypes<Order[]>();
   const orderProcessRate = getOrderProcessRate(orders);
@@ -44,7 +46,9 @@ export default async function AdminPage() {
           <div className="h-96 bg-gray-100 rounded-2xl p-4 flex flex-col">
             <h2 className="text-xl font-semibold">최근 리뷰</h2>
             <div className="mt-4 flex flex-col gap-2 overflow-auto">
-              <ReviewList initialData={{ data: reviews, count: 0 }} recent />
+              <UserProvider user={user}>
+                <ReviewList initialData={{ data: reviews, count: 0 }} recent />
+              </UserProvider>
             </div>
           </div>
         </div>

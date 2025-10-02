@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import _ from "lodash";
 import { toast } from "sonner";
 
 import { createOrder, OrderFormState } from "@/actions/orders";
@@ -11,12 +10,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Purchase } from "@/types/orders";
 import OrderForm from "@/components/order/order-form";
 import { toastError } from "@/lib/utils";
-import { useCartStore } from "@/store";
+import { useCartStore } from "@/store/cart";
 
 const initialState: OrderFormState = { success: false };
 
 export default function PurchasePage() {
-  const { data: cartData, setData: setCartData } = useCartStore();
+  const { updateCartAfterPurchase } = useCartStore();
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
   const [formState, formAction] = useActionState(createOrder.bind(null, purchaseData), initialState);
   const router = useRouter();
@@ -32,21 +31,7 @@ export default function PurchasePage() {
       sessionStorage.removeItem("purchase");
 
       // cart 업데이트 (cart에 저장된 아이템들 중 구매 예정인 아이템 제거)
-      const updated = _.differenceWith(
-        cartData,
-        purchaseData,
-        (cart, purchase) => cart.product.id === purchase.product.id
-      );
-
-      if (updated.length === 0) {
-        // cart 아이템 모두 구매한 경우
-        localStorage.removeItem("cart");
-        setCartData([]);
-      } else {
-        // cart 아이템 중 일부만 구매한 경우
-        localStorage.setItem("cart", JSON.stringify(updated));
-        setCartData(updated);
-      }
+      updateCartAfterPurchase(purchaseData);
 
       toast.success("주문이 완료되었습니다.");
       setPurchaseData([]);

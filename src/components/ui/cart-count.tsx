@@ -2,16 +2,9 @@
 
 import { cn } from "@/lib/utils";
 import { useCartStore } from "@/store/cart";
-import { Cart } from "@/types/cart";
-import { useEffect } from "react";
 
 export default function CartCount() {
-  const { length: count, setData: setCartData } = useCartStore();
-
-  useEffect(() => {
-    const cartStorage: Cart[] = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartData(cartStorage);
-  }, [setCartData]);
+  const count = useCartStore((state) => state.length);
 
   return (
     <div

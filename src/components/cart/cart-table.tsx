@@ -7,41 +7,15 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/store";
+import { useCartStore } from "@/store/cart";
 import { Cart } from "@/types/cart";
 
 export default function CartTable() {
-  const { data: cartData, setData: setCartData } = useCartStore();
-
-  const toggleCart = (id: string) => {
-    const updated = cartData.map((cart) => (cart.product.id === id ? { ...cart, isSelected: !cart.isSelected } : cart));
-    localStorage.setItem("cart", JSON.stringify(updated));
-    setCartData(updated);
-  };
+  const { data: cartData, toggleSelected, removeItem, updateQty } = useCartStore();
 
   const onChangeQty = (cart: Cart, event: React.ChangeEvent<HTMLInputElement>) => {
     const newQty = event.target.value;
-    const index = cartData.findIndex((data) => data.product.id === cart.product.id);
-
-    if (index > -1) {
-      const updated = [...cartData];
-      updated[index] = { ...updated[index], qty: newQty };
-      localStorage.setItem("cart", JSON.stringify(updated));
-      setCartData(updated);
-    }
-  };
-
-  const onDeleteCart = (id: string) => {
-    const updated = cartData.filter((data) => data.product.id !== id);
-    setCartData(updated);
-
-    if (!updated.length) {
-      localStorage.removeItem("cart");
-      setCartData([]);
-      return;
-    }
-    localStorage.setItem("cart", JSON.stringify(updated));
-    setCartData(updated);
+    updateQty(cart.product.id, newQty);
   };
 
   return (
@@ -58,9 +32,12 @@ export default function CartTable() {
         </TableHeader>
         <TableBody>
           {cartData.map((cart) => (
-            <TableRow key={`${cart.product.id}-${cart.qty}`}>
+            <TableRow key={cart.product.id}>
               <TableCell>
-                <Checkbox defaultChecked={cart.isSelected} onCheckedChange={toggleCart.bind(null, cart.product.id)} />
+                <Checkbox
+                  defaultChecked={cart.isSelected}
+                  onCheckedChange={toggleSelected.bind(null, cart.product.id)}
+                />
               </TableCell>
               <TableCell className="flex items-center gap-4">
                 <div className="w-16 aspect-square relative">
@@ -83,7 +60,7 @@ export default function CartTable() {
                   <Button
                     variant="destructive"
                     className="cursor-pointer"
-                    onClick={onDeleteCart.bind(null, cart.product.id)}
+                    onClick={removeItem.bind(null, cart.product.id)}
                   >
                     <Trash />
                   </Button>

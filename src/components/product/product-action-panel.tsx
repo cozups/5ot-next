@@ -25,20 +25,16 @@ import { cn } from "@/lib/utils";
 export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { data: cartData, setData: setCartData } = useCartStore();
+  const { addItem } = useCartStore();
 
-  const onAddCart = (id: string) => {
-    const index = cartData.findIndex((cart) => cart.product.id === id);
+  const onAddCart = () => {
+    const addedItem = addItem(product, countRef.current?.value || "1");
 
-    if (index > -1) {
+    if (!addedItem) {
       toast.warning("이미 장바구니에 추가되어 있는 제품입니다.");
       return;
     }
 
-    const addedCart = [...cartData, { product, qty: countRef.current?.value || "1", isSelected: false }];
-
-    localStorage.setItem("cart", JSON.stringify(addedCart));
-    setCartData(addedCart);
     toast.success("장바구니에 제품이 추가되었습니다.");
   };
 
@@ -80,7 +76,7 @@ export default function ProductActionPanel({ product }: { product: Products }) {
                 "md:h-14",
                 "lg:h-16"
               )}
-              onClick={onAddCart.bind(null, product.id)}
+              onClick={onAddCart}
             >
               <ShoppingBasket />
               장바구니 담기
