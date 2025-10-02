@@ -32,8 +32,7 @@ export default function UserList({
       description: error.message,
     });
   }
-  console.log(isLoading);
-
+  
   return (
     <div className="mt-4 flex flex-col gap-2 overflow-auto">
       {isLoading && Array.from({ length: 3 }).map((_, i) => <UserItemSkeleton key={`user-${i}`} />)}
