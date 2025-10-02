@@ -3,7 +3,6 @@
 import { useActionState, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,40 +10,24 @@ import { insertProduct, ProductFormState } from "@/actions/products";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Category } from "@/types/category";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
-import { getCategoriesBySex } from "@/actions/category";
 import { cn } from "@/lib/utils";
+
+interface ProductFormProps {
+  categories: {
+    men: Category[];
+    women: Category[];
+  };
+}
 
 const initialState: ProductFormState = { success: false };
 
-export default function ProductForm() {
+export default function ProductForm({ categories }: ProductFormProps) {
   const [formState, formAction] = useActionState(insertProduct, initialState);
-  const [sex, setSex] = useState<string>("men");
-  const [category, setCategory] = useState<Category[]>([]);
+  const [sex, setSex] = useState<'men' | 'women'>("men");
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   const { invalidateCache } = useInvalidateCache(["products"]);
-
-  const { data, isError, error, isSuccess } = useQuery({
-    queryKey: ["category", sex],
-    queryFn: async () => {
-      const { data } = await getCategoriesBySex(sex);
-      return data;
-    },
-    staleTime: 5 * 60 * 1000,
-  });
-
-  if (isError) {
-    toast.error("카테고리 목록을 불러오던 중 문제가 발생하였습니다.", {
-      description: error.message,
-    });
-  }
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      setCategory(data);
-    }
-  }, [data, isSuccess]);
 
   useEffect(() => {
     if (formState.success) {
@@ -68,7 +51,7 @@ export default function ProductForm() {
     }
   }, [formState, invalidateCache]);
 
-  const onChangeSelect = (value: string) => {
+  const onChangeSelect = (value: 'men' | 'women') => {
     setSex(value);
   };
 
@@ -146,7 +129,7 @@ export default function ProductForm() {
                   <SelectValue placeholder="카테고리" />
                 </SelectTrigger>
                 <SelectContent>
-                  {category.map((cat) => (
+                  {categories[sex].map((cat) => (
                     <SelectItem key={`${sex}/${cat.name}`} value={cat.name}>
                       {cat.name}
                     </SelectItem>

@@ -15,6 +15,7 @@ const formSchema = z.object({
   description: z.string().trim().min(1, "제품 설명을 적어주세요."),
   category: z.string().trim().min(1, "카테고리를 지정해주세요."),
   sex: z.string().trim().min(1, "성별을 선택해주세요"),
+  image: z.instanceof(File).refine((file) => file.size > 0, "이미지를 넣어주세요."),
 });
 
 export type ProductFormState = ApiResponse<typeof formSchema, Products[] | null>;
@@ -31,22 +32,16 @@ export async function insertProduct(prevState: ProductFormState, formData: FormD
   };
 
   const result = formSchema.safeParse(raw);
-  let errors: Record<string, string[]> = {};
-
-  if (raw.image.size === 0) {
-    errors.image = ["이미지를 넣어주세요."];
-  }
 
   if (!result.success) {
-    errors = Object.assign(errors, z.flattenError(result.error).fieldErrors);
-
-    return {
+   return {
       success: false,
-      errors,
+      errors: z.flattenError(result.error).fieldErrors,
       values: {
         name: raw.name,
         brand: raw.brand,
         price: raw.price,
+        image: raw.image,
         description: raw.description,
         category: raw.category,
         sex: raw.sex,
