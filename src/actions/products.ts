@@ -34,7 +34,7 @@ export async function insertProduct(prevState: ProductFormState, formData: FormD
   const result = formSchema.safeParse(raw);
 
   if (!result.success) {
-   return {
+    return {
       success: false,
       errors: z.flattenError(result.error).fieldErrors,
       values: {
@@ -159,6 +159,7 @@ export async function updateProduct(
         name: raw.name,
         brand: raw.brand,
         price: raw.price,
+        image: raw.image,
         description: raw.description,
         category: raw.category,
         sex: raw.sex,

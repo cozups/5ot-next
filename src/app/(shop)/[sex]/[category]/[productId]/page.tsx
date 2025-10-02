@@ -8,6 +8,7 @@ import { getProductById } from "@/actions/products";
 import { cn, toastError } from "@/lib/utils";
 import ReviewList from "@/components/product/review-list";
 import { getUser } from "@/actions/auth";
+import { UserProvider } from "@/store/user";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -71,7 +72,13 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
       <div>
         {/* reviews */}
         <ReviewForm productId={product.id} />
-        <ReviewList user={user} initialData={{ data: reviews, count: reviewTotalCount }} page={currentPage} productId={productId} />
+        <UserProvider user={user}>
+          <ReviewList
+            initialData={{ data: reviews, count: reviewTotalCount }}
+            page={currentPage}
+            productId={productId}
+          />
+        </UserProvider>
       </div>
     </div>
   );

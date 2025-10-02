@@ -19,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { useCartStore } from "@/store";
+import { useCartStore } from "@/store/cart";
 import { cn } from "@/lib/utils";
 
 export default function ProductActionPanel({ product }: { product: Products }) {

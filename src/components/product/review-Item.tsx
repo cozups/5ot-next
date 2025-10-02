@@ -6,21 +6,20 @@ import { deleteReview } from "@/actions/reviews";
 import DeleteButton from "../delete-button";
 import UpdateReviewDialog from "./update-review-dialog";
 import { cn } from "@/lib/utils";
-import { User } from "@supabase/supabase-js";
+import { useUser } from "@/hooks/use-users";
 
 export default function ReviewItem({
   review,
   panel = false,
   className,
   showProducts = false,
-  user
 }: {
   review: Review;
   panel?: boolean;
   className?: string;
   showProducts?: boolean;
-  user: User;
 }) {
+  const user = useUser();
   const isAllowed = user?.user_metadata.role === "admin" || user?.id === review.user_id;
 
   return (

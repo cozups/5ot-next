@@ -42,17 +42,25 @@ export default function ProductListTable({ initialData, currentPage }: ProductLi
       <TableBody>
         {productList?.map((product: Products) => (
           <TableRow key={product.id}>
-            <TableCell className="flex items-center gap-2">
-              <div className="w-16 aspect-square relative">
-                {product.image && (
-                  <Image src={product.image} alt={`${product.name} image`} fill className="object-cover" sizes="10vw" />
-                )}
+            <TableCell>
+              <div className="flex items-center gap-2">
+                <div className="w-16 aspect-square relative">
+                  {product.image && (
+                    <Image
+                      src={product.image}
+                      alt={`${product.name} image`}
+                      fill
+                      className="object-cover"
+                      sizes="10vw"
+                    />
+                  )}
+                </div>
+                <p>{product.name}</p>
               </div>
-              <p>{product.name}</p>
             </TableCell>
             <TableCell>{product.category}</TableCell>
             <TableCell>{product.brand}</TableCell>
-            <TableCell>{product.description}</TableCell>
+            <TableCell className="max-w-48 break-words whitespace-normal">{product.description}</TableCell>
             <TableCell>{product.price.toLocaleString()}원</TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
