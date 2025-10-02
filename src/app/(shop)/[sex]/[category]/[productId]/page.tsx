@@ -7,6 +7,7 @@ import { getReviewsByPagination } from "@/actions/reviews";
 import { getProductById } from "@/actions/products";
 import { cn, toastError } from "@/lib/utils";
 import ReviewList from "@/components/product/review-list";
+import { getUser } from "@/actions/auth";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -36,6 +37,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const { productId } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
+  const user = await getUser();
 
   const { errors: productErrors, data: product } = await getProductById(productId);
   const { data: reviews, count: reviewTotalCount } = await getReviewsByPagination(productId, {
@@ -69,7 +71,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
       <div>
         {/* reviews */}
         <ReviewForm productId={product.id} />
-        <ReviewList initialData={{ data: reviews, count: reviewTotalCount }} page={currentPage} productId={productId} />
+        <ReviewList user={user} initialData={{ data: reviews, count: reviewTotalCount }} page={currentPage} productId={productId} />
       </div>
     </div>
   );
