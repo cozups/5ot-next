@@ -1,25 +1,25 @@
-'use server';
+"use server";
 
-import { ApiResponse } from '@/types/response';
-import { supabaseAdmin } from '@/utils/supabase/admin';
-import { createClient } from '@/utils/supabase/server';
-import { User } from '@supabase/supabase-js';
-import { revalidatePath } from 'next/cache';
-import { z } from 'zod/v4';
+import { ApiResponse } from "@/types/response";
+import { supabaseAdmin } from "@/utils/supabase/admin";
+import { createClient } from "@/utils/supabase/server";
+import { User } from "@supabase/supabase-js";
+import { revalidatePath } from "next/cache";
+import { z } from "zod/v4";
 
 const joinFormSchema = z.object({
-  username: z.string().trim().min(1, '이름을 반드시 입력해주세요.'),
+  username: z.string().trim().min(1, "이름을 반드시 입력해주세요."),
   phone: z
     .string()
-    .startsWith('010', '전화번호는 반드시 010으로 시작해야 합니다.')
-    .length(11, '전화번호는 11자이어야 합니다.'),
-  userEmail: z.email('올바른 이메일 형식을 작성해주세요.'),
-  password: z.string().trim().min(6, '6자 이상의 암호를 입력해주세요.'),
+    .startsWith("010", "전화번호는 반드시 010으로 시작해야 합니다.")
+    .length(11, "전화번호는 11자이어야 합니다."),
+  userEmail: z.email("올바른 이메일 형식을 작성해주세요."),
+  password: z.string().trim().min(6, "6자 이상의 암호를 입력해주세요."),
 });
 
 const loginFormSchema = z.object({
-  userEmail: z.email('올바른 이메일 형식을 작성해주세요.'),
-  password: z.string().trim().min(6, '6자 이상의 암호를 입력해주세요.'),
+  userEmail: z.email("올바른 이메일 형식을 작성해주세요."),
+  password: z.string().trim().min(6, "6자 이상의 암호를 입력해주세요."),
 });
 
 export type JoinFormState = ApiResponse<typeof joinFormSchema, null>;
@@ -34,15 +34,12 @@ export type UpdateFormState = ApiResponse<
   null
 >;
 
-export async function createUser(
-  prevState: JoinFormState,
-  formData: FormData
-): Promise<JoinFormState> {
+export async function createUser(prevState: JoinFormState, formData: FormData): Promise<JoinFormState> {
   const raw = {
-    username: formData.get('username')?.toString() || '',
-    phone: formData.get('phone')?.toString() || '',
-    userEmail: formData.get('userEmail')?.toString() || '',
-    password: formData.get('password')?.toString() || '',
+    username: formData.get("username")?.toString() || "",
+    phone: formData.get("phone")?.toString() || "",
+    userEmail: formData.get("userEmail")?.toString() || "",
+    password: formData.get("password")?.toString() || "",
   };
 
   // 유효성 검사
@@ -66,8 +63,8 @@ export async function createUser(
     options: {
       data: {
         username: raw.username,
-        role: 'normal',
-        image: '',
+        role: "normal",
+        image: "",
         phone: raw.phone,
       },
     },
@@ -88,13 +85,10 @@ export async function createUser(
   };
 }
 
-export async function loginUser(
-  prevState: LoginFormState,
-  formData: FormData
-): Promise<LoginFormState> {
+export async function loginUser(prevState: LoginFormState, formData: FormData): Promise<LoginFormState> {
   const raw = {
-    userEmail: formData.get('userEmail')?.toString() || '',
-    password: formData.get('password')?.toString() || '',
+    userEmail: formData.get("userEmail")?.toString() || "",
+    password: formData.get("password")?.toString() || "",
   };
 
   // 유효성 검사
@@ -118,9 +112,7 @@ export async function loginUser(
 
   if (loginError) {
     const errorMessage =
-      loginError.code === 'invalid_credentials'
-        ? 'ID 혹은 패스워드가 일치하지 않습니다.'
-        : '로그인에 실패했습니다.';
+      loginError.code === "invalid_credentials" ? "ID 혹은 패스워드가 일치하지 않습니다." : "로그인에 실패했습니다.";
     return {
       success: false,
       errors: { loginError: [errorMessage] },
@@ -155,9 +147,7 @@ export async function logout() {
 export async function deleteUser(user: User) {
   const supabase = await createClient();
 
-  const { error: deleterUserError } = await supabaseAdmin.auth.admin.deleteUser(
-    user.id
-  );
+  const { error: deleterUserError } = await supabaseAdmin.auth.admin.deleteUser(user.id);
 
   if (deleterUserError) {
     return {
@@ -171,10 +161,8 @@ export async function deleteUser(user: User) {
   // 유저의 프로필 이미지를 스토리지에서 삭제
   const image = user.user_metadata.image;
   if (image) {
-    const path = image.split('/public/profile/')[1];
-    const { error: deleteImageError } = await supabase.storage
-      .from('profile')
-      .remove(path);
+    const path = image.split("/public/profile/")[1];
+    const { error: deleteImageError } = await supabase.storage.from("profile").remove(path);
 
     if (deleteImageError) {
       return {
@@ -193,21 +181,17 @@ export async function deleteUser(user: User) {
   };
 }
 
-export async function updateUser(
-  user: User,
-  prevState: UpdateFormState,
-  formData: FormData
-): Promise<UpdateFormState> {
+export async function updateUser(user: User, prevState: UpdateFormState, formData: FormData): Promise<UpdateFormState> {
   const raw = {
-    username: formData.get('username')?.toString() || '',
-    image: formData.get('image') as File,
+    username: formData.get("username")?.toString() || "",
+    image: formData.get("image") as File,
   };
 
   if (raw.username.trim().length < 1) {
     return {
       success: false,
       errors: {
-        username: ['이름을 반드시 입력해주세요'],
+        username: ["이름을 반드시 입력해주세요"],
       },
     };
   }
@@ -218,18 +202,16 @@ export async function updateUser(
   };
   if (raw.image.size > 0) {
     // 이미지 저장 or 기존 이미지 대체
-    const extension = raw.image.type.split('/')[1];
-    const filename = `images/user${user.id.split('-')[0]}.${extension}`;
+    const extension = raw.image.type.split("/")[1];
+    const filename = `images/user${user.id.split("-")[0]}.${extension}`;
 
     // 이전 이미지와 새로운 이미지의 확장자가 다른 경우, 이전 이미지를 삭제 해야함
     const oldImage = user.user_metadata.image;
-    const oldImageExtension = oldImage ? oldImage.split('.')[1] : null;
+    const oldImageExtension = oldImage ? oldImage.split(".")[1] : null;
 
     if (oldImageExtension !== extension) {
-      const path = oldImage.split('/public/profile/')[1];
-      const { error: deleteImageError } = await supabase.storage
-        .from('profile')
-        .remove(path);
+      const path = oldImage.split("/public/profile/")[1];
+      const { error: deleteImageError } = await supabase.storage.from("profile").remove(path);
 
       if (deleteImageError) {
         return {
@@ -242,10 +224,9 @@ export async function updateUser(
     }
 
     // 이미지 업데이트
-    const { data: uploadedImage, error: imageUpdateError } =
-      await supabase.storage
-        .from('profile')
-        .update(filename, raw.image, { upsert: true });
+    const { data: uploadedImage, error: imageUpdateError } = await supabase.storage
+      .from("profile")
+      .update(filename, raw.image, { upsert: true });
 
     if (imageUpdateError) {
       return {
@@ -258,7 +239,7 @@ export async function updateUser(
 
     const {
       data: { publicUrl },
-    } = supabase.storage.from('profile').getPublicUrl(uploadedImage.path);
+    } = supabase.storage.from("profile").getPublicUrl(uploadedImage.path);
     dataToUpdate.image = publicUrl;
   }
 
@@ -276,7 +257,7 @@ export async function updateUser(
     };
   }
 
-  revalidatePath('/', 'layout');
+  revalidatePath("/", "layout");
   return { success: true };
 }
 
@@ -288,7 +269,7 @@ export async function getUser() {
   } = await supabase.auth.getUser();
 
   if (error) {
-    throw new Error(error.message);
+    return null;
   }
 
   return user;

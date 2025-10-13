@@ -1,5 +1,6 @@
 import ProductList from "@/components/product/product-list";
 import ProductItemSkeleton from "@/components/skeleton/product-item-skeleton";
+import { cn } from "@/lib/utils";
 import { Suspense } from "react";
 
 interface ProductListPageProps {
@@ -32,7 +33,7 @@ export default async function ProductListPage({ params, searchParams }: ProductL
       {/* product list */}
       <Suspense
         fallback={
-          <div className="grid grid-cols-4 grid-rows-2 gap-6">
+          <div className={cn("grid grid-cols-2 grid-rows-2 gap-6", "md:grid-cols-4")}>
             {Array.from({ length: 8 }).map(() => (
               <ProductItemSkeleton key={Math.random() * 1000} />
             ))}
