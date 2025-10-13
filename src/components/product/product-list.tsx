@@ -19,7 +19,7 @@ export default async function ProductList({ category, currentPage }: { category:
     <div>
       <div
         className={cn(
-          "w-full h-full grid grid-cols-2 grid-rows-4 gap-6",
+          "w-full h-full grid grid-cols-2 grid-rows-2 gap-6",
           data && data.length > 0 && "md:grid-cols-4 md:grid-rows-2",
           data?.length === 0 && "grid-cols-1 grid-rows-1 justify-center items-center h-[calc(100%-5rem)] text-center"
         )}
