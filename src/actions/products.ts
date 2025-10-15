@@ -246,7 +246,13 @@ export async function getProductsByPagination(query: string, options: { pageNum:
     .overrideTypes<Products[]>();
 
   if (error) {
-    throw new Error(error.message);
+    return {
+      data: null,
+      count: 0,
+      error: {
+        message: error.message,
+      },
+    };
   }
 
   return { data, count: count || 0 };
