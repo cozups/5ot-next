@@ -5,7 +5,7 @@ import ProductActionPanel from "@/components/product/product-action-panel";
 import ReviewForm from "@/components/product/review-form";
 import { getReviewsByPagination } from "@/actions/reviews";
 import { getProductById } from "@/actions/products";
-import { cn, toastError } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import ReviewList from "@/components/product/review-list";
 import { getUser } from "@/actions/auth";
 import { UserProvider } from "@/store/user";
@@ -19,9 +19,9 @@ interface ProductDetailPageProps {
 
 export const generateMetadata = async ({ params }: ProductDetailPageProps) => {
   const { productId } = await params;
-  const { data: product, errors } = await getProductById(productId);
+  const { data: product } = await getProductById(productId);
 
-  if (errors || !product) {
+  if (!product) {
     return {
       title: "Product Not Found | 5ot Next",
       description: "상품을 찾을 수 없습니다.",
@@ -39,20 +39,20 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
   const user = await getUser();
-
   const { errors: productErrors, data: product } = await getProductById(productId);
-  const { data: reviews, count: reviewTotalCount } = await getReviewsByPagination(productId, {
-    pageNum: currentPage,
-    itemsPerPage: 5,
-  });
 
   if (productErrors) {
-    toastError("제품 정보를 불러오던 중 문제가 발생했습니다.", productErrors);
+    throw new Error(productErrors.fetchError?.[0]);
   }
 
   if (!product) {
     notFound();
   }
+
+  const { data: reviews, count: reviewTotalCount } = await getReviewsByPagination(productId, {
+    pageNum: currentPage,
+    itemsPerPage: 5,
+  });
 
   return (
     <div className="py-8">

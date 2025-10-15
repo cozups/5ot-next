@@ -272,10 +272,20 @@ export async function getAllProductsByPagination(options: { pageNum: number; ite
 
 export async function getProductById(id: string): Promise<ApiResponse<null, Products | null>> {
   const supabase = await createClient();
-  const { data } = await supabase.from("products").select().eq("id", id).single<Products>();
+  const { data, error } = await supabase.from("products").select().eq("id", id).limit(1).maybeSingle<Products>();
+
+  if (error) {
+    return {
+      success: false,
+      errors: {
+        fetchError: [error.message],
+      },
+      data: null,
+    };
+  }
 
   return {
     success: true,
-    data,
+    data: data || null,
   };
 }
