@@ -6,22 +6,18 @@ import { deleteReview } from "@/actions/reviews";
 import DeleteButton from "../delete-button";
 import UpdateReviewDialog from "./update-review-dialog";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/hooks/use-users";
 
 export default function ReviewItem({
   review,
-  panel = false,
+  controllable,
   className,
   showProducts = false,
 }: {
   review: Review;
-  panel?: boolean;
+  controllable: boolean;
   className?: string;
   showProducts?: boolean;
 }) {
-  const user = useUser();
-  const isAllowed = user?.user_metadata.role === "admin" || user?.id === review.user_id;
-
   return (
     <li className={cn("bg-gray-100 rounded-xl p-4", className)}>
       <div className="flex justify-between items-center">
@@ -32,9 +28,9 @@ export default function ReviewItem({
             {review.star}
           </div>
         </div>
-        {panel && isAllowed && (
+        {controllable && (
           <div className="flex gap-1">
-            {user?.id === review.user_id && <UpdateReviewDialog review={review} />}
+            <UpdateReviewDialog review={review} />
             <DeleteButton action={deleteReview.bind(null, review.id)} queryKey={["reviews"]} />
           </div>
         )}

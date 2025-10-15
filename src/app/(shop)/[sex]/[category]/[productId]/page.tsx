@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import ProductActionPanel from "@/components/product/product-action-panel";
 import ReviewForm from "@/components/product/review-form";
-import { getReviewsByPagination } from "@/actions/reviews";
 import { getProductById } from "@/actions/products";
 import { cn } from "@/lib/utils";
 import ReviewList from "@/components/product/review-list";
@@ -49,11 +48,6 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     notFound();
   }
 
-  const { data: reviews, count: reviewTotalCount } = await getReviewsByPagination(productId, {
-    pageNum: currentPage,
-    itemsPerPage: 5,
-  });
-
   return (
     <div className="py-8">
       {/* product info */}
@@ -73,11 +67,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
         {/* reviews */}
         <ReviewForm productId={product.id} />
         <UserProvider user={user}>
-          <ReviewList
-            initialData={{ data: reviews, count: reviewTotalCount }}
-            page={currentPage}
-            productId={productId}
-          />
+          <ReviewList page={currentPage} productId={productId} />
         </UserProvider>
       </div>
     </div>

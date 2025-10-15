@@ -1,71 +1,83 @@
 "use client";
 
-import { getRecentReviews, getReviewsByPagination } from "@/actions/reviews";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { createClient } from "@/utils/supabase/client";
 import { Review } from "@/types/products";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import ReviewItem from "./review-Item";
 import CustomPagination from "../ui/custom-pagination";
-import { PaginationResponse } from "@/types/response";
 import { cn, getTotalPage } from "@/lib/utils";
-import ReviewItemSkeleton from "../skeleton/review-item-skeleton";
-import { toast } from "sonner";
+import { useUser } from "@/hooks/use-users";
+
+const ITEMS_PER_PAGE = 5;
 
 export default function ReviewList({
-  initialData,
   page,
   productId,
   recent = false,
 }: {
-  initialData: PaginationResponse<Review[]> | null | undefined;
   page?: number;
   productId?: string;
   recent?: boolean;
 }) {
-  const {
-    data: reviews,
-    isSuccess,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const supabase = createClient();
+  const user = useUser();
+
+  const { data: reviews } = useSuspenseQuery({
     queryKey: ["reviews", recent ? "recent" : { page, productId }],
     queryFn: async () => {
       if (page && productId) {
-        const { data, count } = await getReviewsByPagination(productId, {
-          pageNum: page,
-          itemsPerPage: 5,
-        });
+        const from = (page - 1) * ITEMS_PER_PAGE;
+        const to = from + ITEMS_PER_PAGE - 1;
+
+        const { data, count, error } = await supabase
+          .from("reviews")
+          .select(`*, products:product_id(*), profiles:user_id(*)`, {
+            count: "exact",
+          })
+          .eq("product_id", productId)
+          .range(from, to);
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
         return { data, count };
       }
       if (recent) {
-        const { data } = await getRecentReviews(5);
+        const { data, error } = await supabase
+          .from("reviews")
+          .select(`*, products:product_id(*), profiles:user_id(*)`)
+          .limit(ITEMS_PER_PAGE)
+          .order("created_at", { ascending: true })
+          .overrideTypes<Review[]>();
+
+        if (error) {
+          throw new Error(error.message);
+        }
+
         return { data };
       }
     },
     staleTime: 5 * 60 * 1000,
-    initialData,
-    placeholderData: keepPreviousData,
   });
 
   const totalPage = getTotalPage(reviews?.count || 0, 5);
 
-  if (isError) {
-    toast.error("리뷰를 불러오던 중 문제가 발생했습니다.", {
-      description: error.message,
-    });
-  }
-
   return (
-    <>
+    <div className="mt-4 flex flex-col gap-2 overflow-auto">
       <ul className={cn("flex flex-col gap-6 text-xs", !recent && "mt-8", "md:text-sm", "lg:text-base")}>
-        {isLoading &&
-          Array.from({ length: 2 }).map((_, i) => <ReviewItemSkeleton key={`review-${i}`} recent={recent} />)}
-        {isSuccess &&
-          reviews?.data?.map((review: Review) => (
-            <ReviewItem key={review.id} review={review} panel={!recent} className={recent ? "bg-white" : ""} />
-          ))}
+        {reviews?.data?.map((review: Review) => (
+          <ReviewItem
+            key={review.id}
+            review={review}
+            controllable={!recent && (user?.user_metadata.role === "admin" || user?.id === review.user_id)}
+            className={recent ? "bg-white" : ""}
+            showProducts={recent}
+          />
+        ))}
       </ul>
       {!recent && !!reviews?.count && <CustomPagination currentPage={page!} totalPage={totalPage} />}
-    </>
+    </div>
   );
 }
