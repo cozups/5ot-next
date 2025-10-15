@@ -6,13 +6,15 @@ import { createUser, JoinFormState } from "@/actions/auth";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Button } from "../ui";
+import { Spinner } from "../ui/spinner";
 
 const initialState: JoinFormState = {
   success: false,
 };
 
 export default function JoinForm() {
-  const [state, formAction] = useActionState(createUser, initialState);
+  const [state, formAction, isPending] = useActionState(createUser, initialState);
   const router = useRouter();
 
   useEffect(() => {
@@ -100,9 +102,9 @@ export default function JoinForm() {
           ))}
         </div>
       </div>
-      <button type="submit" className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">
-        회원가입 하기
-      </button>
+      <Button type="submit" className="w-28">
+        {isPending ? <Spinner /> : "회원가입 하기"}
+      </Button>
       <Link href="/login" className="text-center text-xs my-2 text-neutral-600 hover:underline">
         이미 회원이신가요? 로그인 하기
       </Link>

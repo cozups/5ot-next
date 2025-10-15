@@ -5,13 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { Button } from "../ui";
+import { Spinner } from "../ui/spinner";
 
 const initialState: LoginFormState = {
   success: false,
 };
 
 export default function LoginForm() {
-  const [state, formAction] = useActionState(loginUser, initialState);
+  const [state, formAction, isPending] = useActionState(loginUser, initialState);
   const router = useRouter();
 
   useEffect(() => {
@@ -68,7 +70,9 @@ export default function LoginForm() {
         </div>
       </div>
 
-      <button className="bg-neutral-300 w-fit py-1 px-2 rounded-sm my-2 cursor-pointer">로그인 하기</button>
+      <Button type="submit" className="w-28">
+        {isPending ? <Spinner /> : "로그인 하기"}
+      </Button>
       <Link href="/join" className="text-center text-xs my-2 text-neutral-600 hover:underline">
         회원이 아니신가요? 회원가입 하기
       </Link>
