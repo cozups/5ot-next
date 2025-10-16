@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
-import { OrderFormState } from '@/actions/orders';
-import { Order } from '@/types/orders';
-import { DialogFooter, DialogClose } from '../ui/dialog';
-import AddressSearch from './address-search';
-import { useState } from 'react';
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { OrderFormState } from "@/actions/orders";
+import { Order } from "@/types/orders";
+import { DialogFooter, DialogClose } from "../ui/dialog";
+import AddressSearch from "./address-search";
+import { useState } from "react";
 
 interface OrderFormProps {
   action: (payload: FormData) => void;
-  mode: 'purchase' | 'update';
+  mode: "purchase" | "update";
   defaultData?: Order | null;
   formState: OrderFormState;
 }
@@ -21,15 +21,10 @@ export interface AddressResult {
   detail: string;
 }
 
-export default function OrderForm({
-  action,
-  mode,
-  defaultData,
-  formState,
-}: OrderFormProps) {
+export default function OrderForm({ action, mode, defaultData, formState }: OrderFormProps) {
   const [address, setAddress] = useState<AddressResult>({
-    base: '',
-    detail: '',
+    base: "",
+    detail: "",
   });
 
   return (
@@ -42,7 +37,7 @@ export default function OrderForm({
             name="receiver"
             id="receiver"
             className="bg-white"
-            defaultValue={defaultData?.receiver}
+            defaultValue={defaultData?.receiver || ""}
           />
           {formState.errors?.receiver?.map((error: string) => (
             <p className="text-sm text-red-400" key={error}>
@@ -52,13 +47,7 @@ export default function OrderForm({
         </div>
         <div>
           <label htmlFor="phone">전화번호</label>
-          <Input
-            type="text"
-            id="phone"
-            name="phone"
-            className="bg-white"
-            defaultValue={defaultData?.phone}
-          />
+          <Input type="text" id="phone" name="phone" className="bg-white" defaultValue={defaultData?.phone || ""} />
           {formState.errors?.phone?.map((error: string) => (
             <p className="text-sm text-red-400" key={error}>
               {error}
@@ -67,11 +56,7 @@ export default function OrderForm({
         </div>
         <div>
           <label>주소</label>
-          <AddressSearch
-            address={address}
-            setAddress={setAddress}
-            defaultData={defaultData?.address}
-          />
+          <AddressSearch address={address} setAddress={setAddress} defaultData={defaultData?.address || ""} />
           {formState.errors?.address?.map((error: string) => (
             <p className="text-sm text-red-400" key={error}>
               {error}
@@ -84,17 +69,14 @@ export default function OrderForm({
             id="deliveryRequest"
             name="deliveryRequest"
             className="bg-white h-28 overflow-auto"
-            defaultValue={defaultData?.deliveryRequest}
+            defaultValue={defaultData?.deliveryRequest || ""}
           />
         </div>
       </div>
-      {mode === 'update' && (
+      {mode === "update" && (
         <DialogFooter>
           <DialogClose asChild>
-            <Button
-              variant="secondary"
-              className="cursor-pointer self-end mt-4"
-            >
+            <Button variant="secondary" className="cursor-pointer self-end mt-4">
               취소
             </Button>
           </DialogClose>
@@ -105,7 +87,7 @@ export default function OrderForm({
           </DialogClose>
         </DialogFooter>
       )}
-      {mode === 'purchase' && (
+      {mode === "purchase" && (
         <Button type="submit" className="cursor-pointer self-end mt-4">
           제출하기
         </Button>

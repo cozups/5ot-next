@@ -8,8 +8,8 @@ import { Order } from "@/types/orders";
 import OrderStatusAction from "./order-status-action";
 import DeleteButton from "../delete-button";
 import { deleteOrder, getOrders, getOrdersByUserId, updateOrderStatus } from "@/actions/orders";
-import UpdateDeliveryDialog from "./update-delivery-dialog";
 import { getUser } from "@/actions/auth";
+import dynamic from "next/dynamic";
 
 interface OrderListProps {
   initialData: Order[] | undefined;
@@ -22,6 +22,8 @@ const DELIVERY_STATE = {
   delivering: "배송 중",
   canceled: "취소",
 };
+
+const UpdateDeliveryDialog = dynamic(() => import("./update-delivery-dialog"), { ssr: false });
 
 export default function OrderList({ initialData, admin = false }: OrderListProps) {
   const { data: list, error } = useSuspenseQuery({
@@ -45,7 +47,7 @@ export default function OrderList({ initialData, admin = false }: OrderListProps
       }
     },
     initialData,
-    staleTime: 0,
+    staleTime: 60 * 1000,
   });
 
   if (error) {
