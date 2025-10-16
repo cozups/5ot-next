@@ -1,15 +1,10 @@
-'use client';
+"use client";
 
-import { OrderFormState } from '@/actions/orders';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { toastError } from '@/lib/utils';
-import { toast } from 'sonner';
+import { OrderFormState } from "@/actions/orders";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
+import { toastError } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function OrderStatusAction({
   defaultValue,
@@ -18,15 +13,18 @@ export default function OrderStatusAction({
   defaultValue: string;
   action: (id: string) => Promise<OrderFormState>;
 }) {
+  const { invalidateCache } = useInvalidateCache(["orders", "admin"]);
+
   const onChangeStatus = async (value: string) => {
     const result = await action(value);
 
     if (result.success) {
-      toast.success('상태가 업데이트 되었습니다.');
+      invalidateCache();
+      toast.success("상태가 업데이트 되었습니다.");
     }
 
     if (result.errors) {
-      toastError('상태 업데이트 중 문제가 발생했습니다.', result.errors);
+      toastError("상태 업데이트 중 문제가 발생했습니다.", result.errors);
     }
   };
 
