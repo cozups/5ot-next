@@ -6,8 +6,6 @@ import ReviewForm from "@/components/product/review-form";
 import { getProductById } from "@/actions/products";
 import { cn } from "@/lib/utils";
 import ReviewList from "@/components/product/review-list";
-import { getUser } from "@/actions/auth";
-import { UserProvider } from "@/store/user";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -37,7 +35,6 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const { productId } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
-  const user = await getUser();
   const { errors: productErrors, data: product } = await getProductById(productId);
 
   if (productErrors) {
@@ -66,9 +63,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
       <div>
         {/* reviews */}
         <ReviewForm productId={product.id} />
-        <UserProvider user={user}>
-          <ReviewList page={currentPage} productId={productId} />
-        </UserProvider>
+        <ReviewList page={currentPage} productId={productId} />
       </div>
     </div>
   );

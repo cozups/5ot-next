@@ -1,12 +1,21 @@
-import { UserContext } from "@/store/user";
-import { useContext } from "react";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
+
+import { createClient } from "@/utils/supabase/client";
 
 export function useUser() {
-  const context = useContext(UserContext);
+  const [user, setUser] = useState<User | null>(null);
 
-  if (context === null) {
-    throw new Error("useUser를 사용하려면 UserProvider로 감싸야 합니다.");
-  }
+  useEffect(() => {
+    async function fetchUser() {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    fetchUser();
+  }, []);
 
-  return context;
+  return user;
 }
