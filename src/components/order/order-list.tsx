@@ -1,59 +1,56 @@
 "use client";
 
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { cn, toastError } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/types/orders";
 import OrderStatusAction from "./order-status-action";
 import DeleteButton from "../delete-button";
-import { deleteOrder, getOrders, updateOrderStatus } from "@/actions/orders";
+import { deleteOrder, getOrders, getOrdersByUserId, updateOrderStatus } from "@/actions/orders";
 import UpdateDeliveryDialog from "./update-delivery-dialog";
-import OrderItemSkeleton from "../skeleton/order-item-skeleton";
+import { getUser } from "@/actions/auth";
 
 interface OrderListProps {
   initialData: Order[] | undefined;
-  errors?: Record<string, string[]>;
   admin?: boolean;
 }
 
-export default function OrderList({ initialData, errors, admin = false }: OrderListProps) {
-  const {
-    data: list,
-    error: fetchingError,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useQuery({
+const DELIVERY_STATE = {
+  processing: "처리 중",
+  done: "완료",
+  delivering: "배송 중",
+  canceled: "취소",
+};
+
+export default function OrderList({ initialData, admin = false }: OrderListProps) {
+  const { data: list, error } = useSuspenseQuery({
     queryKey: ["orders", admin ? "admin" : "user"],
     queryFn: async () => {
-      const { data } = await getOrders();
+      if (admin) {
+        const { data } = await getOrders();
 
-      return data;
+        return data;
+      }
+      if (!admin) {
+        const user = await getUser();
+
+        if (!user) {
+          throw new Error("User not found");
+        }
+
+        const { data } = await getOrdersByUserId(user?.id);
+
+        return data;
+      }
     },
     initialData,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0,
   });
 
-  useEffect(() => {
-    if (errors) {
-      toastError("주문 목록을 불러오던 중 문제가 발생하였습니다.", errors);
-    }
-  }, [errors]);
-
-  if (isError) {
-    toastError("주문 목록을 불러오던 중 문제가 발생하였습니다.", {
-      fetchError: [fetchingError.message],
-    });
+  if (error) {
+    throw error;
   }
-
-  const status = {
-    processing: "처리 중",
-    done: "완료",
-    delivering: "배송 중",
-    canceled: "취소",
-  };
 
   return (
     <>
@@ -67,8 +64,7 @@ export default function OrderList({ initialData, errors, admin = false }: OrderL
             <TableHead>관리</TableHead>
           </TableRow>
         </TableHeader>
-        {isLoading && <OrderItemSkeleton />}
-        {isSuccess && (
+        {
           <TableBody>
             {list?.map((order: Order) => (
               <TableRow key={order.id}>
@@ -93,7 +89,7 @@ export default function OrderList({ initialData, errors, admin = false }: OrderL
                   {admin && (
                     <OrderStatusAction defaultValue={order.status} action={updateOrderStatus.bind(null, order.id)} />
                   )}
-                  {!admin && <p>{status[order.status as keyof typeof status]}</p>}
+                  {!admin && <p>{DELIVERY_STATE[order.status as keyof typeof DELIVERY_STATE]}</p>}
                 </TableCell>
                 <TableCell>
                   <UpdateDeliveryDialog order={order} admin={admin} />
@@ -105,9 +101,9 @@ export default function OrderList({ initialData, errors, admin = false }: OrderL
               </TableRow>
             ))}
           </TableBody>
-        )}
+        }
       </Table>
-      {isSuccess && list?.length === 0 && <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>}
+      {list?.length === 0 && <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>}
     </>
   );
 }
