@@ -153,12 +153,17 @@ export async function updateOrderData(
   return { success: true };
 }
 
-export async function getOrders(): Promise<OrderFormState> {
+export async function getOrders(options?: { pageNum: number; itemsPerPage: number }) {
+  const from = options ? (options.pageNum - 1) * options.itemsPerPage : 0;
+  const to = options ? from + options.itemsPerPage - 1 : 10000;
+
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, count, error } = await supabase
     .from("orders")
-    .select(`*, profiles:user_id (name)`)
-    .order("created_at", { ascending: true });
+    .select(`*, profiles:user_id (name)`, { count: "exact" })
+    .range(from, to)
+    .order("created_at", { ascending: true })
+    .overrideTypes<Order[]>();
 
   if (error) {
     return {
@@ -172,14 +177,19 @@ export async function getOrders(): Promise<OrderFormState> {
   return {
     success: true,
     data,
+    count: count || 0,
   };
 }
 
-export async function getOrdersByUserId(userId: string): Promise<OrderFormState> {
+export async function getOrdersByUserId(userId: string, options?: { pageNum: number; itemsPerPage: number }) {
+  const from = options ? (options.pageNum - 1) * options.itemsPerPage : 0;
+  const to = options ? from + options.itemsPerPage - 1 : 10000;
+
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from("orders")
-    .select(`*, profiles:user_id (name)`)
+    .select(`*, profiles:user_id (name)`, { count: "exact" })
+    .range(from, to)
     .order("created_at", { ascending: true })
     .eq("user_id", userId);
 
@@ -195,6 +205,7 @@ export async function getOrdersByUserId(userId: string): Promise<OrderFormState>
   return {
     success: true,
     data,
+    count: count || 0,
   };
 }
 

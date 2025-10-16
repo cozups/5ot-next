@@ -13,11 +13,15 @@ export default async function OrderListSection() {
     redirect("/login");
   }
 
-  const { data: orderList } = await getOrdersByUserId(user.id);
+  const { data: orderList, count, errors } = await getOrdersByUserId(user.id);
+
+  if (errors) {
+    throw new Error(errors.getDataError?.[0] || "Unknown error");
+  }
 
   return (
     <Suspense fallback={<OrderListSkeleton />}>
-      <OrderList initialData={orderList} />
+      <OrderList initialData={{ data: orderList, count }} />
     </Suspense>
   );
 }

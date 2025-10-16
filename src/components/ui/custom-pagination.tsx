@@ -12,13 +12,14 @@ interface CustomPaginationProps {
   totalPage: number;
 }
 
+const GROUP_SIZE = 10;
+
 export default function CustomPagination({ currentPage, totalPage }: CustomPaginationProps) {
-  const groupSize = 10;
-  const groupIndex = Math.floor((currentPage - 1) / groupSize);
+  const groupIndex = Math.floor((currentPage - 1) / GROUP_SIZE);
 
   const getPaginationList = () => {
-    const startPage = groupIndex * groupSize + 1;
-    const endPage = Math.min(startPage + groupSize - 1, totalPage);
+    const startPage = groupIndex * GROUP_SIZE + 1;
+    const endPage = Math.min(startPage + GROUP_SIZE - 1, totalPage);
 
     return Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
   };
@@ -36,7 +37,7 @@ export default function CustomPagination({ currentPage, totalPage }: CustomPagin
             </PaginationLink>
           </PaginationItem>
         ))}
-        {groupIndex < Math.floor(totalPage / groupSize) && <PaginationNext href={`?page=${paginationList[9] + 1}`} />}
+        {groupIndex < Math.floor(totalPage / GROUP_SIZE) && <PaginationNext href={`?page=${paginationList[9] + 1}`} />}
       </PaginationContent>
     </Pagination>
   );

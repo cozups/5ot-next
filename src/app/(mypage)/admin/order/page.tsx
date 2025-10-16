@@ -4,7 +4,7 @@ import OrderListSkeleton from "@/components/skeleton/order-list-skeleton";
 import { Suspense } from "react";
 
 export default async function OrderManagementPage() {
-  const { data: orderList, errors } = await getOrders();
+  const { data: orderList, errors, count } = await getOrders();
 
   if (errors) {
     throw new Error(errors.getDataError?.[0] || "Unknown error");
@@ -15,7 +15,7 @@ export default async function OrderManagementPage() {
       <h1 className="text-3xl font-bold my-2">주문 관리</h1>
       <div>
         <Suspense fallback={<OrderListSkeleton />}>
-          <OrderList initialData={orderList} admin />
+          <OrderList initialData={{ data: orderList, count }} admin />
         </Suspense>
       </div>
     </div>

@@ -2,7 +2,7 @@
 
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { cn } from "@/lib/utils";
+import { cn, getTotalPage } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/types/orders";
 import OrderStatusAction from "./order-status-action";
@@ -10,9 +10,11 @@ import DeleteButton from "../delete-button";
 import { deleteOrder, getOrders, getOrdersByUserId, updateOrderStatus } from "@/actions/orders";
 import { getUser } from "@/actions/auth";
 import dynamic from "next/dynamic";
+import CustomPagination from "../ui/custom-pagination";
+import { useSearchParams } from "next/navigation";
 
 interface OrderListProps {
-  initialData: Order[] | undefined;
+  initialData: { data: Order[]; count: number } | null;
   admin?: boolean;
 }
 
@@ -25,14 +27,19 @@ const DELIVERY_STATE = {
 
 const UpdateDeliveryDialog = dynamic(() => import("./update-delivery-dialog"), { ssr: false });
 
+const ITEMS_PER_PAGE = 10;
+
 export default function OrderList({ initialData, admin = false }: OrderListProps) {
-  const { data: list, error } = useSuspenseQuery({
-    queryKey: ["orders", admin ? "admin" : "user"],
+  const searchParams = useSearchParams();
+  const currentPage = Number(searchParams.get("page") ?? 1);
+
+  const { data, error } = useSuspenseQuery({
+    queryKey: ["orders", admin ? "admin" : "user", { page: currentPage }],
     queryFn: async () => {
       if (admin) {
-        const { data } = await getOrders();
+        const { data, count } = await getOrders({ pageNum: currentPage, itemsPerPage: ITEMS_PER_PAGE });
 
-        return data;
+        return { data, count };
       }
       if (!admin) {
         const user = await getUser();
@@ -41,21 +48,27 @@ export default function OrderList({ initialData, admin = false }: OrderListProps
           throw new Error("User not found");
         }
 
-        const { data } = await getOrdersByUserId(user?.id);
+        const { data, count } = await getOrdersByUserId(user?.id, {
+          pageNum: currentPage,
+          itemsPerPage: ITEMS_PER_PAGE,
+        });
 
-        return data;
+        return { data, count };
       }
     },
-    initialData,
+    initialData: initialData || undefined,
     staleTime: 60 * 1000,
   });
+
+  const list = data?.data;
+  const totalPage = getTotalPage(data?.count || 0, ITEMS_PER_PAGE);
 
   if (error) {
     throw error;
   }
 
   return (
-    <>
+    <div>
       <Table className={cn("text-xs", "lg:text-sm")}>
         <TableHeader>
           <TableRow>
@@ -104,8 +117,9 @@ export default function OrderList({ initialData, admin = false }: OrderListProps
             ))}
           </TableBody>
         }
+        {list?.length === 0 && <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>}
       </Table>
-      {list?.length === 0 && <p className="text-center font-semibold my-2">주문 내역이 없습니다.</p>}
-    </>
+      <CustomPagination currentPage={currentPage} totalPage={totalPage} />
+    </div>
   );
 }
