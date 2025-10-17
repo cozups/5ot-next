@@ -41,14 +41,23 @@ export default async function MainHeader() {
       {/* 메뉴 */}
       <TopMenu className="hidden lg:flex lg:w-[40%]" />
       {/* 로그인/회원가입, 장바구니, 유저 프로필 */}
-      <div className={cn("lg:w-[30%] flex justify-end items-center")}>
+      <div className={cn("lg:w-[30%] flex justify-end items-center gap-2")}>
+        <Link href="/cart">
+          <div className="relative">
+            <CartCount />
+            <Button className="flex items-center gap-2 cursor-pointer bg-blue-300 hover:bg-blue-400">
+              <ShoppingBasket />
+              <span className="hidden md:inline">장바구니</span>
+            </Button>
+          </div>
+        </Link>
         {!user && (
           <nav>
             <ul className={cn("flex gap-2 text-black text-xs", "md:text-sm", "lg:text-base")}>
               <li>
                 <Link href="/login">로그인</Link>
               </li>
-              <li>
+              <li className="hidden md:block">
                 <Link href="/join">회원가입</Link>
               </li>
             </ul>
@@ -71,16 +80,7 @@ export default async function MainHeader() {
                 <p className="text-sm md:text-base">{user.user_metadata.username}</p>
               </div>
             </Link>
-            {/* 장바구니 & 로그아웃 버튼 */}
-            <Link href="/cart">
-              <div className="relative">
-                <CartCount />
-                <Button className="flex items-center gap-2 cursor-pointer bg-blue-300 hover:bg-blue-400">
-                  <ShoppingBasket />
-                  <span className="hidden md:inline">장바구니</span>
-                </Button>
-              </div>
-            </Link>
+            {/* 로그아웃 버튼 */}
             <LogoutButton />
           </div>
         )}
