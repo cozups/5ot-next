@@ -27,7 +27,7 @@ export default function CartSummary() {
     <div className="bg-slate-100 p-4 mt-4 rounded-xl">
       <h2 className="text-lg font-semibold">합계</h2>
       <div className="flex flex-col">
-        <div className="w-96 h-32 overflow-auto">
+        <div className="max-w-96 h-32 overflow-auto">
           {selected.length === 0 && <p className="text-sm">선택된 상품이 없습니다.</p>}
           {selected.length > 0 &&
             selected.map((data) => (
