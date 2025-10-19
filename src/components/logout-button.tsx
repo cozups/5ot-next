@@ -6,14 +6,17 @@ import { toast } from "sonner";
 import { logout } from "@/actions/auth";
 import { Button } from "./ui";
 import { DoorOpen } from "lucide-react";
+import { useUser } from "@/hooks/use-users";
 
 export default function LogoutButton() {
   const router = useRouter();
+  const { refetch } = useUser();
 
   const onClickLogout = async () => {
     const result = await logout();
 
     if (result.success) {
+      refetch();
       toast.success("로그아웃 되었습니다.");
       router.push("/");
     }
@@ -24,6 +27,7 @@ export default function LogoutButton() {
       });
     }
   };
+
   return (
     <Button className="cursor-pointer flex items-center" onClick={onClickLogout}>
       <DoorOpen className="w-4 h-4" />

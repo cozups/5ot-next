@@ -11,6 +11,8 @@ import { DialogClose, DialogFooter } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { UpdateFormState, updateUser } from "@/actions/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useUser } from "@/hooks/use-users";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 
 const initialState: UpdateFormState = { success: false };
 
@@ -19,9 +21,13 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
   const [imageSrc, setImageSrc] = useState(user.user_metadata.image || "/images/user.png");
   const [isChanged, setIsChanged] = useState<boolean>(false);
   const [formState, formAction] = useActionState(updateUser.bind(null, user), initialState);
+  const { refetch } = useUser();
+  const { invalidateCache } = useInvalidateCache(["orders"]);
 
   useEffect(() => {
     if (formState.success) {
+      refetch();
+      invalidateCache();
       toast.success("프로필이 업데이트 되었습니다.");
     }
 
@@ -42,7 +48,7 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
         description: formState.errors.dataUpdateError[0],
       });
     }
-  }, [formState]);
+  }, [formState, refetch]);
 
   const onClickImage = () => {
     if (!inputRef.current) {

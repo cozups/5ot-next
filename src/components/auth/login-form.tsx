@@ -7,6 +7,7 @@ import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
 import { Button } from "../ui";
 import { Spinner } from "../ui/spinner";
+import { useUser } from "@/hooks/use-users";
 
 const initialState: LoginFormState = {
   success: false,
@@ -15,9 +16,11 @@ const initialState: LoginFormState = {
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginUser, initialState);
   const router = useRouter();
+  const { refetch } = useUser();
 
   useEffect(() => {
-    if (state.success) {
+    if (state.success && state.user) {
+      refetch();
       toast.success("로그인 되었습니다.");
       router.replace("/");
     }
@@ -26,7 +29,7 @@ export default function LoginForm() {
         description: state.errors.loginError[0],
       });
     }
-  }, [state, router]);
+  }, [state, router, refetch]);
 
   return (
     <form action={formAction} className="border-2 w-[36rem] flex flex-col items-center py-8">

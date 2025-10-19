@@ -105,7 +105,7 @@ export async function loginUser(prevState: LoginFormState, formData: FormData): 
   // 로그인 요청
   const supabase = await createClient();
 
-  const { error: loginError } = await supabase.auth.signInWithPassword({
+  const { data, error: loginError } = await supabase.auth.signInWithPassword({
     email: raw.userEmail,
     password: raw.password,
   });
@@ -121,6 +121,7 @@ export async function loginUser(prevState: LoginFormState, formData: FormData): 
   }
 
   return {
+    user: data.user,
     success: true,
   };
 }

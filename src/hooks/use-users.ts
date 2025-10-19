@@ -1,24 +1,27 @@
-import { useEffect, useState } from "react";
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 
-import { createClient } from "@/utils/supabase/client";
-
 export function useUser() {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
-  useEffect(() => {
-    setIsLoading(true);
-    async function fetchUser() {
-      const supabase = createClient();
+  const {
+    data: user,
+    isLoading,
+    refetch,
+  } = useQuery<User | null>({
+    queryKey: ["user"],
+    queryFn: async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setUser(user);
-      setIsLoading(false);
-    }
-    fetchUser();
-  }, []);
+      return user;
+    },
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+  });
 
-  return { user, isLoading };
+  return { user, isLoading, refetch };
 }
