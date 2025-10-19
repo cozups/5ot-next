@@ -21,7 +21,7 @@ export default function ReviewList({
   recent?: boolean;
 }) {
   const supabase = createClient();
-  const user = useUser();
+  const { user } = useUser();
 
   const { data: reviews } = useSuspenseQuery({
     queryKey: ["reviews", recent ? "recent" : { page, productId }],

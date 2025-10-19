@@ -1,13 +1,22 @@
-import Link from "next/link";
+"use client";
 
-import { createClient } from "@/utils/supabase/server";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+
+import { createClient } from "@/utils/supabase/client";
 import { Menubar, MenubarMenu, MenubarTrigger, MenubarContent } from "./menubar";
 import { Category } from "@/types/category";
 import { cn } from "@/lib/utils";
 
-export default async function TopMenu({ className }: { className?: string }) {
-  const supabase = await createClient();
-  const { data } = await supabase.from("category").select().overrideTypes<Category[]>();
+export default function TopMenu({ className }: { className?: string }) {
+  const { data } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from("category").select().overrideTypes<Category[]>();
+      return data;
+    },
+  });
 
   return (
     <Menubar className={cn("flex justify-center items-center gap-8 border-0 shadow-none", className)}>

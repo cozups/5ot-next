@@ -1,4 +1,5 @@
-import { createClient } from "@/utils/supabase/server";
+"use client";
+
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +13,18 @@ import {
 import { Category } from "@/types/category";
 import Link from "next/link";
 import SearchBar from "../search-bar";
+import { useQuery } from "@tanstack/react-query";
+import { createClient } from "@/utils/supabase/client";
 
-export default async function AppSidebar() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("category").select().overrideTypes<Category[]>();
+export default function AppSidebar() {
+  const { data } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from("category").select().overrideTypes<Category[]>();
+      return data;
+    },
+  });
 
   return (
     <Sidebar>
