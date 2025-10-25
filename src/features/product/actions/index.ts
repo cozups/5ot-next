@@ -8,15 +8,15 @@ import { generateRandomId } from "@/lib/utils";
 import { ApiResponse, PaginationResponse } from "@/types/response";
 import { mapErrors } from "@/lib/handle-errors";
 import { createClient } from "@/utils/supabase/server";
-import { productFormData, productFormSchema as formSchema } from "@/lib/validations-schema/product";
+import { ProductFormData, productFormSchema as formSchema } from "@/lib/validations-schema/product";
 import { getImageURL, removeImageFromStorage, uploadImageToStorage } from "@/actions/storage";
 import { ErrorReturn } from "@/types/error";
 
-export type ProductFormState = ApiResponse<productFormData, Products[] | null>;
+export type ProductFormState = ApiResponse<ProductFormData, Products[] | null>;
 type GetResponse = ApiResponse<null, Products[] | null>;
 type GetPaginationResponse = PaginationResponse<Products[] | null>;
 
-export async function insertProduct(prevState: ProductFormState, formData: FormData): Promise<ProductFormState> {
+export async function insertProduct(formData: FormData): Promise<ProductFormState> {
   const raw = {
     name: formData.get("name")?.toString() || "",
     brand: formData.get("brand")?.toString() || "",
