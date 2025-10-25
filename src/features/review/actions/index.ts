@@ -1,24 +1,16 @@
 "use server";
 
 import { mapErrors } from "@/lib/handle-errors";
+import { reviewFormSchema } from "@/lib/validations-schema/review";
 import { Review } from "@/types/products";
 import { ApiResponse, PaginationResponse } from "@/types/response";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { z } from "zod/v4";
-
-const reviewFormSchema = z.object({
-  content: z.string().trim().min(1, "리뷰 내용을 입력해주세요."),
-});
 
 export type ReviewFormState = ApiResponse<null, Review[] | null>;
 type GetPaginationResponse = PaginationResponse<Review[] | null>;
 
-export async function createReview(
-  productId: string,
-  prevState: ReviewFormState,
-  formData: FormData
-): Promise<ReviewFormState> {
+export async function createReview(productId: string, formData: FormData): Promise<ReviewFormState> {
   const raw = {
     star: formData.get("star")?.toString() || "",
     content: formData.get("content")?.toString() || "",
@@ -61,11 +53,7 @@ export async function createReview(
   return { success: true };
 }
 
-export async function updateReview(
-  id: string,
-  prevState: ReviewFormState,
-  formData: FormData
-): Promise<ReviewFormState> {
+export async function updateReview(id: string, formData: FormData): Promise<ReviewFormState> {
   const raw = {
     star: formData.get("star")?.toString() || "",
     content: formData.get("content")?.toString() || "",
