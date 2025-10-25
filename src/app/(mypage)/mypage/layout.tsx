@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
-import DeleteUserDialog from "@/components/delete-user-dialog";
-import { getUser } from "@/actions/auth";
+import DeleteUserDialog from "@/features/auth/ui/delete-user-dialog";
+import { getUser } from "@/features/auth";
 
 export const generateMetadata = async () => {
-  const user = await getUser();
+  const { data: user } = await getUser();
 
   if (!user) {
     return null;
@@ -17,7 +17,7 @@ export const generateMetadata = async () => {
 };
 
 export default async function MyPageLayout({ profile, orders }: { profile: React.ReactNode; orders: React.ReactNode }) {
-  const user = await getUser();
+  const { data: user } = await getUser();
 
   if (!user) {
     redirect("/login");

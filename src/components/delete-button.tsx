@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Button } from './ui/button';
+import { Button } from "./ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,10 +11,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from './ui/alert-dialog';
-import { Trash } from 'lucide-react';
-import { toast } from 'sonner';
-import { useInvalidateCache } from '@/hooks/useInvalidateCache';
+} from "./ui/alert-dialog";
+import { Trash } from "lucide-react";
+import { toast } from "sonner";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
+import { ErrorReturn } from "@/types/error";
 
 export default function DeleteButton({
   action,
@@ -22,7 +23,7 @@ export default function DeleteButton({
 }: {
   action: () => Promise<{
     success: boolean;
-    errors?: Record<string, string[]>;
+    errors?: ErrorReturn | undefined;
   }>;
   queryKey?: string[];
 }) {
@@ -31,15 +32,11 @@ export default function DeleteButton({
     const result = await action();
 
     if (result.success) {
-      toast.success('성공적으로 삭제되었습니다.');
+      toast.success("성공적으로 삭제되었습니다.");
       invalidateCache();
     }
-    if (result.errors) {
-      Object.values(result.errors)
-        .flat()
-        .forEach((error) => {
-          toast.error('삭제에 실패하였습니다.', { description: error });
-        });
+    if (result.errors?.name === "server") {
+      toast.error("삭제에 실패하였습니다.", { description: result.errors.message });
     }
   };
 
@@ -53,9 +50,7 @@ export default function DeleteButton({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>정말로 삭제하시겠습니까?</AlertDialogTitle>
-          <AlertDialogDescription>
-            관련 항목들이 전체 삭제됩니다.
-          </AlertDialogDescription>
+          <AlertDialogDescription>관련 항목들이 전체 삭제됩니다.</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>

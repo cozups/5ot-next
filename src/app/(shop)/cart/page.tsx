@@ -1,5 +1,5 @@
-import CartTable from "@/components/cart/cart-table";
-import CartSummary from "@/components/cart/cart-summary";
+import CartTable from "@/features/cart/ui/cart-table";
+import CartSummary from "@/features/cart/ui/cart-summary";
 
 export const metadata = {
   title: "장바구니 | 5ot Next",

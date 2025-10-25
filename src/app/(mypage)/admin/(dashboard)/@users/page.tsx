@@ -1,4 +1,4 @@
-import UserList from "@/components/admin/user-list";
+import UserList from "@/features/auth/ui/user-list";
 
 export default function UserListPage() {
   return (

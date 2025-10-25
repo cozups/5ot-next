@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
-import MainHeader from "@/components/main-header";
-import Footer from "@/components/footer";
+import MainHeader from "@/components/layout/main-header";
+import Footer from "@/components/layout/footer";
 import clsx from "clsx";
 import { Toaster } from "@/components/ui/sonner";
 import Providers from "./providers";

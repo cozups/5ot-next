@@ -1,11 +1,11 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import ProductActionPanel from "@/components/product/product-action-panel";
-import ReviewForm from "@/components/product/review-form";
-import { getProductById } from "@/actions/products";
+import ProductActionPanel from "@/features/product/ui/product-action-panel";
+import { getProductById } from "@/features/product/actions";
 import { cn } from "@/lib/utils";
-import ReviewList from "@/components/product/review-list";
+import ReviewForm from "@/features/review/ui/review-form";
+import ReviewList from "@/features/review/ui/review-list";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -38,7 +38,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const { errors: productErrors, data: product } = await getProductById(productId);
 
   if (productErrors) {
-    throw new Error(productErrors.fetchError?.[0]);
+    throw productErrors;
   }
 
   if (!product) {

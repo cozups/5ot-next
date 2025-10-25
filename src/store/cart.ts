@@ -47,6 +47,7 @@ export const useCartStore = create<CartStore>()(
         );
 
         set({ data: updated, length: updated.length });
+        sessionStorage.removeItem("purchase");
       },
       toggleSelected: (productId) => {
         set((state) => ({

@@ -12,7 +12,7 @@ import {
 } from "./sidebar";
 import { Category } from "@/types/category";
 import Link from "next/link";
-import SearchBar from "../search-bar";
+import SearchBar from "../layout/search-bar";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/utils/supabase/client";
 

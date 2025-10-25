@@ -1,5 +1,5 @@
 import MainImageSlider from "@/components/home/main-image-slider";
-import RecentProducts from "@/components/home/recent-products";
+import RecentProducts from "@/features/product/ui/recent-products";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";

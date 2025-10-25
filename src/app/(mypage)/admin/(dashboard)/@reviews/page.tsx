@@ -1,4 +1,4 @@
-import ReviewList from "@/components/product/review-list";
+import ReviewList from "@/features/review/ui/review-list";
 
 export default async function ReviewListPage() {
   return (

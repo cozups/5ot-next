@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
 
-import { getUser } from "@/actions/auth";
-import { getOrdersByUserId } from "@/actions/orders";
-import OrderList from "@/components/order/order-list";
+import { getOrdersByUserId } from "@/features/order/actions";
+import OrderList from "@/features/order/ui/order-list";
 import OrderListSkeleton from "@/components/skeleton/order-list-skeleton";
+import { getUser } from "@/features/auth";
 
 export default async function OrderListSection() {
-  const user = await getUser();
+  const { data: user } = await getUser();
 
   if (!user) {
     redirect("/login");
@@ -16,12 +16,12 @@ export default async function OrderListSection() {
   const { data: orderList, count, errors } = await getOrdersByUserId(user.id);
 
   if (errors) {
-    throw new Error(errors.getDataError?.[0] || "Unknown error");
+    throw errors;
   }
 
   return (
     <Suspense fallback={<OrderListSkeleton />}>
-      <OrderList initialData={{ data: orderList, count }} />
+      <OrderList initialData={{ data: orderList || [], count: count || 0 }} />
     </Suspense>
   );
 }

@@ -1,4 +1,4 @@
-import LoginForm from "@/components/auth/login-form";
+import LoginForm from "@/features/auth/ui/login-form";
 
 export const metadata = {
   title: "로그인 | 5ot Next",

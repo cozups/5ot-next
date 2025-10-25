@@ -5,8 +5,8 @@ import Link from "next/link";
 
 import { useUser } from "@/hooks/use-users";
 import { cn } from "@/lib/utils";
-import LogoutButton from "../logout-button";
 import { Skeleton } from "../ui/skeleton";
+import LogoutButton from "@/features/auth/ui/logout-button";
 
 export default function AuthSection() {
   const { user, isLoading } = useUser();

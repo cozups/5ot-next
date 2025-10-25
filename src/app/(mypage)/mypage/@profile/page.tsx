@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import { getUser } from "@/actions/auth";
 import { cn, parseToKorTime } from "@/lib/utils";
-import UpdateProfileDialog from "@/components/update-profile-dialog";
+import { getUser } from "@/features/auth";
+import UpdateProfileDialog from "@/features/auth/ui/update-profile-dialog";
 
 export default async function MypageProfile() {
-  const user = await getUser();
+  const { data: user } = await getUser();
   if (!user) {
     redirect("/login");
   }

@@ -1,4 +1,4 @@
-import JoinForm from "@/components/auth/join-form";
+import JoinForm from "@/features/auth/ui/join-form";
 
 export const metadata = {
   title: "회원가입 | 5ot Next",

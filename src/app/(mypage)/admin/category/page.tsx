@@ -1,13 +1,13 @@
-import { deleteCategory } from "@/actions/category";
-import CategoryProductView from "@/components/category/category-product-view";
-import CreateCategoryForm from "@/components/category/create-category-form";
-import DeleteButton from "@/components/delete-button";
-import { Button } from "@/components/ui/button";
-
-import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import DeleteButton from "@/components/delete-button";
+import { createClient } from "@/utils/supabase/server";
+import { deleteCategory } from "@/features/category/actions";
+import CategoryForm from "@/features/category/ui/category-form";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import CategoryProductView from "@/features/category/ui/category-product-view";
 
 export default async function CategoryManagementPage({
   searchParams,
@@ -29,7 +29,7 @@ export default async function CategoryManagementPage({
         <div>
           {/* 카테고리 추가 */}
           <div className="bg-slate-200 py-4 px-6 rounded-2xl my-8 mx-auto">
-            <CreateCategoryForm />
+            <CategoryForm />
           </div>
 
           {/* 카테고리 데이터*/}
