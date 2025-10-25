@@ -10,10 +10,10 @@ import { Category } from "@/types/category";
 
 export type CategoryFormState = ApiResponse<CategoryFormData, null>;
 
-export async function createCategory(prevState: CategoryFormState, formData: FormData): Promise<CategoryFormState> {
+export async function createCategory(formData: FormData): Promise<CategoryFormState> {
   const raw = {
-    name: (formData.get("categoryName") as string) || "",
-    sex: (formData.get("categorySex") as string) || "",
+    name: (formData.get("name") as string) || "",
+    sex: (formData.get("sex") as string) || "",
   };
 
   const result = categoryFormSchema.safeParse(raw);
