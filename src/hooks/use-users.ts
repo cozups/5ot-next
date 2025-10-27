@@ -1,10 +1,7 @@
 "use client";
 
-import { User } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { createClient } from "@/utils/supabase/client";
-
-import { getUser } from "@/features/auth/queries";
 
 export function useUser() {
   const supabase = createClient();
@@ -13,16 +10,11 @@ export function useUser() {
     data: user,
     isLoading,
     refetch,
-  } = useQuery<User | null>({
+  } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const response = await getUser(supabase);
-
-      if (response.errors) {
-        throw new Error(response.errors.message);
-      }
-
-      return response.data;
+      const { data } = await supabase.auth.getSession();
+      return data.session?.user || null;
     },
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,

@@ -6,6 +6,7 @@ export async function getUser(client: SupabaseClient) {
     data: { user },
     error,
   } = await client.auth.getUser();
+  console.log(error);
 
   if (error) {
     return {

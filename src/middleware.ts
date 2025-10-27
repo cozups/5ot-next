@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabase/server";
 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
@@ -13,24 +13,23 @@ export async function middleware(request: NextRequest) {
   const userRole = user?.user_metadata?.role;
 
   const { pathname } = request.nextUrl;
-  const publicPath = ['/login', '/join', '/men', '/women', '/cart'];
-  const isPublicPath =
-    publicPath.some((path) => pathname.startsWith(path)) || pathname === '/';
+  const publicPath = ["/login", "/join", "/category", "/product", "/cart"];
+  const isPublicPath = publicPath.some((path) => pathname.startsWith(path)) || pathname === "/";
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
   if (user) {
-    if (pathname.startsWith('/mypage') && userRole === 'admin') {
-      return NextResponse.redirect(new URL('/admin', request.url));
+    if (pathname.startsWith("/mypage") && userRole === "admin") {
+      return NextResponse.redirect(new URL("/admin", request.url));
     }
 
-    if (pathname.startsWith('/admin') && userRole !== 'admin') {
+    if (pathname.startsWith("/admin") && userRole !== "admin") {
       const url = request.nextUrl.clone();
-      url.pathname = '/';
+      url.pathname = "/";
       return NextResponse.redirect(url);
     }
   }
@@ -47,6 +46,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * Feel free to modify this pattern to include more paths.
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
