@@ -66,6 +66,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
 
       return { data: response.data, count: response.count };
     },
+    staleTime: 5 * 60 * 1000,
   });
 
   return (
