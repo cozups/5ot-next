@@ -21,6 +21,8 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { ReviewFormData, reviewFormSchema } from "@/lib/validations-schema/review";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { generateFormData } from "@/lib/generate-form-data";
+import { useUser } from "@/hooks/use-users";
+import { useRouter } from "next/navigation";
 
 interface ReviewFormProps {
   productId?: string;
@@ -40,12 +42,19 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
     resolver: zodResolver(reviewFormSchema),
     defaultValues: { star: defaultData?.star.toString() || "5", content: defaultData?.content || "" },
   });
+  const { user } = useUser();
+  const router = useRouter();
 
   const [isPending, startTransition] = useTransition();
 
   const { invalidateCache } = useInvalidateCache(["reviews"]);
 
   const onSubmit: SubmitHandler<ReviewFormData> = (data) => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
     const formData = generateFormData(data);
 
     startTransition(async () => {
