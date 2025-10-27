@@ -1,18 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { cn, getTotalPage } from "@/lib/utils";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Order } from "@/types/orders";
+import { useUser } from "@/hooks/use-users";
+import { cn, getTotalPage } from "@/lib/utils";
+import { getUser } from "@/features/auth/queries";
 import OrderStatusAction from "./order-status-action";
 import DeleteButton from "../../../components/delete-button";
-import { deleteOrder, getOrdersByPagination, getOrdersByUserId, updateOrderStatus } from "@/features/order/actions";
-import dynamic from "next/dynamic";
 import CustomPagination from "../../../components/ui/custom-pagination";
-import { useSearchParams } from "next/navigation";
-import { getUser } from "@/features/auth";
-import { useUser } from "@/hooks/use-users";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { deleteOrder, getOrdersByPagination, getOrdersByUserId, updateOrderStatus } from "@/features/order/actions";
 
 interface OrderListProps {
   initialData: { data: Order[]; count: number } | null;
@@ -44,7 +45,8 @@ export default function OrderList({ initialData }: OrderListProps) {
         return { data, count };
       }
       if (!isAdmin) {
-        const { data: user } = await getUser();
+        const supabase = createClient();
+        const { data: user } = await getUser(supabase);
 
         if (!user) {
           throw new Error("User not found");

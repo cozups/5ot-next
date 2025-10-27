@@ -2,36 +2,52 @@
 
 import Link from "next/link";
 import { toast } from "sonner";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 
+import { useUser } from "@/hooks/use-users";
+import { createUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
-import { createUser, JoinFormState } from "@/features/auth";
-
-const initialState: JoinFormState = {
-  success: false,
-};
+import { generateFormData } from "@/lib/generate-form-data";
+import { JoinFormData, joinFormSchema } from "@/lib/validations-schema/auth";
 
 export default function JoinForm() {
-  const [state, formAction, isPending] = useActionState(createUser, initialState);
-  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<JoinFormData>({ resolver: zodResolver(joinFormSchema) });
+  const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (state.success) {
-      toast.success("회원가입에 성공했습니다.", {
-        description: "자동으로 로그인 되었습니다.",
-      });
-      router.push("/");
-    }
-    if (state.errors?.name === "server") {
-      toast.error("회원가입에 실패했습니다.", {
-        description: state.errors.message,
-      });
-    }
-  }, [state, router]);
+  const router = useRouter();
+  const { refetch } = useUser();
+
+  const onSubmit: SubmitHandler<JoinFormData> = (data) => {
+    const formData = generateFormData(data);
+
+    startTransition(async () => {
+      const result = await createUser(formData);
+
+      if (result.success) {
+        toast.success("회원가입에 성공했습니다.", {
+          description: "자동으로 로그인 되었습니다.",
+        });
+        refetch();
+        router.push("/");
+      }
+
+      if (result.errors) {
+        toast.error("회원가입에 실패했습니다.", {
+          description: result.errors.message,
+        });
+      }
+    });
+  };
 
   return (
-    <form action={formAction} className="border-2 w-[36rem] flex flex-col items-center py-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="border-2 w-[36rem] flex flex-col items-center py-8">
       <h1 className="text-center text-2xl font-bold mb-8">Join</h1>
 
       <div className="w-72 flex flex-col gap-8 my-8">
@@ -39,66 +55,32 @@ export default function JoinForm() {
           <label htmlFor="username" className="font-semibold">
             이름
           </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            className="border-b-2"
-            defaultValue={state.values?.username}
-          />
-          {state.errors?.errors?.username?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("username")} className="border-b-2" />
+          {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
         </div>
 
         <div className="flex flex-col">
           <label htmlFor="phone" className="font-semibold">
             전화번호
           </label>
-          <input type="text" id="phone" name="phone" className="border-b-2" defaultValue={state.values?.phone} />
-          {state.errors?.errors?.phone?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("phone")} maxLength={11} className="border-b-2" />
+          {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
         </div>
 
         <div className="flex flex-col">
           <label htmlFor="userEmail" className="font-semibold">
             Email
           </label>
-          <input
-            type="text"
-            id="userEmail"
-            name="userEmail"
-            className="border-b-2"
-            defaultValue={state.values?.userEmail}
-          />
-          {state.errors?.errors?.userEmail?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("userEmail")} className="border-b-2" />
+          {errors.userEmail && <p className="text-sm text-red-600">{errors.userEmail.message}</p>}
         </div>
 
         <div className="flex flex-col">
           <label htmlFor="password" className="font-semibold">
             Password
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="border-b-2"
-            defaultValue={state.values?.password}
-          />
-          {state.errors?.errors?.password?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("password")} type="password" className="border-b-2" />
+          {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
         </div>
       </div>
       <Button type="submit" className="w-28" disabled={isPending}>

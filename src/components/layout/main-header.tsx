@@ -6,14 +6,16 @@ import { Button } from "../ui/button";
 import SearchBar from "./search-bar";
 import CartCount from "../ui/cart-count";
 import { cn } from "@/lib/utils";
-import TopMenu from "./top-menu";
 import { SidebarTrigger } from "../ui/sidebar";
 import AuthSection from "./auth-section";
+import dynamic from "next/dynamic";
 
 const FontPacifico = Pacifico({
   subsets: ["latin"],
   weight: ["400"],
 });
+
+const TopMenu = dynamic(() => import("./top-menu"));
 
 export default async function MainHeader() {
   return (

@@ -1,13 +1,15 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
-import { getOrdersByUserId } from "@/features/order/actions";
+import { getUser } from "@/features/auth/queries";
 import OrderList from "@/features/order/ui/order-list";
+import { getOrdersByUserId } from "@/features/order/actions";
 import OrderListSkeleton from "@/components/skeleton/order-list-skeleton";
-import { getUser } from "@/features/auth";
 
 export default async function OrderListSection() {
-  const { data: user } = await getUser();
+  const supabase = await createClient();
+  const { data: user } = await getUser(supabase);
 
   if (!user) {
     redirect("/login");

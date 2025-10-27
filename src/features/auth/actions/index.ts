@@ -20,7 +20,7 @@ export type UpdateFormState = ApiResponse<
   null
 >;
 
-export async function createUser(prevState: JoinFormState, formData: FormData): Promise<JoinFormState> {
+export async function createUser(formData: FormData): Promise<JoinFormState> {
   const raw = {
     username: formData.get("username")?.toString() || "",
     phone: formData.get("phone")?.toString() || "",
@@ -69,7 +69,7 @@ export async function createUser(prevState: JoinFormState, formData: FormData): 
   };
 }
 
-export async function loginUser(prevState: LoginFormState, formData: FormData): Promise<LoginFormState> {
+export async function loginUser(formData: FormData): Promise<LoginFormState> {
   const raw = {
     userEmail: formData.get("userEmail")?.toString() || "",
     password: formData.get("password")?.toString() || "",
@@ -227,42 +227,4 @@ export async function updateUser(user: User, prevState: UpdateFormState, formDat
 
   revalidatePath("/", "layout");
   return { success: true };
-}
-
-export async function getUser() {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error) {
-      throw error;
-    }
-
-    return { success: true, data: user };
-  } catch (err) {
-    return {
-      success: false,
-      errors: mapErrors(err),
-    };
-  }
-}
-
-export async function getUserList() {
-  try {
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
-
-    if (error) {
-      throw error;
-    }
-
-    return { success: false, data };
-  } catch (err) {
-    return {
-      success: false,
-      errors: mapErrors(err),
-    };
-  }
 }

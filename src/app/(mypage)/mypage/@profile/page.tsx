@@ -1,12 +1,14 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
 import { cn, parseToKorTime } from "@/lib/utils";
-import { getUser } from "@/features/auth";
+import { getUser } from "@/features/auth/queries";
 import UpdateProfileDialog from "@/features/auth/ui/update-profile-dialog";
 
 export default async function MypageProfile() {
-  const { data: user } = await getUser();
+  const supabase = await createClient();
+  const { data: user } = await getUser(supabase);
   if (!user) {
     redirect("/login");
   }

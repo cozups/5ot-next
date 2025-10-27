@@ -2,37 +2,49 @@
 
 import Link from "next/link";
 import { toast } from "sonner";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 import { useUser } from "@/hooks/use-users";
+import { loginUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
-import { LoginFormState, loginUser } from "@/features/auth";
-
-const initialState: LoginFormState = {
-  success: false,
-};
+import { generateFormData } from "@/lib/generate-form-data";
+import { LoginFormData, loginFormSchema } from "@/lib/validations-schema/auth";
 
 export default function LoginForm() {
-  const [state, formAction, isPending] = useActionState(loginUser, initialState);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({ resolver: zodResolver(loginFormSchema) });
+  const [isPending, startTransition] = useTransition();
+
   const router = useRouter();
   const { refetch } = useUser();
 
-  useEffect(() => {
-    if (state.success && state.user) {
-      refetch();
-      toast.success("로그인 되었습니다.");
-      router.replace("/");
-    }
-    if (state.errors?.name === "server") {
-      toast.error("로그인에 실패했습니다.", {
-        description: state.errors?.message,
-      });
-    }
-  }, [state, router, refetch]);
+  const onSubmit: SubmitHandler<LoginFormData> = (data) => {
+    const formData = generateFormData(data);
+
+    startTransition(async () => {
+      const result = await loginUser(formData);
+
+      if (result.success) {
+        toast.success("로그인 되었습니다.");
+        refetch();
+        router.replace("/");
+      }
+      if (result.errors) {
+        toast.error("로그인에 실패했습니다.", {
+          description: result.errors.message,
+        });
+      }
+    });
+  };
 
   return (
-    <form action={formAction} className="border-2 w-[36rem] flex flex-col items-center py-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="border-2 w-[36rem] flex flex-col items-center py-8">
       <h1 className="text-center text-2xl font-bold mb-8">Login</h1>
 
       <div className="w-72 flex flex-col gap-8 my-8">
@@ -40,36 +52,16 @@ export default function LoginForm() {
           <label htmlFor="userEmail" className="font-semibold">
             ID
           </label>
-          <input
-            type="text"
-            id="userEmail"
-            name="userEmail"
-            className="border-b-2"
-            defaultValue={state.values?.userEmail}
-          />
-          {state.errors?.errors?.userEmail?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("userEmail")} className="border-b-2" />
+          {errors.userEmail && <p className="text-sm text-red-600">{errors.userEmail.message}</p>}
         </div>
 
         <div className="flex flex-col">
           <label htmlFor="password" className="font-semibold">
             PW
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="border-b-2"
-            defaultValue={state.values?.password}
-          />
-          {state.errors?.errors?.password?.map((msg) => (
-            <p key={msg} className="text-sm text-red-600">
-              {msg}
-            </p>
-          ))}
+          <input {...register("password")} type="password" className="border-b-2" />
+          {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
         </div>
       </div>
 

@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
 
+import { getUser } from "@/features/auth/queries";
 import DeleteUserDialog from "@/features/auth/ui/delete-user-dialog";
-import { getUser } from "@/features/auth";
 
 export const generateMetadata = async () => {
-  const { data: user } = await getUser();
+  const supabase = await createClient();
+  const { data: user } = await getUser(supabase);
 
   if (!user) {
     return null;
@@ -17,7 +19,8 @@ export const generateMetadata = async () => {
 };
 
 export default async function MyPageLayout({ profile, orders }: { profile: React.ReactNode; orders: React.ReactNode }) {
-  const { data: user } = await getUser();
+  const supabase = await createClient();
+  const { data: user } = await getUser(supabase);
 
   if (!user) {
     redirect("/login");

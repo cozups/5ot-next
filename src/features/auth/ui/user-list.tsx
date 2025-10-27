@@ -1,22 +1,24 @@
 "use client";
 
-import { User } from "@supabase/supabase-js";
-import { useSuspenseQuery } from "@tanstack/react-query";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { User } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/utils/supabase/admin";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
+import { cn } from "@/lib/utils";
+import { getUserList } from "../queries";
 
 export default function UserList() {
   const { data } = useSuspenseQuery({
     queryKey: ["user-list"],
     queryFn: async () => {
-      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+      const response = await getUserList(supabaseAdmin);
 
-      if (error) {
-        throw new Error(error.message);
+      if (response.errors) {
+        throw new Error(response.errors.message);
       }
 
-      return data;
+      return response.data;
     },
     staleTime: 5 * 60 * 1000,
   });
