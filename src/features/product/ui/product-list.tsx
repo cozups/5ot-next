@@ -8,12 +8,12 @@ import CustomPagination from "../../../components/ui/custom-pagination";
 
 const ITEMS_PER_PAGE = 8;
 
-export default async function ProductList({ category, currentPage }: { category: string; currentPage: number }) {
+export default async function ProductList({ categoryId, currentPage }: { categoryId: string; currentPage: number }) {
   const {
     data,
     count: totalCount,
     errors,
-  } = await getProductsByPagination(category, {
+  } = await getProductsByPagination(categoryId, {
     pageNum: currentPage,
     itemsPerPage: ITEMS_PER_PAGE,
   });
@@ -39,7 +39,7 @@ export default async function ProductList({ category, currentPage }: { category:
           </div>
         )}
         {data?.map((product: Products) => (
-          <Link key={product.id} href={`/${category}/${product.id}`} prefetch>
+          <Link key={product.id} href={`/product/${product.id}`} prefetch>
             <ProductItem product={product} />
           </Link>
         ))}

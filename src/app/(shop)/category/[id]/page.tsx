@@ -6,14 +6,13 @@ import { cn } from "@/lib/utils";
 
 interface ProductListPageProps {
   params: Promise<{
-    sex: string;
-    category: string;
+    id: string;
   }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function ProductListPage({ params, searchParams }: ProductListPageProps) {
-  const { sex, category } = await params;
+  const { id } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
 
@@ -27,7 +26,7 @@ export default async function ProductListPage({ params, searchParams }: ProductL
         </div>
       }
     >
-      <ProductList category={`${sex}/${category}`} currentPage={currentPage} />
+      <ProductList categoryId={id} currentPage={currentPage} />
     </Suspense>
   );
 }

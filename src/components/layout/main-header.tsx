@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import SearchBar from "./search-bar";
 import CartCount from "../ui/cart-count";
 import { cn } from "@/lib/utils";
-import TopMenu from "../ui/top-menu";
+import TopMenu from "./top-menu";
 import { SidebarTrigger } from "../ui/sidebar";
 import AuthSection from "./auth-section";
 

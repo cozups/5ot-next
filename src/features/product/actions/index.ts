@@ -206,7 +206,7 @@ export async function getProductByName(name: string): Promise<GetResponse> {
 
 // 제품 리스트를 페이지네이션하여 반환
 export async function getProductsByPagination(
-  query: string,
+  categoryId: string,
   options: { pageNum: number; itemsPerPage: number }
 ): Promise<GetPaginationResponse> {
   const from = (options.pageNum - 1) * options.itemsPerPage;
@@ -216,7 +216,7 @@ export async function getProductsByPagination(
   const { data, count, error } = await supabase
     .from("products")
     .select("*", { count: "exact" })
-    .eq("category", query)
+    .eq("cat_id", categoryId)
     .range(from, to)
     .overrideTypes<Products[]>();
 

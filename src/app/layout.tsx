@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import dynamic from "next/dynamic";
 
-const AppSidebar = dynamic(() => import("@/components/ui/app-sidebar"));
+const AppSidebar = dynamic(() => import("@/components/layout/app-sidebar"));
 
 const NotoSansKr = Noto_Sans_KR({
   subsets: ["latin"],

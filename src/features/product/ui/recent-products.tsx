@@ -21,7 +21,7 @@ export default async function RecentProducts() {
             sizes="(max-width: 1200px) 50vw, 20vw"
           />
 
-          <Link href={`/${product.category}/${product.id}`}>
+          <Link href={`/product/${product.id}`}>
             <div
               className={cn(
                 "bg-[rgba(0,0,0,0.25)] absolute top-0 left-0 w-full h-full cursor-pointer",

@@ -14,13 +14,13 @@ import ReviewListSkeleton from "@/components/skeleton/review-list-skeleton";
 
 interface ProductDetailPageProps {
   params: Promise<{
-    productId: string;
+    id: string;
   }>;
   searchParams: Promise<{ page: string }>;
 }
 
 export const generateMetadata = async ({ params }: ProductDetailPageProps) => {
-  const { productId } = await params;
+  const { id: productId } = await params;
   const { data: product } = await getProductById(productId);
 
   if (!product) {
@@ -37,7 +37,7 @@ export const generateMetadata = async ({ params }: ProductDetailPageProps) => {
 };
 
 export default async function ProductDetailPage({ params, searchParams }: ProductDetailPageProps) {
-  const { productId } = await params;
+  const { id: productId } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
   const { errors: productErrors, data: product } = await getProductById(productId);
