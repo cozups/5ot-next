@@ -2,13 +2,12 @@
 
 import { mapErrors } from "@/lib/handle-errors";
 import { reviewFormSchema } from "@/lib/validations-schema/review";
-import { Review } from "@/types/products";
-import { ApiResponse, PaginationResponse } from "@/types/response";
+import { Review } from "@/types/review";
+import { ApiResponse } from "@/types/response";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export type ReviewFormState = ApiResponse<null, Review[] | null>;
-type GetPaginationResponse = PaginationResponse<Review[] | null>;
 
 export async function createReview(productId: string, formData: FormData): Promise<ReviewFormState> {
   const raw = {
@@ -80,7 +79,7 @@ export async function updateReview(id: string, formData: FormData): Promise<Revi
     };
   }
 
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   return { success: true };
 }
 
@@ -98,77 +97,4 @@ export async function deleteReview(id: string) {
 
   revalidatePath("/");
   return { success: true };
-}
-
-export async function getReviews(productId: string): Promise<ReviewFormState> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("reviews")
-    .select(`*, products:product_id(*), profiles:user_id(*)`)
-    .eq("product_id", productId)
-    .overrideTypes<Review[]>();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-    };
-  }
-
-  return {
-    success: true,
-    data,
-  };
-}
-
-export async function getReviewsByPagination(
-  query: string,
-  options: { pageNum: number; itemsPerPage: number }
-): Promise<GetPaginationResponse> {
-  const from = (options.pageNum - 1) * options.itemsPerPage;
-  const to = from + options.itemsPerPage - 1;
-
-  const supabase = await createClient();
-  const { data, count, error } = await supabase
-    .from("reviews")
-    .select(`*, products:product_id(*), profiles:user_id(*)`, {
-      count: "exact",
-    })
-    .eq("product_id", query)
-    .range(from, to)
-    .overrideTypes<Review[]>();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-      count: 0,
-    };
-  }
-
-  return { success: true, data, count: count || 0 };
-}
-
-export async function getRecentReviews(length: number): Promise<ApiResponse<null, Review[] | null>> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("reviews")
-    .select(`*, products:product_id(*), profiles:user_id(*)`)
-    .limit(length)
-    .order("created_at", { ascending: true })
-    .overrideTypes<Review[]>();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-    };
-  }
-
-  return {
-    success: true,
-    data,
-  };
 }

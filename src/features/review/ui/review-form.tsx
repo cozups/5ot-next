@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useTransition } from "react";
 
 import { Star } from "lucide-react";
-import { Review } from "@/types/products";
+import { Review } from "@/types/review";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { createReview, updateReview } from "@/features/review/actions";
 import {
@@ -35,6 +35,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
     handleSubmit,
     control,
     formState: { errors },
+    reset,
   } = useForm<ReviewFormData>({
     resolver: zodResolver(reviewFormSchema),
     defaultValues: { star: defaultData?.star.toString() || "5", content: defaultData?.content || "" },
@@ -54,6 +55,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
         if (result.success) {
           toast.success("리뷰가 작성되었습니다.");
           invalidateCache();
+          reset();
         }
 
         if (result.errors) {

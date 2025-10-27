@@ -3,11 +3,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { createClient } from "@/utils/supabase/client";
-import { Review } from "@/types/products";
+import { Review } from "@/types/review";
 import ReviewItem from "./review-Item";
 import { cn, getTotalPage } from "@/lib/utils";
 import { useUser } from "@/hooks/use-users";
 import CustomPagination from "@/components/ui/custom-pagination";
+import { getRecentReviews, getReviewsByPagination } from "../queries";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -27,36 +28,21 @@ export default function ReviewList({
     queryKey: ["reviews", recent ? "recent" : { page, productId }],
     queryFn: async () => {
       if (page && productId) {
-        const from = (page - 1) * ITEMS_PER_PAGE;
-        const to = from + ITEMS_PER_PAGE - 1;
+        const response = await getReviewsByPagination(supabase, productId, {
+          pageNum: page,
+          itemsPerPage: ITEMS_PER_PAGE,
+        });
 
-        const { data, count, error } = await supabase
-          .from("reviews")
-          .select(`*, products:product_id(*), profiles:user_id(*)`, {
-            count: "exact",
-          })
-          .eq("product_id", productId)
-          .range(from, to);
+        if (response.errors) throw new Error(response.errors.message);
 
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        return { data, count };
+        return { data: response.data, count: response.count };
       }
       if (recent) {
-        const { data, error } = await supabase
-          .from("reviews")
-          .select(`*, products:product_id(*), profiles:user_id(*)`)
-          .limit(ITEMS_PER_PAGE)
-          .order("created_at", { ascending: true })
-          .overrideTypes<Review[]>();
+        const response = await getRecentReviews(supabase, ITEMS_PER_PAGE);
 
-        if (error) {
-          throw new Error(error.message);
-        }
+        if (response.errors) throw new Error(response.errors.message);
 
-        return { data };
+        return { data: response.data, count: response.data?.length || 0 };
       }
     },
     staleTime: 5 * 60 * 1000,

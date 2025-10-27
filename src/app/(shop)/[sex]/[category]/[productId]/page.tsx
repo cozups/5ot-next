@@ -6,6 +6,11 @@ import { getProductById } from "@/features/product/actions";
 import { cn } from "@/lib/utils";
 import ReviewForm from "@/features/review/ui/review-form";
 import ReviewList from "@/features/review/ui/review-list";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { createClient } from "@/utils/supabase/server";
+import { getReviewsByPagination } from "@/features/review/queries";
+import { Suspense } from "react";
+import ReviewListSkeleton from "@/components/skeleton/review-list-skeleton";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -45,6 +50,24 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     notFound();
   }
 
+  const supabase = await createClient();
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["reviews", { page: currentPage, productId }],
+    queryFn: async () => {
+      const response = await getReviewsByPagination(supabase, productId, {
+        pageNum: currentPage,
+        itemsPerPage: 5,
+      });
+
+      if (response.errors) {
+        throw new Error(response.errors.message);
+      }
+
+      return { data: response.data, count: response.count };
+    },
+  });
+
   return (
     <div className="py-8">
       {/* product info */}
@@ -56,6 +79,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
             fill
             className="object-cover"
             sizes="(max-width: 768px) 90vw, 33vw"
+            priority
           />
         </div>
         <ProductActionPanel product={product} />
@@ -63,7 +87,11 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
       <div>
         {/* reviews */}
         <ReviewForm productId={product.id} />
-        <ReviewList page={currentPage} productId={productId} />
+        <Suspense fallback={<ReviewListSkeleton />}>
+          <HydrationBoundary state={dehydrate(queryClient)}>
+            <ReviewList page={currentPage} productId={productId} />
+          </HydrationBoundary>
+        </Suspense>
       </div>
     </div>
   );

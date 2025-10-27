@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { Pencil } from "lucide-react";
 import ReviewForm from "./review-form";
-import { Review } from "@/types/products";
+import { Review } from "@/types/review";
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui";
 
 interface UpdateButtonProps {

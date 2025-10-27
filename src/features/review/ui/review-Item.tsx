@@ -1,6 +1,6 @@
 "use client";
 
-import { Review } from "@/types/products";
+import { Review } from "@/types/review";
 import { Star } from "lucide-react";
 import { deleteReview } from "@/features/review/actions";
 import UpdateReviewDialog from "./update-review-dialog";
