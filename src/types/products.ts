@@ -8,4 +8,5 @@ export type Products = {
   brand: string;
   category: string;
   rate: number;
+  cat_id: string;
 };

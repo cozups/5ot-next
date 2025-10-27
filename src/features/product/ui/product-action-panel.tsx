@@ -50,8 +50,13 @@ export default function ProductActionPanel({ product }: { product: Products }) {
   return (
     <div className="flex-1 flex flex-col justify-between">
       <div className="h-[80%] flex flex-col items-start justify-between">
-        <div>
-          <h2 className="text-2xl font-semibold">{product.name}</h2>
+        <div className="w-full">
+          <div className="w-full flex justify-between items-end">
+            <h2 className="text-2xl font-semibold">{product.name}</h2>
+            <Link href={`/category/${product.cat_id}`} className="text-xs text-gray-400 underline">
+              {product.category}
+            </Link>
+          </div>
           <p className="text-sm text-gray-400">{product.brand}</p>
           <p className="flex items-center gap-1">
             <Star className="w-4 h-4" fill="orange" />

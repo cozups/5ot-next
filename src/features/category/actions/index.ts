@@ -7,6 +7,7 @@ import { mapErrors } from "@/lib/handle-errors";
 import { createClient } from "@/utils/supabase/server";
 import { CategoryFormData, categoryFormSchema } from "@/lib/validations-schema/category";
 import { Category } from "@/types/category";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export type CategoryFormState = ApiResponse<CategoryFormData, null>;
 
@@ -57,6 +58,19 @@ export async function deleteCategory(id: string): Promise<CategoryFormState> {
   return {
     success: true,
   };
+}
+
+export async function getCategory(client: SupabaseClient, id: string): Promise<ApiResponse<null, Category | null>> {
+  const { data, error } = await client.from("category").select().eq("id", id).maybeSingle<Category>();
+
+  if (error) {
+    return {
+      success: false,
+      errors: mapErrors(error),
+    };
+  }
+
+  return { success: true, data };
 }
 
 export async function getCategories() {
