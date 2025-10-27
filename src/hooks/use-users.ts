@@ -16,8 +16,7 @@ export function useUser() {
       const { data } = await supabase.auth.getSession();
       return data.session?.user || null;
     },
-    staleTime: 1000 * 60 * 5,
-    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 60,
   });
 
   return { user, isLoading, refetch };

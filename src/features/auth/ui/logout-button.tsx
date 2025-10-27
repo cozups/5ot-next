@@ -1,24 +1,24 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { DoorOpen } from "lucide-react";
 import { Button } from "@/components/ui";
 import { logout } from "@/features/auth";
-import { useUser } from "@/hooks/use-users";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function LogoutButton() {
   const router = useRouter();
-  const { refetch } = useUser();
+  const queryClient = useQueryClient();
 
   const onClickLogout = async () => {
     const result = await logout();
 
     if (result.success) {
-      refetch();
-      toast.success("로그아웃 되었습니다.");
+      queryClient.setQueryData(["user"], null);
       router.push("/");
+      toast.success("로그아웃 되었습니다.");
     }
 
     if (result.errors?.name === "server") {

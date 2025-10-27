@@ -1,23 +1,20 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { User } from "@supabase/supabase-js";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Order } from "@/types/orders";
-import { useUser } from "@/hooks/use-users";
 import { cn, getTotalPage } from "@/lib/utils";
-import { getUser } from "@/features/auth/queries";
 import OrderStatusAction from "./order-status-action";
 import DeleteButton from "../../../components/delete-button";
 import CustomPagination from "../../../components/ui/custom-pagination";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteOrder, getOrdersByPagination, getOrdersByUserId, updateOrderStatus } from "@/features/order/actions";
-
-interface OrderListProps {
-  initialData: { data: Order[]; count: number } | null;
-}
+import { deleteOrder, updateOrderStatus } from "@/features/order/actions";
+import { getOrdersByPagination, getOrdersByUserId } from "../queries";
+import { ORDER_ITEMS_PER_PAGE } from "@/app/(mypage)/admin/order/constants";
 
 const DELIVERY_STATE = {
   processing: "처리 중",
@@ -28,44 +25,50 @@ const DELIVERY_STATE = {
 
 const UpdateDeliveryDialog = dynamic(() => import("./update-delivery-dialog"), { ssr: false });
 
-const ITEMS_PER_PAGE = 10;
-
-export default function OrderList({ initialData }: OrderListProps) {
+export default function OrderList({ user }: { user: User | null }) {
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page") ?? 1);
-  const { user } = useUser();
+
   const isAdmin = user?.user_metadata.role === "admin";
 
+  const supabase = createClient();
   const { data, error } = useSuspenseQuery({
     queryKey: ["orders", isAdmin ? "admin" : "user", { page: currentPage }],
     queryFn: async () => {
       if (isAdmin) {
-        const { data, count } = await getOrdersByPagination({ pageNum: currentPage, itemsPerPage: ITEMS_PER_PAGE });
+        const { data, count, errors } = await getOrdersByPagination(supabase, {
+          pageNum: currentPage,
+          itemsPerPage: ORDER_ITEMS_PER_PAGE,
+        });
+
+        if (errors) {
+          throw new Error(errors.message);
+        }
 
         return { data, count };
       }
       if (!isAdmin) {
-        const supabase = createClient();
-        const { data: user } = await getUser(supabase);
-
         if (!user) {
           throw new Error("User not found");
         }
 
-        const { data, count } = await getOrdersByUserId(user?.id, {
+        const { data, count, errors } = await getOrdersByUserId(supabase, user?.id, {
           pageNum: currentPage,
-          itemsPerPage: ITEMS_PER_PAGE,
+          itemsPerPage: ORDER_ITEMS_PER_PAGE,
         });
+
+        if (errors) {
+          throw new Error(errors.message);
+        }
 
         return { data, count };
       }
     },
-    initialData: initialData || undefined,
     staleTime: 60 * 1000,
   });
 
   const list = data?.data || [];
-  const totalPage = getTotalPage(data?.count || 0, ITEMS_PER_PAGE);
+  const totalPage = getTotalPage(data?.count || 0, ORDER_ITEMS_PER_PAGE);
 
   if (error) {
     throw error;

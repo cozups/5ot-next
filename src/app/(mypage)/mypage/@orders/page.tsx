@@ -4,8 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 
 import { getUser } from "@/features/auth/queries";
 import OrderList from "@/features/order/ui/order-list";
-import { getOrdersByUserId } from "@/features/order/actions";
+import { getOrdersByUserId } from "@/features/order/queries";
 import OrderListSkeleton from "@/components/skeleton/order-list-skeleton";
+import { QueryClient } from "@tanstack/react-query";
 
 export default async function OrderListSection() {
   const supabase = await createClient();
@@ -15,15 +16,24 @@ export default async function OrderListSection() {
     redirect("/login");
   }
 
-  const { data: orderList, count, errors } = await getOrdersByUserId(user.id);
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["orders", "admin", { page: 1 }],
+    queryFn: async () => {
+      const response = await getOrdersByUserId(supabase, user.id);
 
-  if (errors) {
-    throw errors;
-  }
+      if (response.errors) {
+        throw new Error(response.errors.message);
+      }
+
+      return { data: response.data, count: response.count };
+    },
+    staleTime: 60 * 1000,
+  });
 
   return (
     <Suspense fallback={<OrderListSkeleton />}>
-      <OrderList initialData={{ data: orderList || [], count: count || 0 }} />
+      <OrderList user={user} />
     </Suspense>
   );
 }

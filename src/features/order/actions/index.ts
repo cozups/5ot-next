@@ -3,12 +3,11 @@
 import { mapErrors } from "@/lib/handle-errors";
 import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
 import { Order, Purchase } from "@/types/orders";
-import { ApiResponse, PaginationResponse } from "@/types/response";
+import { ApiResponse } from "@/types/response";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export type OrderFormState = ApiResponse<OrderFormData, Order[]>;
-type GetPaginationResponse = PaginationResponse<Order[] | null>;
 
 export async function createOrder(products: Purchase[], formData: FormData): Promise<OrderFormState> {
   const raw = {
@@ -129,82 +128,4 @@ export async function updateOrderData(id: string, formData: FormData): Promise<O
 
   revalidatePath("/mypage");
   return { success: true };
-}
-
-export async function getOrdersByPagination(options?: {
-  pageNum: number;
-  itemsPerPage: number;
-}): Promise<GetPaginationResponse> {
-  const from = options ? (options.pageNum - 1) * options.itemsPerPage : 0;
-  const to = options ? from + options.itemsPerPage - 1 : 10000;
-
-  const supabase = await createClient();
-  const { data, count, error } = await supabase
-    .from("orders")
-    .select(`*, profiles:user_id (name)`, { count: "exact" })
-    .range(from, to)
-    .order("created_at", { ascending: true })
-    .overrideTypes<Order[]>();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-      count: 0,
-    };
-  }
-
-  return {
-    success: true,
-    data,
-    count: count || 0,
-  };
-}
-
-export async function getOrdersByUserId(
-  userId: string,
-  options?: { pageNum: number; itemsPerPage: number }
-): Promise<GetPaginationResponse> {
-  const from = options ? (options.pageNum - 1) * options.itemsPerPage : 0;
-  const to = options ? from + options.itemsPerPage - 1 : 10000;
-
-  const supabase = await createClient();
-  const { data, error, count } = await supabase
-    .from("orders")
-    .select(`*, profiles:user_id (name)`, { count: "exact" })
-    .range(from, to)
-    .order("created_at", { ascending: true })
-    .eq("user_id", userId);
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-      count: 0,
-    };
-  }
-
-  return {
-    success: true,
-    data,
-    count: count || 0,
-  };
-}
-
-export async function getOrderById(id: string): Promise<ApiResponse<null, Order | null>> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("orders").select().eq("id", id).single();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-      data: null,
-    };
-  }
-
-  return {
-    success: true,
-    data,
-  };
 }
