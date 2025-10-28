@@ -1,9 +1,10 @@
-import { getAllProductsByPagination } from "@/features/product/actions";
+import { getAllProductsByPagination } from "@/features/product/queries";
 import ProductForm from "@/features/product/ui/product-form";
 import ProductListTable from "@/features/product/ui/product-list-table";
 
 import CustomPagination from "@/components/ui/custom-pagination";
 import { getTotalPage } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/server";
 
 interface ProductManagementPageProps {
   searchParams: Promise<{
@@ -14,8 +15,9 @@ interface ProductManagementPageProps {
 export default async function ProductManagementPage({ searchParams }: ProductManagementPageProps) {
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
+  const supabase = await createClient();
 
-  const { data: productList, count: totalCount } = await getAllProductsByPagination({
+  const { data: productList, count: totalCount } = await getAllProductsByPagination(supabase, {
     pageNum: currentPage,
     itemsPerPage: 10,
   });

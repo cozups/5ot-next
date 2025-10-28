@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import ProductActionPanel from "@/features/product/ui/product-action-panel";
-import { getProductById } from "@/features/product/actions";
+import { getProductById } from "@/features/product/queries";
 import { cn } from "@/lib/utils";
 import ReviewForm from "@/features/review/ui/review-form";
 import ReviewList from "@/features/review/ui/review-list";
@@ -21,7 +21,8 @@ interface ProductDetailPageProps {
 
 export const generateMetadata = async ({ params }: ProductDetailPageProps) => {
   const { id: productId } = await params;
-  const { data: product } = await getProductById(productId);
+  const supabase = await createClient();
+  const { data: product } = await getProductById(supabase, productId);
 
   if (!product) {
     return {
@@ -40,7 +41,8 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
   const { id: productId } = await params;
   const { page } = await searchParams;
   const currentPage = Number(page) || 1;
-  const { errors: productErrors, data: product } = await getProductById(productId);
+  const supabase = await createClient();
+  const { errors: productErrors, data: product } = await getProductById(supabase, productId);
 
   if (productErrors) {
     throw productErrors;
@@ -50,7 +52,6 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
     notFound();
   }
 
-  const supabase = await createClient();
   const queryClient = new QueryClient();
   await queryClient.prefetchQuery({
     queryKey: ["reviews", { page: currentPage, productId }],

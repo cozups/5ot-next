@@ -78,7 +78,7 @@ export async function updateReview(id: string, formData: FormData): Promise<Revi
     };
   }
 
-  revalidatePath("/", "layout");
+  revalidatePath("/product");
   return { success: true };
 }
 
@@ -94,6 +94,6 @@ export async function deleteReview(id: string) {
     };
   }
 
-  revalidatePath("/");
+  revalidatePath("/product");
   return { success: true };
 }

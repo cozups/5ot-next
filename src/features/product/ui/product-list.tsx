@@ -3,17 +3,19 @@ import Link from "next/link";
 import { Products } from "@/types/products";
 import { cn, getTotalPage } from "@/lib/utils";
 import ProductItem from "./product-item";
-import { getProductsByPagination } from "@/features/product/actions";
+import { getProductsByPagination } from "@/features/product/queries";
 import CustomPagination from "../../../components/ui/custom-pagination";
+import { createClient } from "@/utils/supabase/server";
 
 const ITEMS_PER_PAGE = 8;
 
 export default async function ProductList({ categoryId, currentPage }: { categoryId: string; currentPage: number }) {
+  const supabase = await createClient();
   const {
     data,
     count: totalCount,
     errors,
-  } = await getProductsByPagination(categoryId, {
+  } = await getProductsByPagination(supabase, categoryId, {
     pageNum: currentPage,
     itemsPerPage: ITEMS_PER_PAGE,
   });

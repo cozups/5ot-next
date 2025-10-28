@@ -164,6 +164,7 @@ export async function updateUser(user: User, prevState: UpdateFormState, formDat
       success: false,
       errors: {
         name: "validation",
+        code: "validation",
         message: "형식에 맞지 않는 입력값입니다.",
         errors: {
           username: ["이름을 반드시 입력해주세요"],

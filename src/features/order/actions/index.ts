@@ -64,6 +64,7 @@ export async function deleteOrder(id: string): Promise<OrderFormState> {
     };
   }
 
+  revalidatePath("/mypage");
   revalidatePath("/admin/order");
   return {
     success: true,
@@ -127,5 +128,6 @@ export async function updateOrderData(id: string, formData: FormData): Promise<O
   }
 
   revalidatePath("/mypage");
+  revalidatePath("/admin/order");
   return { success: true };
 }

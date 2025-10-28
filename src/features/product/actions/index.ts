@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { Category } from "@/types/category";
 import { Products } from "@/types/products";
 import { generateRandomId } from "@/lib/utils";
-import { ApiResponse, PaginationResponse } from "@/types/response";
+import { ApiResponse } from "@/types/response";
 import { mapErrors } from "@/lib/handle-errors";
 import { createClient } from "@/utils/supabase/server";
 import { ProductFormData, productFormSchema as formSchema } from "@/lib/validations-schema/product";
@@ -13,8 +13,6 @@ import { getImageURL, removeImageFromStorage, uploadImageToStorage } from "@/act
 import { ErrorReturn } from "@/types/error";
 
 export type ProductFormState = ApiResponse<ProductFormData, Products[] | null>;
-type GetResponse = ApiResponse<null, Products[] | null>;
-type GetPaginationResponse = PaginationResponse<Products[] | null>;
 
 export async function insertProduct(formData: FormData): Promise<ProductFormState> {
   const raw = {
@@ -105,6 +103,7 @@ export async function deleteProduct(product: Products): Promise<{ success: boole
     };
   }
 
+  revalidatePath("/category");
   revalidatePath("/admin/product");
   return { success: true };
 }
@@ -182,96 +181,7 @@ export async function updateProduct(
     };
   }
 
+  revalidatePath("/category");
   revalidatePath("/admin/product");
   return { success: true };
-}
-
-// 검색할 때 사용
-export async function getProductByName(name: string): Promise<GetResponse> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase.rpc("search_product_by_compact_name", {
-    search_text: name.trim(),
-  });
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-    };
-  }
-
-  return { success: true, data };
-}
-
-// 제품 리스트를 페이지네이션하여 반환
-export async function getProductsByPagination(
-  categoryId: string,
-  options: { pageNum: number; itemsPerPage: number }
-): Promise<GetPaginationResponse> {
-  const from = (options.pageNum - 1) * options.itemsPerPage;
-  const to = from + options.itemsPerPage - 1;
-
-  const supabase = await createClient();
-  const { data, count, error } = await supabase
-    .from("products")
-    .select("*", { count: "exact" })
-    .eq("cat_id", categoryId)
-    .range(from, to)
-    .overrideTypes<Products[]>();
-
-  if (error) {
-    return {
-      success: false,
-      data: null,
-      count: 0,
-      errors: mapErrors(error),
-    };
-  }
-
-  return { success: true, data, count: count || 0 };
-}
-
-export async function getAllProductsByPagination(options: {
-  pageNum: number;
-  itemsPerPage: number;
-}): Promise<GetPaginationResponse> {
-  const from = (options.pageNum - 1) * options.itemsPerPage;
-  const to = from + options.itemsPerPage - 1;
-
-  const supabase = await createClient();
-  const { data, count, error } = await supabase
-    .from("products")
-    .select("*", { count: "exact" })
-    .range(from, to)
-    .overrideTypes<Products[]>();
-
-  if (error) {
-    return {
-      success: false,
-      data: null,
-      count: 0,
-      errors: mapErrors(error),
-    };
-  }
-
-  return { success: true, data, count: count || 0 };
-}
-
-export async function getProductById(id: string): Promise<ApiResponse<null, Products | null>> {
-  const supabase = await createClient();
-  const { data, error } = await supabase.from("products").select().eq("id", id).limit(1).maybeSingle<Products>();
-
-  if (error) {
-    return {
-      success: false,
-      errors: mapErrors(error),
-      data: null,
-    };
-  }
-
-  return {
-    success: true,
-    data: data || null,
-  };
 }

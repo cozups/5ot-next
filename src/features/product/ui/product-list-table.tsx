@@ -3,10 +3,12 @@ import Image from "next/image";
 
 import UpdateProductDialog from "@/features/product/ui/update-product-dialog";
 import DeleteButton from "@/components/delete-button";
-import { deleteProduct, getAllProductsByPagination } from "@/features/product/actions";
+import { deleteProduct } from "@/features/product/actions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Products } from "@/types/products";
 import { useQuery } from "@tanstack/react-query";
+import { getAllProductsByPagination } from "../queries";
+import { createClient } from "@/utils/supabase/client";
 
 interface ProductListTableProps {
   initialData: Products[];
@@ -14,10 +16,11 @@ interface ProductListTableProps {
 }
 
 export default function ProductListTable({ initialData, currentPage }: ProductListTableProps) {
+  const supabase = createClient();
   const { data: productList } = useQuery({
     queryKey: ["products", { page: currentPage }],
     queryFn: async () => {
-      const { data } = await getAllProductsByPagination({
+      const { data } = await getAllProductsByPagination(supabase, {
         pageNum: currentPage,
         itemsPerPage: 10,
       });

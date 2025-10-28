@@ -6,20 +6,22 @@ import { Search } from "lucide-react";
 import _ from "lodash";
 
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { getProductByName } from "@/features/product/actions";
+import { getProductByName } from "@/features/product/queries";
 import { Products } from "@/types/products";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/utils/supabase/client";
 
 export default function SearchBar({ className }: { className?: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchWord, setSearchWord] = useState<string>("");
   const [searchResults, setSearchResults] = useState<Products[]>([]);
+  const supabase = createClient();
 
   const debounceSearch = useCallback(
     _.debounce(async (query: string) => {
       if (query.trim().length > 0) {
-        const searchedProducts = await getProductByName(query);
+        const searchedProducts = await getProductByName(supabase, query);
         setSearchResults(searchedProducts.data || []);
       }
     }, 300),
