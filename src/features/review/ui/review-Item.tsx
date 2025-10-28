@@ -6,18 +6,25 @@ import { deleteReview } from "@/features/review/actions";
 import UpdateReviewDialog from "./update-review-dialog";
 import { cn } from "@/lib/utils";
 import DeleteButton from "@/components/delete-button";
+import { useUser } from "@/hooks/use-users";
+import { useEffect, useState } from "react";
 
 export default function ReviewItem({
   review,
-  controllable,
   className,
-  showProducts = false,
+  recent = false,
 }: {
   review: Review;
-  controllable: boolean;
   className?: string;
-  showProducts?: boolean;
+  recent?: boolean;
 }) {
+  const { user } = useUser();
+  const [isControllable, setIsControllable] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsControllable(() => !recent && (user?.user_metadata.role === "admin" || user?.id === review.user_id));
+  }, [review.user_id, user?.id, user?.user_metadata.role, recent]);
+
   return (
     <li className={cn("bg-gray-100 rounded-xl p-4", className)}>
       <div className="flex justify-between items-center">
@@ -28,13 +35,13 @@ export default function ReviewItem({
             {review.star}
           </div>
         </div>
-        {controllable && (
+        {isControllable && (
           <div className="flex gap-1">
             <UpdateReviewDialog review={review} />
             <DeleteButton action={deleteReview.bind(null, review.id)} queryKey={["reviews"]} />
           </div>
         )}
-        {showProducts && <p className="text-xs">[{review.products.name}] 구매</p>}
+        {recent && <p className="text-xs">[{review.products.name}] 구매</p>}
       </div>
       <div className="mt-2">{review.content}</div>
     </li>

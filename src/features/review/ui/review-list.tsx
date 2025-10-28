@@ -1,12 +1,11 @@
 "use client";
 
+import { createClient } from "@/utils/supabase/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
-import { createClient } from "@/utils/supabase/client";
-import { Review } from "@/types/review";
 import ReviewItem from "./review-Item";
+import { Review } from "@/types/review";
 import { cn, getTotalPage } from "@/lib/utils";
-import { useUser } from "@/hooks/use-users";
 import CustomPagination from "@/components/ui/custom-pagination";
 import { getRecentReviews, getReviewsByPagination } from "../queries";
 
@@ -22,7 +21,6 @@ export default function ReviewList({
   recent?: boolean;
 }) {
   const supabase = createClient();
-  const { user } = useUser();
 
   const { data: reviews } = useSuspenseQuery({
     queryKey: ["reviews", recent ? "recent" : { page, productId }],
@@ -54,13 +52,7 @@ export default function ReviewList({
     <div className="mt-4 flex flex-col gap-2 overflow-auto">
       <ul className={cn("flex flex-col gap-6 text-xs", !recent && "mt-8", "md:text-sm", "lg:text-base")}>
         {reviews?.data?.map((review: Review) => (
-          <ReviewItem
-            key={review.id}
-            review={review}
-            controllable={!recent && (user?.user_metadata.role === "admin" || user?.id === review.user_id)}
-            className={recent ? "bg-white" : ""}
-            showProducts={recent}
-          />
+          <ReviewItem key={review.id} review={review} className={recent ? "bg-white" : ""} recent={recent} />
         ))}
       </ul>
       {!recent && !!reviews?.count && <CustomPagination currentPage={page!} totalPage={totalPage} />}
