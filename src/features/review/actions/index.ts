@@ -58,13 +58,12 @@ export async function updateReview(id: string, formData: FormData): Promise<Revi
     content: formData.get("content")?.toString() || "",
   };
 
-  if (!raw.content.trim().length) {
+  const result = reviewFormSchema.safeParse(raw);
+
+  if (result.error) {
     return {
       success: false,
-      errors: {
-        name: "validation",
-        message: "리뷰 내용을 입력해주세요.",
-      },
+      errors: mapErrors(result.error),
     };
   }
 

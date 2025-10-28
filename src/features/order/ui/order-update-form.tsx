@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { useUser } from "@/hooks/use-users";
 import { generateFormData } from "@/lib/generate-form-data";
+import { useErrorStore } from "@/store/error";
 
 interface OrderUpdateFromProps {
   defaultData: Order;
@@ -26,6 +27,7 @@ export default function OrderUpdateForm({ defaultData, onComplete }: OrderUpdate
   const { user } = useUser();
   const isAdmin = user?.user_metadata.role === "admin";
   const { invalidateCache } = useInvalidateCache(["orders", isAdmin ? "admin" : "user"]);
+  const { addError } = useErrorStore();
 
   const {
     register,
@@ -54,8 +56,8 @@ export default function OrderUpdateForm({ defaultData, onComplete }: OrderUpdate
         invalidateCache();
         onComplete();
       }
-      if (result.errors?.name === "server") {
-        toast.success("주문 업데이트 중 문제가 발생하였습니다.", { description: result.errors.message });
+      if (result.errors) {
+        addError(result.errors);
       }
     });
   };

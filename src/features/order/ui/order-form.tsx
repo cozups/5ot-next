@@ -14,6 +14,7 @@ import AddressSearchDialog from "./address-search-dialog";
 import { generateFormData } from "@/lib/generate-form-data";
 import { Spinner, Button, Input, Textarea } from "@/components/ui";
 import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
+import { useErrorStore } from "@/store/error";
 
 export interface AddressResult {
   base: string;
@@ -34,6 +35,7 @@ export default function OrderForm() {
 
   const { updateCartAfterPurchase } = useCartStore();
   const router = useRouter();
+  const { addError } = useErrorStore();
 
   useEffect(() => {
     const purchaseStorage: Purchase[] = JSON.parse(sessionStorage.getItem("purchase") || "[]");
@@ -57,10 +59,8 @@ export default function OrderForm() {
         router.replace("/");
       }
 
-      if (result.errors?.name === "server") {
-        toast.error("주문 중 문제가 발생하였습니다.", {
-          description: result.errors.message,
-        });
+      if (result.errors) {
+        addError(result.errors);
       }
     });
   };

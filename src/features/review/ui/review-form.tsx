@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { generateFormData } from "@/lib/generate-form-data";
 import { useUser } from "@/hooks/use-users";
 import { useRouter } from "next/navigation";
+import { useErrorStore } from "@/store/error";
 
 interface ReviewFormProps {
   productId?: string;
@@ -47,6 +48,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
 
   const [isPending, startTransition] = useTransition();
 
+  const { addError } = useErrorStore();
   const { invalidateCache } = useInvalidateCache(["reviews"]);
 
   const onSubmit: SubmitHandler<ReviewFormData> = (data) => {
@@ -68,9 +70,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
         }
 
         if (result.errors) {
-          toast.error("리뷰 작성 중 문제가 발생했습니다.", {
-            description: result.errors.message,
-          });
+          addError(result.errors);
         }
       }
       if (mode === "update" && defaultData) {
@@ -83,9 +83,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
         }
 
         if (result.errors) {
-          toast.error("리뷰 작성 중 문제가 발생했습니다.", {
-            description: result.errors.message,
-          });
+          addError(result.errors);
         }
       }
     });

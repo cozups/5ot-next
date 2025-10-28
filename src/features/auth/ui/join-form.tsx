@@ -12,6 +12,7 @@ import { createUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
 import { generateFormData } from "@/lib/generate-form-data";
 import { JoinFormData, joinFormSchema } from "@/lib/validations-schema/auth";
+import { useErrorStore } from "@/store/error";
 
 export default function JoinForm() {
   const {
@@ -23,6 +24,7 @@ export default function JoinForm() {
 
   const router = useRouter();
   const { refetch } = useUser();
+  const { addError } = useErrorStore();
 
   const onSubmit: SubmitHandler<JoinFormData> = (data) => {
     const formData = generateFormData(data);
@@ -39,9 +41,7 @@ export default function JoinForm() {
       }
 
       if (result.errors) {
-        toast.error("회원가입에 실패했습니다.", {
-          description: result.errors.message,
-        });
+        addError(result.errors);
       }
     });
   };

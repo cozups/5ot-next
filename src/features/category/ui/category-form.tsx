@@ -9,6 +9,7 @@ import { createCategory } from "../actions";
 import { generateFormData } from "@/lib/generate-form-data";
 import { CategoryFormData, categoryFormSchema } from "@/lib/validations-schema/category";
 import { Input, Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui";
+import { useErrorStore } from "@/store/error";
 
 export default function CategoryForm() {
   const {
@@ -19,6 +20,7 @@ export default function CategoryForm() {
     reset,
   } = useForm<CategoryFormData>({ resolver: zodResolver(categoryFormSchema) });
   const [isPending, startTransition] = useTransition();
+  const { addError } = useErrorStore();
 
   const onSubmit: SubmitHandler<CategoryFormData> = (data) => {
     const formData = generateFormData(data);
@@ -29,10 +31,9 @@ export default function CategoryForm() {
       if (result.success) {
         toast.success("카테고리가 추가되었습니다.");
         reset({ name: "", sex: "" });
-      } else {
-        toast.error("카테고리 추가 중 문제가 발생했습니다.", {
-          description: result.errors?.message,
-        });
+      }
+      if (result.errors) {
+        addError(result.errors);
       }
     });
   };

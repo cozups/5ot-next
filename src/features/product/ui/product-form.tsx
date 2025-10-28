@@ -13,6 +13,7 @@ import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { useCategory } from "@/features/category/hooks/use-category";
 import { ProductFormData, productFormSchema } from "@/lib/validations-schema/product";
 import { Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input, Button } from "@/components/ui";
+import { useErrorStore } from "@/store/error";
 
 export default function ProductForm() {
   const {
@@ -28,6 +29,7 @@ export default function ProductForm() {
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const categories = useCategory();
   const { invalidateCache } = useInvalidateCache(["products"]);
+  const { addError } = useErrorStore();
 
   const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -60,9 +62,7 @@ export default function ProductForm() {
       }
 
       if (result.errors) {
-        toast.error("제품 추가 중 문제가 발생하였습니다.", {
-          description: result.errors.message,
-        });
+        addError(result.errors);
       }
     });
   };

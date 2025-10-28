@@ -12,10 +12,10 @@ export enum AuthApiErrorMessage {
 
 // Storage API 오류 메시지 매핑: Error가 code를 제공하지 않음
 export const StorageApiErrorMessage = {
-  404: "요청하신 리소스를 찾을 수 없습니다.", // 리소스 없음
-  401: "유효하지 않은 JWT 토큰입니다.", // 잘못된 JWT 토큰
   400: "잘못된 요청 형식입니다.", // 잘못된 요청 형식
+  401: "로그인 정보가 존재하지 않거나 유효하지 않습니다.", // 잘못된 JWT 토큰
   403: "권한이 없습니다.", // 권한 없음
+  404: "요청하신 리소스를 찾을 수 없습니다.", // 리소스 없음
   409: "리소스가 이미 존재합니다.", // 리소스 충돌
   429: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.", // 너무 많은 요청
   544: "데이터베이스에 요청이 많아 효율적으로 처리할 수 없습니다. 잠시 후 다시 시도해주세요.", // DB 요청 과부하
@@ -36,9 +36,48 @@ export const DatabaseApiErrorMessage = {
   "42501": "인증되지 않았거나 권한이 없는 사용자입니다.", // 인증되지 않음 or 권한 없음
 };
 
-export type ErrorReturn = {
-  name: "validation" | "server" | "network" | "unexpected";
+export const DatabaseApiErrorCodes = {
+  client: ["0L", "0P", "23503", "23505", "25006", "28", "P0001", "42883", "42P01", "42501"],
+  server: [
+    "08",
+    "09",
+    "25",
+    "2D",
+    "38",
+    "39",
+    "3B",
+    "40",
+    "53400",
+    "53",
+    "54",
+    "55",
+    "57",
+    "58",
+    "F0",
+    "HV",
+    "P0",
+    "XX",
+    "42P17",
+  ],
+};
+
+export type StorageError = {
+  statusCode: string;
+  error: string;
   message: string;
-  code?: string;
+};
+
+export type DatabaseError = {
+  code: string;
+  details: string | null;
+  hint: string | null;
+  message: string;
+};
+
+export type ErrorReturn = {
+  name: "validation" | "client" | "server" | "network" | "unexpected";
+  message: string;
+  code: string;
   errors?: Record<string, string[]>;
+  toast?: boolean;
 };

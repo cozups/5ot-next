@@ -12,6 +12,7 @@ import { loginUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
 import { generateFormData } from "@/lib/generate-form-data";
 import { LoginFormData, loginFormSchema } from "@/lib/validations-schema/auth";
+import { useErrorStore } from "@/store/error";
 
 export default function LoginForm() {
   const {
@@ -23,6 +24,7 @@ export default function LoginForm() {
 
   const router = useRouter();
   const { refetch } = useUser();
+  const { addError } = useErrorStore();
 
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
     const formData = generateFormData(data);
@@ -36,9 +38,7 @@ export default function LoginForm() {
         router.replace("/");
       }
       if (result.errors) {
-        toast.error("로그인에 실패했습니다.", {
-          description: result.errors.message,
-        });
+        addError(result.errors);
       }
     });
   };
