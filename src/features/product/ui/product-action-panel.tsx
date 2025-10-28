@@ -51,9 +51,9 @@ export default function ProductActionPanel({ product }: { product: Products }) {
     <div className="flex-1 flex flex-col justify-between">
       <div className="h-[80%] flex flex-col items-start justify-between">
         <div className="w-full">
-          <div className="w-full flex justify-between items-end">
+          <div className={cn("w-full flex flex-col", "md:flex-row md:justify-between md:items-end")}>
             <h2 className="text-2xl font-semibold">{product.name}</h2>
-            <Link href={`/category/${product.cat_id}`} className="text-xs text-gray-400 underline">
+            <Link href={`/category/${product.cat_id}`} className={cn("text-xs text-gray-400 underline self-end")}>
               {product.category}
             </Link>
           </div>
