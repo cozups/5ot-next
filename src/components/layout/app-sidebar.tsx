@@ -8,7 +8,9 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "../ui/sidebar";
 import Link from "next/link";
 import SearchBar from "./search-bar";
@@ -16,6 +18,7 @@ import { useCategory } from "@/features/category/hooks/use-category";
 
 export default function AppSidebar() {
   const { men, women } = useCategory();
+  const { toggleSidebar } = useSidebar();
 
   return (
     <Sidebar>
@@ -29,9 +32,11 @@ export default function AppSidebar() {
             <SidebarMenu>
               {men.map((menu) => (
                 <SidebarMenuItem key={menu.id}>
-                  <Link href={`/category/${menu.id}`} className="block px-2 py-1 hover:bg-gray-100 rounded">
-                    {menu.name}
-                  </Link>
+                  <SidebarMenuButton onClick={toggleSidebar} asChild>
+                    <Link href={`/category/${menu.id}`} className="block px-2 py-1 hover:bg-gray-100 rounded">
+                      {menu.name}
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
@@ -43,9 +48,11 @@ export default function AppSidebar() {
             <SidebarMenu>
               {women.map((menu) => (
                 <SidebarMenuItem key={menu.id}>
-                  <Link href={`/category/${menu.id}`} className="block px-2 py-1 hover:bg-gray-100 rounded">
-                    {menu.name}
-                  </Link>
+                  <SidebarMenuButton onClick={toggleSidebar} asChild>
+                    <Link href={`/category/${menu.id}`} className="block px-2 py-1 hover:bg-gray-100 rounded">
+                      {menu.name}
+                    </Link>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
