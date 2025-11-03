@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -13,6 +12,8 @@ import { useCategory } from "@/features/category/hooks/use-category";
 import { ProductFormData, productFormSchema } from "@/lib/validations-schema/product";
 import { Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input, Button } from "@/components/ui";
 import { useFormTransition } from "@/hooks/use-form-transition";
+import ImagePreview from "@/components/ui/image-preview";
+import { useImagePreview } from "@/hooks/use-image-preview";
 
 export default function ProductForm() {
   const {
@@ -24,34 +25,18 @@ export default function ProductForm() {
   } = useForm<ProductFormData>({ resolver: zodResolver(productFormSchema) });
 
   const [sex, setSex] = useState<"men" | "women">("men");
-  const [pickedImage, setPickedImage] = useState<string | null>(null);
   const categories = useCategory();
+  const { pickedImage, onChangeImage, resetImage } = useImagePreview();
   const { invalidateCache } = useInvalidateCache(["products"]);
   const { isPending, execute } = useFormTransition(insertProduct, {
     onSuccess: () => {
-      setPickedImage(null);
+      resetImage();
       setSex("men");
       reset();
       invalidateCache();
     },
     onSuccessText: ["제품이 추가되었습니다."],
   });
-
-  const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const fileReader = new FileReader();
-
-    fileReader.onload = () => {
-      setPickedImage(fileReader.result as string);
-    };
-
-    fileReader.readAsDataURL(file);
-  };
 
   const onSubmit: SubmitHandler<ProductFormData> = (data) => {
     const formData = generateFormData(data);
@@ -162,17 +147,12 @@ export default function ProductForm() {
             {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}
           </div>
         </div>
-        <div className={cn("w-36 aspect-square bg-slate-500 relative", "md:flex-1")}>
-          {pickedImage && (
-            <Image
-              src={pickedImage}
-              fill
-              alt="product image"
-              className="object-cover"
-              sizes="(max-width: 768px) 33vw, 50vw"
-            />
-          )}
-        </div>
+        <ImagePreview
+          src={pickedImage}
+          alt="new product image"
+          sizes="(max-width: 768px) 33vw, 50vw"
+          className="w-36 md:flex-1"
+        />
       </div>
       <Button type="submit" disabled={isPending} className="w-16">
         {isPending ? <Spinner /> : "추가"}

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { Pen } from "lucide-react";
 
@@ -26,13 +25,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { generateFormData } from "@/lib/generate-form-data";
 import { useFormTransition } from "@/hooks/use-form-transition";
 import { useCategory } from "@/features/category/hooks/use-category";
+import { useImagePreview } from "@/hooks/use-image-preview";
+import ImagePreview from "@/components/ui/image-preview";
 
 export default function UpdateProductDialog({ product }: { product: Products }) {
   const [isOpen, setIsOpen] = useState(false);
   const [defaultSex, defaultCategory] = product.category.split("/");
   const [sex, setSex] = useState<"men" | "women">(defaultSex as "men" | "women");
   const categories = useCategory();
-  const [pickedImage, setPickedImage] = useState<string | undefined>(product.image || undefined);
+  const { pickedImage, onChangeImage, resetImage } = useImagePreview(product.image || undefined);
 
   const { invalidateCache } = useInvalidateCache(["products"]);
 
@@ -63,22 +64,6 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
     },
   });
 
-  const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const fileReader = new FileReader();
-
-    fileReader.onload = () => {
-      setPickedImage(fileReader.result as string);
-    };
-
-    fileReader.readAsDataURL(file);
-  };
-
   const onSubmit: SubmitHandler<UpdateProductFormData> = (data) => {
     const formData = generateFormData(data);
     execute(formData, product);
@@ -89,6 +74,7 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
       open={isOpen}
       onOpenChange={(open) => {
         setIsOpen(open);
+        resetImage();
         reset();
       }}
     >
@@ -104,17 +90,12 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-end gap-2">
-            <div className="w-48 aspect-square relative">
-              {pickedImage && (
-                <Image
-                  src={pickedImage}
-                  fill
-                  alt="product image"
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 20vw"
-                />
-              )}
-            </div>
+            <ImagePreview
+              src={pickedImage}
+              alt={`${product.name} image`}
+              sizes="(max-width: 768px) 50vw, 20vw"
+              className="w-48"
+            />
             <Controller
               name="image"
               control={control}
