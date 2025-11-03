@@ -9,7 +9,6 @@ import Providers from "./providers";
 import { cn } from "@/lib/utils";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import dynamic from "next/dynamic";
-import GlobalErrorToast from "@/components/global-error-toast";
 
 const AppSidebar = dynamic(() => import("@/components/layout/app-sidebar"));
 
@@ -48,7 +47,6 @@ export default function RootLayout({
               <Footer />
             </div>
             <Toaster expand position="bottom-right" richColors />
-            <GlobalErrorToast />
           </Providers>
         </SidebarProvider>
       </body>

@@ -1,4 +1,3 @@
-import { useErrorStore } from "@/store/error";
 import { ApiResponse } from "@/types/response";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -21,7 +20,6 @@ export function useFormTransition<
   { onSuccessText, onSuccess }: UseFormTransitionOptions = {}
 ) {
   const [isPending, startTransition] = useTransition();
-  const { addError } = useErrorStore();
 
   const execute = (data?: T, ...args: any[]) => {
     startTransition(async () => {
@@ -37,7 +35,7 @@ export function useFormTransition<
         }
 
         if (result.errors) {
-          addError(result.errors);
+          toast.error(result.errors.message);
         }
       } catch (error) {
         console.error(error);
