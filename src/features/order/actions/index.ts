@@ -2,14 +2,14 @@
 
 import { mapErrors } from "@/lib/handle-errors";
 import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
-import { Order, Purchase } from "@/types/orders";
+import { Purchase } from "@/types/orders";
 import { ApiResponse } from "@/types/response";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export type OrderFormState = ApiResponse<OrderFormData, Order[]>;
+export type OrderFormState = ApiResponse<OrderFormData, null>;
 
-export async function createOrder(products: Purchase[], formData: FormData): Promise<OrderFormState> {
+export async function createOrder(formData: FormData, products: Purchase[]): Promise<OrderFormState> {
   const raw = {
     receiver: formData.get("receiver")?.toString() || "",
     phone: formData.get("phone")?.toString() || "",
@@ -89,7 +89,7 @@ export async function updateOrderStatus(id: string, status: string) {
   };
 }
 
-export async function updateOrderData(id: string, formData: FormData): Promise<OrderFormState> {
+export async function updateOrderData(formData: FormData, id: string): Promise<OrderFormState> {
   const raw = {
     receiver: formData.get("receiver")?.toString() || "",
     phone: formData.get("phone")?.toString() || "",

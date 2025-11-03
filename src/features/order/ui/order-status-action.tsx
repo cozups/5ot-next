@@ -3,7 +3,7 @@
 import { OrderFormState } from "@/features/order/actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
-import { toast } from "sonner";
+import { useFormTransition } from "@/hooks/use-form-transition";
 
 export default function OrderStatusAction({
   defaultValue,
@@ -13,18 +13,15 @@ export default function OrderStatusAction({
   action: (id: string) => Promise<OrderFormState>;
 }) {
   const { invalidateCache } = useInvalidateCache(["orders", "admin"]);
+  const { execute } = useFormTransition(action, {
+    onSuccess: () => {
+      invalidateCache();
+    },
+    onSuccessText: ["상태가 업데이트 되었습니다."],
+  });
 
   const onChangeStatus = async (value: string) => {
-    const result = await action(value);
-
-    if (result.success) {
-      invalidateCache();
-      toast.success("상태가 업데이트 되었습니다.");
-    }
-
-    if (result.errors) {
-      toast.error("상태 업데이트 중 문제가 발생했습니다.", { description: result.errors.message });
-    }
+    execute(value);
   };
 
   return (

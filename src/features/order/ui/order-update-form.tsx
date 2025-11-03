@@ -5,16 +5,14 @@ import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Order } from "@/types/orders";
-import { Button, Input, Spinner, Textarea } from "@/components/ui";
-import AddressSearchDialog from "./address-search-dialog";
-import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
-import { useTransition } from "react";
-import { updateOrderData } from "../actions";
-import { toast } from "sonner";
-import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { useUser } from "@/hooks/use-users";
+import { updateOrderData } from "../actions";
+import AddressSearchDialog from "./address-search-dialog";
 import { generateFormData } from "@/lib/generate-form-data";
-import { useErrorStore } from "@/store/error";
+import { useFormTransition } from "@/hooks/use-form-transition";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
+import { Button, Input, Spinner, Textarea } from "@/components/ui";
+import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
 
 interface OrderUpdateFromProps {
   defaultData: Order;
@@ -22,12 +20,10 @@ interface OrderUpdateFromProps {
 }
 
 export default function OrderUpdateForm({ defaultData, onComplete }: OrderUpdateFromProps) {
-  const [isPending, startTransition] = useTransition();
   const [baseAddress, detailAddress] = defaultData.address.split(", ");
   const { user } = useUser();
   const isAdmin = user?.user_metadata.role === "admin";
   const { invalidateCache } = useInvalidateCache(["orders", isAdmin ? "admin" : "user"]);
-  const { addError } = useErrorStore();
 
   const {
     register,
@@ -42,24 +38,21 @@ export default function OrderUpdateForm({ defaultData, onComplete }: OrderUpdate
       phone: defaultData.phone,
       baseAddress,
       detailAddress,
+      deliveryRequest: defaultData.deliveryRequest,
     },
+  });
+
+  const { isPending, execute } = useFormTransition(updateOrderData, {
+    onSuccess: () => {
+      invalidateCache();
+      onComplete();
+    },
+    onSuccessText: ["주문이 업데이트 되었습니다."],
   });
 
   const onSubmit: SubmitHandler<OrderFormData> = (data) => {
     const formData = generateFormData(data);
-
-    startTransition(async () => {
-      const result = await updateOrderData(defaultData.id, formData);
-
-      if (result.success) {
-        toast.success("주문이 업데이트 되었습니다.");
-        invalidateCache();
-        onComplete();
-      }
-      if (result.errors) {
-        addError(result.errors);
-      }
-    });
+    execute(formData, defaultData.id);
   };
 
   const onCompleteSearch = (data: Address) => {

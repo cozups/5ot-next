@@ -8,11 +8,17 @@ import { generateRandomId } from "@/lib/utils";
 import { ApiResponse } from "@/types/response";
 import { mapErrors } from "@/lib/handle-errors";
 import { createClient } from "@/utils/supabase/server";
-import { ProductFormData, productFormSchema as formSchema } from "@/lib/validations-schema/product";
-import { getImageURL, removeImageFromStorage, uploadImageToStorage } from "@/actions/storage";
+import {
+  ProductFormData,
+  UpdateProductFormData,
+  productFormSchema as formSchema,
+  updateProductFormSchema,
+} from "@/lib/validations-schema/product";
+import { removeImageFromStorage, uploadImageToStorage } from "@/actions/storage";
 import { ErrorReturn } from "@/types/error";
 
-export type ProductFormState = ApiResponse<ProductFormData, Products[] | null>;
+export type ProductFormState = ApiResponse<ProductFormData, null>;
+export type UpdateProductFormState = ApiResponse<UpdateProductFormData, null>;
 
 export async function insertProduct(formData: FormData): Promise<ProductFormState> {
   const raw = {
@@ -108,11 +114,7 @@ export async function deleteProduct(product: Products): Promise<{ success: boole
   return { success: true };
 }
 
-export async function updateProduct(
-  originalData: Products,
-  prevState: ProductFormState,
-  formData: FormData
-): Promise<ProductFormState> {
+export async function updateProduct(formData: FormData, originalData: Products): Promise<UpdateProductFormState> {
   const raw = {
     name: formData.get("name")?.toString() || "",
     brand: formData.get("brand")?.toString() || "",
@@ -123,7 +125,7 @@ export async function updateProduct(
     sex: formData.get("sex")?.toString() || "",
   };
 
-  const result = formSchema.safeParse(raw);
+  const result = updateProductFormSchema.safeParse(raw);
 
   if (!result.success) {
     return {
@@ -134,7 +136,7 @@ export async function updateProduct(
   }
 
   const supabase = await createClient();
-  let updatedImagePath: string | undefined = undefined;
+  let updatedImagePath: string | undefined = originalData.image;
 
   // 이미지 업데이트
   if (raw.image?.size > 0) {
@@ -150,7 +152,7 @@ export async function updateProduct(
       };
     }
 
-    updatedImagePath = await getImageURL("products", data.publicPath);
+    updatedImagePath = data.publicPath;
   }
 
   // 카테고리 가져오기 - cat_id 업데이트 위함 (Supabase Functions로 개선 가능할 듯)
@@ -162,17 +164,16 @@ export async function updateProduct(
     .overrideTypes<Category[]>();
 
   const dataToUpdate = {
-    ...raw,
+    name: raw.name,
+    price: raw.price,
+    description: raw.description,
+    image: updatedImagePath,
+    brand: raw.brand,
     category: `${raw.sex}/${raw.category}`,
     cat_id: category![0].id,
   };
 
-  // 이미지가 변경되었을 때, 이미지 url도 같이 업데이트
-  const isImageUploaded = updatedImagePath && updatedImagePath.length;
-  const { error: productUpdateError } = await supabase
-    .from("products")
-    .update(isImageUploaded ? Object.assign(dataToUpdate, { image: updatedImagePath }) : dataToUpdate)
-    .eq("id", originalData.id);
+  const { error: productUpdateError } = await supabase.from("products").update(dataToUpdate).eq("id", originalData.id);
 
   if (productUpdateError) {
     return {

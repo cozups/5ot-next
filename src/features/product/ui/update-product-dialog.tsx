@@ -1,14 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Pen } from "lucide-react";
 
 import { Products } from "@/types/products";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { ProductFormState, updateProduct } from "@/features/product/actions";
-import { Category } from "@/types/category";
-import { createClient } from "@/utils/supabase/client";
+import { updateProduct } from "@/features/product/actions";
 import { Button } from "../../../components/ui/button";
 import {
   Dialog,
@@ -20,53 +18,50 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../../../components/ui/dialog";
-import { Input } from "../../../components/ui";
-import { toast } from "sonner";
+import { Input, Spinner } from "../../../components/ui";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
-
-const initialState: ProductFormState = { success: false };
+import { UpdateProductFormData, updateProductFormSchema } from "@/lib/validations-schema/product";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { generateFormData } from "@/lib/generate-form-data";
+import { useFormTransition } from "@/hooks/use-form-transition";
+import { useCategory } from "@/features/category/hooks/use-category";
 
 export default function UpdateProductDialog({ product }: { product: Products }) {
-  const [formState, formAction] = useActionState(updateProduct.bind(null, product), initialState);
+  const [isOpen, setIsOpen] = useState(false);
   const [defaultSex, defaultCategory] = product.category.split("/");
-
-  const [sex, setSex] = useState<string>(defaultSex);
-  const [category, setCategory] = useState<Category[]>([]);
-  const [pickedImage, setPickedImage] = useState<string | null>(product.image || null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [sex, setSex] = useState<"men" | "women">(defaultSex as "men" | "women");
+  const categories = useCategory();
+  const [pickedImage, setPickedImage] = useState<string | undefined>(product.image || undefined);
 
   const { invalidateCache } = useInvalidateCache(["products"]);
 
-  useEffect(() => {
-    const getCategory = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from("category").select().eq("sex", sex);
-
-      if (data) {
-        setCategory(data);
-      }
-    };
-
-    getCategory();
-  }, [sex]);
-
-  useEffect(() => {
-    if (formState.success) {
-      formRef.current?.reset();
-      toast.success("성공적으로 제품을 업데이트 했습니다.");
+  const { isPending, execute } = useFormTransition(updateProduct, {
+    onSuccess: () => {
       invalidateCache();
-    }
+      setIsOpen(false);
+    },
+    onSuccessText: ["제품이 업데이트 되었습니다."],
+  });
 
-    if (formState.errors) {
-      toast.error("제품을 추가하던 중 문제가 발생하였습니다.", {
-        description: formState.errors.message,
-      });
-    }
-  }, [formState, invalidateCache]);
-
-  const onChangeSelect = (value: string) => {
-    setSex(value);
-  };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    control,
+    reset,
+  } = useForm<UpdateProductFormData>({
+    resolver: zodResolver(updateProductFormSchema),
+    defaultValues: {
+      name: product.name,
+      brand: product.brand,
+      price: product.price.toString(),
+      description: product.description,
+      sex,
+      category: defaultCategory,
+      image: pickedImage,
+    },
+  });
 
   const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,8 +79,19 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
     fileReader.readAsDataURL(file);
   };
 
+  const onSubmit: SubmitHandler<UpdateProductFormData> = (data) => {
+    const formData = generateFormData(data);
+    execute(formData, product);
+  };
+
   return (
-    <Dialog>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        reset();
+      }}
+    >
       <DialogTrigger asChild>
         <Button>
           <Pen />
@@ -96,7 +102,7 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
           <DialogTitle>제품 수정하기</DialogTitle>
           <DialogDescription>제품 정보를 수정합니다.</DialogDescription>
         </DialogHeader>
-        <form action={formAction}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex items-end gap-2">
             <div className="w-48 aspect-square relative">
               {pickedImage && (
@@ -109,59 +115,94 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
                 />
               )}
             </div>
-            <Input type="file" name="image" className="w-1/2" onChange={onChangeImage} />
+            <Controller
+              name="image"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  name={field.name}
+                  type="file"
+                  accept="image/*"
+                  className="bg-white"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    field.onChange(file);
+                    onChangeImage(e);
+                  }}
+                />
+              )}
+            />
           </div>
 
           <div className="flex flex-col gap-3">
             <div>
               <label htmlFor="name">제품명</label>
-              <Input type="text" id="name" name="name" defaultValue={product.name} />
-              {<p className="text-red-500 text-sm">{formState.errors?.name}</p>}
+              <Input {...register("name")} />
+              {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
             </div>
             <div>
               <label htmlFor="brand">제조사</label>
-              <Input type="text" id="brand" name="brand" defaultValue={product.brand} />
-              {<p className="text-red-500 text-sm">{formState.errors?.errors?.brand}</p>}
+              <Input {...register("brand")} />
+              {errors.brand && <p className="text-red-500 text-sm">{errors.brand.message}</p>}
             </div>
             <div>
               <label htmlFor="brapricend">가격</label>
-              <Input type="number" id="price" name="price" defaultValue={product.price} />
-              {<p className="text-red-500 text-sm">{formState.errors?.errors?.price}</p>}
+              <Input {...register("price")} type="number" />
+              {errors.price && <p className="text-red-500 text-sm">{errors.price.message}</p>}
             </div>
             <div>
               <label htmlFor="description">제품 설명</label>
-              <Input type="text" id="description" name="description" defaultValue={product.description} />
-              {<p className="text-red-500 text-sm">{formState.errors?.errors?.description}</p>}
+              <Input {...register("description")} />
+              {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
             </div>
             <div className="flex items-center gap-4">
               <div>
                 <label htmlFor="category">성별</label>
-                <Select name="sex" defaultValue={defaultSex} onValueChange={onChangeSelect}>
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="성별" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="men">남성</SelectItem>
-                    <SelectItem value="women">여성</SelectItem>
-                  </SelectContent>
-                </Select>
-                {<p className="text-red-500 text-sm">{formState.errors?.errors?.sex}</p>}
+                <Controller
+                  name="sex"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      onValueChange={(value: "men" | "women") => {
+                        field.onChange(value);
+                        setSex(value);
+                      }}
+                      value={field.value || ""}
+                    >
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="성별" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="men">남성</SelectItem>
+                        <SelectItem value="women">여성</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.sex && <p className="text-red-500 text-sm">{errors.sex.message}</p>}
               </div>
               <div>
                 <label htmlFor="category">카테고리</label>
-                <Select name="category" defaultValue={defaultCategory}>
-                  <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="카테고리" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {category.map((cat) => (
-                      <SelectItem key={`${sex}/${cat.name}`} value={cat.name}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {<p className="text-red-500 text-sm">{formState?.errors?.errors?.category}</p>}
+                <Controller
+                  name="category"
+                  control={control}
+                  render={({ field }) => (
+                    <Select {...field} onValueChange={field.onChange} value={field.value || ""}>
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="카테고리" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories[sex].map((cat) => (
+                          <SelectItem key={`${sex}/${cat.name}`} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.category && <p className="text-red-500 text-sm">{errors.category.message}</p>}
               </div>
             </div>
           </div>
@@ -169,9 +210,9 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
             <DialogClose asChild>
               <Button variant="secondary">취소</Button>
             </DialogClose>
-            <DialogClose asChild>
-              <Button type="submit">수정</Button>
-            </DialogClose>
+            <Button type="submit" disabled={isPending} className="w-16">
+              {isPending ? <Spinner /> : "수정"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

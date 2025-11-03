@@ -153,7 +153,7 @@ export async function deleteUser(user: User) {
   };
 }
 
-export async function updateUser(user: User, prevState: UpdateFormState, formData: FormData): Promise<UpdateFormState> {
+export async function updateUser(user: User, formData: FormData): Promise<UpdateFormState> {
   const raw = {
     username: formData.get("username")?.toString() || "",
     image: formData.get("image") as File,

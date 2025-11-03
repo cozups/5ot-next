@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { toast } from "sonner";
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -11,8 +9,8 @@ import { useUser } from "@/hooks/use-users";
 import { createUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
 import { generateFormData } from "@/lib/generate-form-data";
+import { useFormTransition } from "@/hooks/use-form-transition";
 import { JoinFormData, joinFormSchema } from "@/lib/validations-schema/auth";
-import { useErrorStore } from "@/store/error";
 
 export default function JoinForm() {
   const {
@@ -20,30 +18,21 @@ export default function JoinForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<JoinFormData>({ resolver: zodResolver(joinFormSchema) });
-  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
   const { refetch } = useUser();
-  const { addError } = useErrorStore();
+
+  const { isPending, execute } = useFormTransition(createUser, {
+    onSuccessText: ["회원가입에 성공했습니다.", "자동으로 로그인 되었습니다."],
+    onSuccess: () => {
+      refetch();
+      router.push("/");
+    },
+  });
 
   const onSubmit: SubmitHandler<JoinFormData> = (data) => {
     const formData = generateFormData(data);
-
-    startTransition(async () => {
-      const result = await createUser(formData);
-
-      if (result.success) {
-        toast.success("회원가입에 성공했습니다.", {
-          description: "자동으로 로그인 되었습니다.",
-        });
-        refetch();
-        router.push("/");
-      }
-
-      if (result.errors) {
-        addError(result.errors);
-      }
-    });
+    execute(formData);
   };
 
   return (

@@ -1,15 +1,14 @@
 "use server";
 
 import { mapErrors } from "@/lib/handle-errors";
-import { reviewFormSchema } from "@/lib/validations-schema/review";
-import { Review } from "@/types/review";
+import { ReviewFormData, reviewFormSchema } from "@/lib/validations-schema/review";
 import { ApiResponse } from "@/types/response";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-export type ReviewFormState = ApiResponse<null, Review[] | null>;
+export type ReviewFormState = ApiResponse<ReviewFormData, null>;
 
-export async function createReview(productId: string, formData: FormData): Promise<ReviewFormState> {
+export async function createReview(formData: FormData, productId: string): Promise<ReviewFormState> {
   const raw = {
     star: formData.get("star")?.toString() || "",
     content: formData.get("content")?.toString() || "",
@@ -21,6 +20,7 @@ export async function createReview(productId: string, formData: FormData): Promi
     return {
       success: false,
       errors: mapErrors(result.error),
+      values: raw,
     };
   }
 
@@ -31,6 +31,7 @@ export async function createReview(productId: string, formData: FormData): Promi
     return {
       success: false,
       errors: mapErrors(userDataError),
+      values: raw,
     };
   }
 
@@ -45,6 +46,7 @@ export async function createReview(productId: string, formData: FormData): Promi
     return {
       success: false,
       errors: mapErrors(insertError),
+      values: raw,
     };
   }
 
@@ -52,7 +54,7 @@ export async function createReview(productId: string, formData: FormData): Promi
   return { success: true };
 }
 
-export async function updateReview(id: string, formData: FormData): Promise<ReviewFormState> {
+export async function updateReview(formData: FormData, id: string): Promise<ReviewFormState> {
   const raw = {
     star: formData.get("star")?.toString() || "",
     content: formData.get("content")?.toString() || "",
@@ -64,6 +66,7 @@ export async function updateReview(id: string, formData: FormData): Promise<Revi
     return {
       success: false,
       errors: mapErrors(result.error),
+      values: raw,
     };
   }
 
@@ -75,6 +78,7 @@ export async function updateReview(id: string, formData: FormData): Promise<Revi
     return {
       success: false,
       errors: mapErrors(updateError),
+      values: raw,
     };
   }
 

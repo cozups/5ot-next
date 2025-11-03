@@ -15,7 +15,7 @@ export default function UpdateReviewDialog({ review }: UpdateButtonProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button onClick={() => setIsOpen(true)}>
           <Pencil />

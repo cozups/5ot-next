@@ -13,9 +13,11 @@ import {
   AlertDialogTrigger,
 } from "./ui/alert-dialog";
 import { Trash } from "lucide-react";
-import { toast } from "sonner";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { ErrorReturn } from "@/types/error";
+import { useFormTransition } from "@/hooks/use-form-transition";
+import { useState } from "react";
+import { Spinner } from "./ui";
 
 export default function DeleteButton({
   action,
@@ -27,21 +29,23 @@ export default function DeleteButton({
   }>;
   queryKey?: string[];
 }) {
-  const { invalidateCache } = useInvalidateCache(queryKey || []);
-  const onClickDelete = async () => {
-    const result = await action();
+  const [isOpen, setIsOpen] = useState(false);
 
-    if (result.success) {
-      toast.success("성공적으로 삭제되었습니다.");
+  const { invalidateCache } = useInvalidateCache(queryKey || []);
+  const { isPending, execute } = useFormTransition(action, {
+    onSuccess: () => {
       invalidateCache();
-    }
-    if (result.errors?.name === "server") {
-      toast.error("삭제에 실패하였습니다.", { description: result.errors.message });
-    }
+      setIsOpen(false);
+    },
+    onSuccessText: ["성공적으로 삭제되었습니다."],
+  });
+
+  const onClickDelete = async () => {
+    execute();
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <Button variant="destructive" className="cursor-pointer">
           <Trash />
@@ -54,7 +58,9 @@ export default function DeleteButton({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={onClickDelete}>삭제</AlertDialogAction>
+          <AlertDialogAction onClick={onClickDelete} className="w-16" disabled={isPending}>
+            {isPending ? <Spinner /> : "삭제"}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

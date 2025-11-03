@@ -1,10 +1,9 @@
 "use client";
 
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Address } from "react-daum-postcode";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState, useTransition } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
 import { Purchase } from "@/types/orders";
@@ -12,9 +11,9 @@ import { useCartStore } from "@/store/cart";
 import { createOrder } from "@/features/order/actions";
 import AddressSearchDialog from "./address-search-dialog";
 import { generateFormData } from "@/lib/generate-form-data";
+import { useFormTransition } from "@/hooks/use-form-transition";
 import { Spinner, Button, Input, Textarea } from "@/components/ui";
 import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
-import { useErrorStore } from "@/store/error";
 
 export interface AddressResult {
   base: string;
@@ -31,11 +30,16 @@ export default function OrderForm() {
   } = useForm<OrderFormData>({ resolver: zodResolver(orderFormSchema) });
 
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
-  const [isPending, startTransition] = useTransition();
 
   const { updateCartAfterPurchase } = useCartStore();
   const router = useRouter();
-  const { addError } = useErrorStore();
+  const { isPending, execute } = useFormTransition(createOrder, {
+    onSuccess: () => {
+      updateCartAfterPurchase(purchaseData);
+      router.replace("/");
+    },
+    onSuccessText: ["주문이 완료되었습니다."],
+  });
 
   useEffect(() => {
     const purchaseStorage: Purchase[] = JSON.parse(sessionStorage.getItem("purchase") || "[]");
@@ -49,20 +53,7 @@ export default function OrderForm() {
 
   const onSubmit: SubmitHandler<OrderFormData> = (data) => {
     const formData = generateFormData(data);
-
-    startTransition(async () => {
-      const result = await createOrder(purchaseData, formData);
-
-      if (result.success) {
-        updateCartAfterPurchase(purchaseData);
-        toast.success("주문이 완료되었습니다.");
-        router.replace("/");
-      }
-
-      if (result.errors) {
-        addError(result.errors);
-      }
-    });
+    execute(formData, purchaseData);
   };
 
   return (
@@ -98,7 +89,7 @@ export default function OrderForm() {
       </div>
 
       <Button type="submit" className="cursor-pointer self-end mt-4 w-20" disabled={isPending}>
-        {isPending ? <Spinner /> : "수정하기"}
+        {isPending ? <Spinner /> : "제출하기"}
       </Button>
     </form>
   );

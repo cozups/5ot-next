@@ -18,3 +18,20 @@ export const loginFormSchema = z.object({
 });
 
 export type LoginFormData = z.infer<typeof loginFormSchema>;
+
+export const updateProfileFormSchema = z.object({
+  username: z.string().trim().min(1, "이름을 반드시 입력해주세요."),
+  image: z
+    .any()
+    .optional()
+    .refine(
+      (file) => !file || file.size <= 1024 * 1024, // 파일이 없거나, 1MB 이하인 경우만 통과
+      "1MB 이하의 이미지를 넣어주세요"
+    )
+    .refine(
+      (file) => !file || ["image/gif", "image/jpeg", "image/png", "image/webp"].includes(file.type),
+      "지원하지 않는 이미지 형식입니다."
+    ),
+});
+
+export type UpdateProfileFormData = z.infer<typeof updateProfileFormSchema>;

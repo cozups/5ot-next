@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { toast } from "sonner";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 
@@ -13,7 +12,7 @@ import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 import { useCategory } from "@/features/category/hooks/use-category";
 import { ProductFormData, productFormSchema } from "@/lib/validations-schema/product";
 import { Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input, Button } from "@/components/ui";
-import { useErrorStore } from "@/store/error";
+import { useFormTransition } from "@/hooks/use-form-transition";
 
 export default function ProductForm() {
   const {
@@ -24,12 +23,19 @@ export default function ProductForm() {
     reset,
   } = useForm<ProductFormData>({ resolver: zodResolver(productFormSchema) });
 
-  const [isPending, startTransition] = useTransition();
   const [sex, setSex] = useState<"men" | "women">("men");
   const [pickedImage, setPickedImage] = useState<string | null>(null);
   const categories = useCategory();
   const { invalidateCache } = useInvalidateCache(["products"]);
-  const { addError } = useErrorStore();
+  const { isPending, execute } = useFormTransition(insertProduct, {
+    onSuccess: () => {
+      setPickedImage(null);
+      setSex("men");
+      reset();
+      invalidateCache();
+    },
+    onSuccessText: ["제품이 추가되었습니다."],
+  });
 
   const onChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -49,22 +55,7 @@ export default function ProductForm() {
 
   const onSubmit: SubmitHandler<ProductFormData> = (data) => {
     const formData = generateFormData(data);
-
-    startTransition(async () => {
-      const result = await insertProduct(formData);
-
-      if (result.success) {
-        setPickedImage(null);
-        setSex("men");
-        reset();
-        toast.success("제품이 추가되었습니다.");
-        invalidateCache();
-      }
-
-      if (result.errors) {
-        addError(result.errors);
-      }
-    });
+    execute(formData);
   };
 
   return (

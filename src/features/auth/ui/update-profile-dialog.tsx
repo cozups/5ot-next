@@ -1,14 +1,13 @@
 "use client";
 
-import React, { useActionState, useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { FileImage } from "lucide-react";
-import { toast } from "sonner";
 
 import { User } from "@supabase/supabase-js";
 import { useUser } from "@/hooks/use-users";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
-import { UpdateFormState, updateUser } from "@/features/auth";
+import { updateUser } from "@/features/auth";
 import {
   Button,
   Input,
@@ -19,31 +18,41 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose,
+  Spinner,
 } from "@/components/ui";
-
-const initialState: UpdateFormState = { success: false };
+import { useFormTransition } from "@/hooks/use-form-transition";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { UpdateProfileFormData, updateProfileFormSchema } from "@/lib/validations-schema/auth";
+import { generateFormData } from "@/lib/generate-form-data";
 
 export default function UpdateProfileDialog({ user }: { user: User }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [imageSrc, setImageSrc] = useState(user.user_metadata.image || "/images/user.png");
   const [isChanged, setIsChanged] = useState<boolean>(false);
-  const [formState, formAction] = useActionState(updateUser.bind(null, user), initialState);
   const { refetch } = useUser();
   const { invalidateCache } = useInvalidateCache(["orders"]);
-
-  useEffect(() => {
-    if (formState.success) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { isPending, execute } = useFormTransition(updateUser.bind(null, user), {
+    onSuccess: () => {
       refetch();
       invalidateCache();
-      toast.success("프로필이 업데이트 되었습니다.");
-    }
+      setIsOpen(false);
+    },
+    onSuccessText: ["프로필이 업데이트 되었습니다."],
+  });
 
-    if (formState.errors?.name === "server") {
-      toast.error("이미지 업데이트 중 문제가 발생했습니다.", {
-        description: formState.errors.message,
-      });
-    }
-  }, [formState, refetch]);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UpdateProfileFormData>({
+    resolver: zodResolver(updateProfileFormSchema),
+    defaultValues: {
+      username: user.user_metadata.username || "",
+      image: null,
+    },
+  });
 
   const onClickImage = () => {
     if (!inputRef.current) {
@@ -69,8 +78,13 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
     fileReader.readAsDataURL(file);
   };
 
+  const onSubmit: SubmitHandler<UpdateProfileFormData> = (data) => {
+    const formData = generateFormData(data);
+    execute(formData);
+  };
+
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="cursor-pointer">프로필 수정</Button>
       </DialogTrigger>
@@ -78,7 +92,7 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
         <DialogHeader>
           <DialogTitle>프로필 수정하기</DialogTitle>
         </DialogHeader>
-        <form action={formAction} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
           <div className="w-48 h-48 rounded-full relative overflow-hidden mx-auto" onClick={onClickImage}>
             <Image
               src={imageSrc}
@@ -96,18 +110,8 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
           </div>
           <div>
             <label htmlFor="username">이름</label>
-            <Input
-              type="text"
-              defaultValue={user.user_metadata.username || ""}
-              className="mt-2"
-              name="username"
-              id="username"
-            />
-            {formState.errors?.errors?.username?.map((error) => (
-              <p key={error} className="text-sm text-red-400">
-                {error}
-              </p>
-            ))}
+            <Input {...register("username")} className="mt-2" />
+            {errors.username && <p className="text-sm text-red-400">{errors.username.message}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>
@@ -115,11 +119,9 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
                 취소
               </Button>
             </DialogClose>
-            <DialogClose asChild>
-              <Button type="submit" className="cursor-pointer">
-                수정
-              </Button>
-            </DialogClose>
+            <Button type="submit" className="cursor-pointer w-16" disabled={isPending}>
+              {isPending ? <Spinner /> : "수정"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

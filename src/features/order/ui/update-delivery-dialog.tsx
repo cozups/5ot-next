@@ -23,9 +23,9 @@ export default function UpdateDeliveryDialog({ order }: UpdateDeliveryDialogProp
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="mr-1" onClick={() => setIsOpen(true)}>
+        <Button className="mr-1">
           <Pencil />
         </Button>
       </DialogTrigger>

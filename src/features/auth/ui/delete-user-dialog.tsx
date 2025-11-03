@@ -1,5 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
+
+import { useUser } from "@/hooks/use-users";
+import { deleteUser } from "@/features/auth";
+import { useFormTransition } from "@/hooks/use-form-transition";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,34 +18,26 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { deleteUser } from "@/features/auth";
-import { useUser } from "@/hooks/use-users";
-import { User } from "@supabase/supabase-js";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export default function DeleteUserDialog({ user }: { user: User }) {
   const router = useRouter();
   const { refetch } = useUser();
+  const { execute } = useFormTransition(deleteUser, {
+    onSuccess: () => {
+      setIsOpen(false);
+      refetch();
+      router.push("/");
+    },
+    onSuccessText: ["회원 탈퇴되었습니다.", "안녕히 가세요."],
+  });
+  const [isOpen, setIsOpen] = useState(false);
 
   const onClickDialog = async () => {
-    const result = await deleteUser(user);
-
-    if (result.success) {
-      refetch();
-      toast.success("회원 탈퇴되었습니다.", { description: "안녕히 가세요." });
-      router.push("/");
-    }
-
-    if (result.errors?.name === "server") {
-      toast.error("회원 탈퇴에 실패하였습니다.", {
-        description: result.errors.message,
-      });
-    }
+    execute(user);
   };
 
   return (
-    <AlertDialog>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
         <button className="text-gray-600 underline text-sm mt-4 cursor-pointer">회원 탈퇴하기</button>
       </AlertDialogTrigger>

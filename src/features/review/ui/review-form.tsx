@@ -1,8 +1,5 @@
 "use client";
 
-import { toast } from "sonner";
-import { useTransition } from "react";
-
 import { Star } from "lucide-react";
 import { Review } from "@/types/review";
 import { useInvalidateCache } from "@/hooks/useInvalidateCache";
@@ -23,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { generateFormData } from "@/lib/generate-form-data";
 import { useUser } from "@/hooks/use-users";
 import { useRouter } from "next/navigation";
-import { useErrorStore } from "@/store/error";
+import { useFormTransition } from "@/hooks/use-form-transition";
 
 interface ReviewFormProps {
   productId?: string;
@@ -46,11 +43,15 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
   const { user } = useUser();
   const router = useRouter();
 
-  const [isPending, startTransition] = useTransition();
-
-  const { addError } = useErrorStore();
   const { invalidateCache } = useInvalidateCache(["reviews"]);
-
+  const { isPending, execute } = useFormTransition(mode === "write" ? createReview : updateReview, {
+    onSuccess: () => {
+      invalidateCache();
+      onComplete?.();
+      reset();
+    },
+    onSuccessText: mode === "write" ? ["리뷰가 작성되었습니다."] : ["리뷰가 업데이트 되었습니다."],
+  });
   const onSubmit: SubmitHandler<ReviewFormData> = (data) => {
     if (!user) {
       router.push("/login");
@@ -59,34 +60,7 @@ export default function ReviewForm({ mode = "write", defaultData, productId, onC
 
     const formData = generateFormData(data);
 
-    startTransition(async () => {
-      if (mode === "write" && productId) {
-        const result = await createReview(productId, formData);
-
-        if (result.success) {
-          toast.success("리뷰가 작성되었습니다.");
-          invalidateCache();
-          reset();
-        }
-
-        if (result.errors) {
-          addError(result.errors);
-        }
-      }
-      if (mode === "update" && defaultData) {
-        const result = await updateReview(defaultData.id, formData);
-
-        if (result.success) {
-          toast.success("리뷰가 작성되었습니다.");
-          invalidateCache();
-          onComplete?.();
-        }
-
-        if (result.errors) {
-          addError(result.errors);
-        }
-      }
-    });
+    execute(formData, mode === "write" ? productId : defaultData?.id);
   };
 
   return (

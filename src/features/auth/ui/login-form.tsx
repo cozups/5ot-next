@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { toast } from "sonner";
-import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -12,7 +10,7 @@ import { loginUser } from "@/features/auth";
 import { Button, Spinner } from "@/components/ui";
 import { generateFormData } from "@/lib/generate-form-data";
 import { LoginFormData, loginFormSchema } from "@/lib/validations-schema/auth";
-import { useErrorStore } from "@/store/error";
+import { useFormTransition } from "@/hooks/use-form-transition";
 
 export default function LoginForm() {
   const {
@@ -20,27 +18,21 @@ export default function LoginForm() {
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({ resolver: zodResolver(loginFormSchema) });
-  const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
   const { refetch } = useUser();
-  const { addError } = useErrorStore();
+
+  const { isPending, execute } = useFormTransition(loginUser, {
+    onSuccessText: ["로그인 되었습니다"],
+    onSuccess: () => {
+      refetch();
+      router.replace("/");
+    },
+  });
 
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
     const formData = generateFormData(data);
-
-    startTransition(async () => {
-      const result = await loginUser(formData);
-
-      if (result.success) {
-        toast.success("로그인 되었습니다.");
-        refetch();
-        router.replace("/");
-      }
-      if (result.errors) {
-        addError(result.errors);
-      }
-    });
+    execute(formData);
   };
 
   return (
