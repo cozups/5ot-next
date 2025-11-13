@@ -1,23 +1,23 @@
 # 5ot-Next
 
-![5ot-next](https://github.com/user-attachments/assets/69ddc643-6a7e-416e-b087-8a303d8b2750)
+<img width="1920" height="1145" alt="image" src="https://github.com/user-attachments/assets/d5613a6f-0c88-47da-b52a-e4f79c7b0102" />
 
 이 프로젝트는 과거 팀 프로젝트 [5ot](https://github.com/cozups/5ot)을 Next.js 기반으로 재구성한 프로젝트입니다.
 
-- 기존 프로젝트는 Express를 기반으로 서버를 구동하고, views 라우터를 이용해 화면을 렌더링하는 방식이었습니다.
-- HTML, CSS, JavaScript만을 사용하여 프론트엔드를 구성했으며, 백엔드 중심의 구조를 가지고 있었습니다.
+- 기존 프로젝트는 Express를 기반으로 서버를 구동하고, views 라우터를 이용해 화면을 렌더링하는 방식이었으며 HTML, CSS, JavaScript만을 사용하여 프론트엔드를 구성했습니다.
 - 이미지 저장 방식 등의 문제를 비롯해 여러 개선점이 발견되었고, 보다 프론트엔드 중심적인 프로젝트로 새롭게 만들고자 했습니다.
 - 현재 Next.js와 TypeScript를 학습 중이며, 이를 활용하여 프로젝트를 발전시키는 것을 목표로 하고 있습니다.
 
 ## 주요 기술 스택
 
 - **Next.js** (App Router, Server Actions)
-- **Supabase** (DB, 인증, 스토리지)
-- **TanStack Query** (데이터 패칭/캐싱)
-- **Sonner** (toast 알림)
 - **TypeScript**
-- **Zod** (폼 검증)
+- **TanStack Query** (데이터 페칭/캐싱)
 - **Tailwind CSS**
+- **React-Hook-Form** (폼 구성)
+- **Zod** (폼 검증)
+- **Sonner** (toast 알림)
+- **Supabase** (DB, 인증, 스토리지)
 
 ## 주요 기능
 
@@ -54,11 +54,15 @@
 
 ```
 src/
-  actions/         # 서버 액션(상품, 주문, 리뷰 등)
-  components/      # UI 컴포넌트
+  actions/         # 공통 액션(이미지 저장)
+  components/      # 공통 UI 컴포넌트
   app/             # Next.js 라우트(페이지)
-  lib/             # 유틸리티, 클라이언트 생성 등
+  features/        # 기능 별 폴더(인증, 제품, 리뷰, 카테고리 등)
+  hooks/           # 공통적으로 사용되는 hooks
+  lib/             # 유틸리티
+  store/           # 전역 상태
   types/           # 타입 정의
+  utils/           # supabase 클라이언트 생성
 ```
 
 ## 개발/실행 방법
