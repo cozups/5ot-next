@@ -8,6 +8,7 @@ import { generateFormData } from "@/lib/generate-form-data";
 import { useFormTransition } from "@/hooks/use-form-transition";
 import { CategoryFormData, categoryFormSchema } from "@/lib/validations-schema/category";
 import { Input, Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui";
+import { useInvalidateCache } from "@/hooks/useInvalidateCache";
 
 export default function CategoryForm() {
   const {
@@ -17,8 +18,12 @@ export default function CategoryForm() {
     control,
     reset,
   } = useForm<CategoryFormData>({ resolver: zodResolver(categoryFormSchema) });
+  const { invalidateCache } = useInvalidateCache(["category"]);
   const { isPending, execute } = useFormTransition(createCategory, {
-    onSuccess: () => reset({ name: "", sex: "" }),
+    onSuccess: () => {
+      invalidateCache();
+      reset({ name: "", sex: "" });
+    },
     onSuccessText: ["카테고리가 추가되었습니다."],
   });
 

@@ -46,7 +46,7 @@ export default async function CategoryManagementPage({
                         <Link href={`?selected=${cat.sex}-${cat.name}`} className="">
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton action={deleteCategory.bind(null, cat.id)} />
+                        <DeleteButton queryKey={["category"]} action={deleteCategory.bind(null, cat.id)} />
                       </TableCell>
                     </TableRow>
                   ))}
@@ -63,7 +63,7 @@ export default async function CategoryManagementPage({
                         <Link href={`?selected=${cat.sex}-${cat.name}`} className="">
                           <Button>상품 보기</Button>
                         </Link>
-                        <DeleteButton action={deleteCategory.bind(null, cat.id)} />
+                        <DeleteButton queryKey={["category"]} action={deleteCategory.bind(null, cat.id)} />
                       </TableCell>
                     </TableRow>
                   ))}
