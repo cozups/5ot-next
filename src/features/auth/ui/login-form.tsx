@@ -35,6 +35,18 @@ export default function LoginForm() {
     execute(formData);
   };
 
+  const onClickTestLogin = (mode: "user" | "admin") => {
+    const formData = new FormData();
+    if (mode === "user") {
+      formData.set("userEmail", process.env.NEXT_PUBLIC_TEST_USER_ID as string);
+      formData.set("password", process.env.NEXT_PUBLIC_TEST_USER_PW as string);
+    } else {
+      formData.set("userEmail", process.env.NEXT_PUBLIC_TEST_ADMIN_ID as string);
+      formData.set("password", process.env.NEXT_PUBLIC_TEST_ADMIN_PW as string);
+    }
+    execute(formData);
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="border-2 w-[36rem] flex flex-col items-center py-8">
       <h1 className="text-center text-2xl font-bold mb-8">Login</h1>
@@ -63,6 +75,15 @@ export default function LoginForm() {
       <Link href="/join" className="text-center text-xs my-2 text-neutral-600 hover:underline">
         회원이 아니신가요? 회원가입 하기
       </Link>
+
+      <div className="flex flex-col gap-2">
+        <Button onClick={() => onClickTestLogin("user")} className="w-52" variant="outline" disabled={isPending}>
+          {isPending ? <Spinner /> : "테스트 유저 계정 로그인 하기"}
+        </Button>
+        <Button onClick={() => onClickTestLogin("admin")} className="w-52" variant="outline" disabled={isPending}>
+          {isPending ? <Spinner /> : "테스트 관리자 계정 로그인 하기"}
+        </Button>
+      </div>
     </form>
   );
 }
