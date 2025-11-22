@@ -203,3 +203,20 @@ export async function insertRecentViewedProduct(
 
   return { success: true };
 }
+
+export async function updateCart(
+  userId: string,
+  cartData: { product: Products; qty: string; isSelected: boolean }[]
+): Promise<{ success: boolean; errors?: ErrorReturn }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ cart: cartData }).eq("id", userId);
+
+  if (error) {
+    return {
+      success: false,
+      errors: mapErrors(error),
+    };
+  }
+
+  return { success: true };
+}

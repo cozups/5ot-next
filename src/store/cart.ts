@@ -8,6 +8,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 export interface CartStore {
   data: Cart[];
   length: number;
+  getItem: () => Cart[];
   addItem: (product: Products, qty: string) => Cart | undefined;
   updateQty: (productId: string, qty: string) => void;
   updateCartAfterPurchase: (purchaseData: Purchase[]) => void;
@@ -21,6 +22,10 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       data: [],
       length: 0,
+      getItem: () => {
+        const data = get().data;
+        return data;
+      },
       addItem: (product, qty) => {
         const { data } = get();
         const isExist = data.some((cart) => cart.product.id === product.id);

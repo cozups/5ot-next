@@ -21,13 +21,36 @@ import {
 } from "../../../components/ui/alert-dialog";
 import { useCartStore } from "@/store/cart";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/hooks/use-users";
+import { updateCart } from "../actions";
 
 export default function ProductActionPanel({ product }: { product: Products }) {
   const countRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const { addItem } = useCartStore();
+  const { getItem, addItem } = useCartStore();
+  const { user } = useUser();
 
-  const onAddCart = () => {
+  const onAddCart = async () => {
+    if (user) {
+      // DB에도 저장
+      const currentCart = getItem();
+
+      const isExist = currentCart.some((cart) => cart.product.id === product.id);
+
+      if (isExist) {
+        return;
+      }
+
+      const newItem = { product, qty: countRef.current?.value || "1", isSelected: true };
+      const updated = [...currentCart, newItem];
+
+      const { success } = await updateCart(user.id, updated);
+      if (!success) {
+        toast.error("장바구니 추가에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
+    }
+
     const addedItem = addItem(product, countRef.current?.value || "1");
 
     if (!addedItem) {
