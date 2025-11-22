@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 
-import ProductList from "@/features/product/ui/product-list";
+import ProductList from "@/features/product/components/product-list";
 import ProductItemSkeleton from "@/components/skeleton/product-item-skeleton";
 import { cn } from "@/lib/utils";
 

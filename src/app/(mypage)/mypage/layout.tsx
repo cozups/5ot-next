@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 
 import { getUser } from "@/features/auth/queries";
 import DeleteUserDialog from "@/features/auth/ui/delete-user-dialog";
+import RecentViewedProducts from "@/features/product/components/recent-viewed-products";
 
 export const generateMetadata = async () => {
   const supabase = await createClient();
@@ -35,6 +36,10 @@ export default async function MyPageLayout({ profile, orders }: { profile: React
       <h2 className="text-2xl font-bold my-6">구매 내역</h2>
       <div className="min-h-96">{orders}</div>
 
+      {/* 최근 본 상품 */}
+      <RecentViewedProducts />
+
+      {/* 회원 탈퇴 */}
       <DeleteUserDialog user={user} />
     </div>
   );

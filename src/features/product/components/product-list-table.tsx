@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 
-import UpdateProductDialog from "@/features/product/ui/update-product-dialog";
+import UpdateProductDialog from "@/features/product/components/update-product-dialog";
 import DeleteButton from "@/components/delete-button";
 import { deleteProduct } from "@/features/product/actions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";

@@ -1,6 +1,6 @@
 import { getAllProductsByPagination } from "@/features/product/queries";
-import ProductForm from "@/features/product/ui/product-form";
-import ProductListTable from "@/features/product/ui/product-list-table";
+import ProductForm from "@/features/product/components/product-form";
+import ProductListTable from "@/features/product/components/product-list-table";
 
 import CustomPagination from "@/components/ui/custom-pagination";
 import { getTotalPage } from "@/lib/utils";

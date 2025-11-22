@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
-import ProductActionPanel from "@/features/product/ui/product-action-panel";
+import ProductActionPanel from "@/features/product/components/product-action-panel";
 import { getProductById } from "@/features/product/queries";
 import { cn } from "@/lib/utils";
 import ReviewForm from "@/features/review/ui/review-form";
@@ -11,6 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getReviewsByPagination } from "@/features/review/queries";
 import { Suspense } from "react";
 import ReviewListSkeleton from "@/components/skeleton/review-list-skeleton";
+import LocalStorageSaver from "@/features/product/components/localstorage-saver";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -95,6 +96,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
           </HydrationBoundary>
         </Suspense>
       </div>
+      <LocalStorageSaver product={product} />
     </div>
   );
 }
