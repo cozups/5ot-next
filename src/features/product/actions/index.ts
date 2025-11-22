@@ -186,3 +186,20 @@ export async function updateProduct(formData: FormData, originalData: Products):
   revalidatePath("/admin/product");
   return { success: true };
 }
+
+export async function insertRecentViewedProduct(
+  userId: string,
+  productInfo: { id: string; name: string; image: string; price: string }[]
+): Promise<{ success: boolean; errors?: ErrorReturn }> {
+  const supabase = await createClient();
+  const { error } = await supabase.from("profiles").update({ recent_viewed_products: productInfo }).eq("id", userId);
+
+  if (error) {
+    return {
+      success: false,
+      errors: mapErrors(error),
+    };
+  }
+
+  return { success: true };
+}

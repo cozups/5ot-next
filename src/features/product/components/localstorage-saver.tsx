@@ -1,7 +1,9 @@
 "use client";
 
+import { useUser } from "@/hooks/use-users";
 import { Products } from "@/types/products";
 import { useEffect } from "react";
+import { insertRecentViewedProduct } from "../actions";
 
 interface ProductInfo {
   id: string;
@@ -11,6 +13,8 @@ interface ProductInfo {
 }
 
 export default function LocalStorageSaver({ product }: { product: Products }) {
+  const { user } = useUser();
+
   useEffect(() => {
     const productInfoToSave = { id: product.id, name: product.name, image: product.image || "", price: product.price };
 
@@ -25,7 +29,11 @@ export default function LocalStorageSaver({ product }: { product: Products }) {
     }
 
     localStorage.setItem("recentViewedProducts", JSON.stringify(storedProducts.slice(0, 10)));
-  });
+    if (user) {
+      // 서버에도 저장
+      insertRecentViewedProduct(user.id, storedProducts.slice(0, 10));
+    }
+  }, [user, product]);
 
   return null;
 }

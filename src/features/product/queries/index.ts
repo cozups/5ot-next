@@ -96,3 +96,20 @@ export async function getProductById(client: SupabaseClient, id: string): Promis
     data: data || null,
   };
 }
+
+export async function getRecentViewedProducts(client: SupabaseClient, userId: string) {
+  const { data, error } = await client.from("profiles").select("recent_viewed_products").eq("id", userId).single();
+
+  if (error) {
+    return {
+      success: false,
+      errors: mapErrors(error),
+      data: null,
+    };
+  }
+
+  return {
+    success: true,
+    data: data?.recent_viewed_products || [],
+  };
+}

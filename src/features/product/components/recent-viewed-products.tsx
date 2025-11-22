@@ -1,9 +1,12 @@
 "use client";
 
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui";
+import { useUser } from "@/hooks/use-users";
+import { createClient } from "@/utils/supabase/client";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getRecentViewedProducts } from "../queries";
 
 interface RecentProducts {
   id: string;
@@ -14,13 +17,29 @@ interface RecentProducts {
 
 export default function RecentViewedProducts() {
   const [products, setProducts] = useState<RecentProducts[]>([]);
+  const { user } = useUser();
 
   useEffect(() => {
-    const storedProducts = localStorage.getItem("recentViewedProducts");
-    if (storedProducts) {
-      setProducts(JSON.parse(storedProducts));
+    let storedProducts = [];
+
+    async function fetchRecentViewedProducts() {
+      const supabase = createClient();
+      const { success, data } = await getRecentViewedProducts(supabase, user!.id);
+
+      if (success) {
+        setProducts(data);
+      }
     }
-  }, []);
+
+    if (user) {
+      fetchRecentViewedProducts();
+    }
+
+    if (!user) {
+      storedProducts = JSON.parse(localStorage.getItem("recentViewedProducts") || "[]");
+      setProducts(storedProducts);
+    }
+  }, [user]);
 
   return (
     <div>
