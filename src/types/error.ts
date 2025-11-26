@@ -61,23 +61,23 @@ export const DatabaseApiErrorCodes = {
   ],
 };
 
-export type StorageError = {
+export interface StorageError {
   statusCode: string;
   error: string;
   message: string;
-};
+}
 
-export type DatabaseError = {
+export interface DatabaseError {
   code: string;
   details: string | null;
   hint: string | null;
   message: string;
-};
+}
 
-export type ErrorReturn = {
+export interface ErrorReturn {
   name: "validation" | "client" | "server" | "network" | "unexpected";
   message: string;
   code: string;
   errors?: Record<string, string[]>;
   toast?: boolean;
-};
+}

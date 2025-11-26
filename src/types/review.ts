@@ -1,6 +1,6 @@
 import { Products } from "./products";
 
-export type Review = {
+export interface Review {
   id: string;
   created_at: string;
   user_id: string;
@@ -9,4 +9,4 @@ export type Review = {
   star: number;
   profiles?: { name: string };
   products: Products;
-};
+}
