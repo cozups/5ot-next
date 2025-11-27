@@ -9,6 +9,7 @@ export interface CartStore {
   data: Cart[];
   length: number;
   getItem: () => Cart[];
+  setItem: (data: Cart[]) => void;
   addItem: (product: Products, qty: string) => Cart | undefined;
   updateQty: (productId: string, qty: string) => void;
   updateCartAfterPurchase: (purchaseData: Purchase[]) => void;
@@ -26,6 +27,7 @@ export const useCartStore = create<CartStore>()(
         const data = get().data;
         return data;
       },
+      setItem: (data) => set({ data, length: data.length }),
       addItem: (product, qty) => {
         const { data } = get();
         const isExist = data.some((cart) => cart.product.id === product.id);
@@ -34,7 +36,7 @@ export const useCartStore = create<CartStore>()(
           return;
         }
 
-        const newItem = { product, qty, isSelected: true };
+        const newItem = { product, qty, isSelected: true, addedAt: new Date().toISOString() };
         const updated = [...data, newItem];
         set({ data: updated, length: updated.length });
         return newItem;

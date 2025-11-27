@@ -4,4 +4,5 @@ export interface Cart {
   product: Products;
   qty: string;
   isSelected: boolean;
+  addedAt: string;
 }

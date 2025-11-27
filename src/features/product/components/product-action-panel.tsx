@@ -31,31 +31,22 @@ export default function ProductActionPanel({ product }: { product: Products }) {
   const { user } = useUser();
 
   const onAddCart = async () => {
-    if (user) {
-      // DB에도 저장
-      const currentCart = getItem();
-
-      const isExist = currentCart.some((cart) => cart.product.id === product.id);
-
-      if (isExist) {
-        return;
-      }
-
-      const newItem = { product, qty: countRef.current?.value || "1", isSelected: true };
-      const updated = [...currentCart, newItem];
-
-      const { success } = await updateCart(user.id, updated);
-      if (!success) {
-        toast.error("장바구니 추가에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-    }
-
     const addedItem = addItem(product, countRef.current?.value || "1");
 
     if (!addedItem) {
       toast.warning("이미 장바구니에 추가되어 있는 제품입니다.");
       return;
+    }
+
+    if (user) {
+      // DB에도 저장
+      const currentCart = getItem();
+
+      const { success } = await updateCart(user.id, currentCart);
+      if (!success) {
+        toast.error("장바구니 추가에 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
     }
 
     toast.success("장바구니에 제품이 추가되었습니다.");

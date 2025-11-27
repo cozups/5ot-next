@@ -11,43 +11,69 @@ import { useCartStore } from "@/store/cart";
 import { Cart } from "@/types/cart";
 import { useUser } from "@/hooks/use-users";
 import { toast } from "sonner";
-import { useTransition } from "react";
+import { useEffect, useTransition } from "react";
 import { createClient } from "@/utils/supabase/client";
+import { getCartDataFromDB } from "../queries";
+import { arrangeProductDataByTime } from "@/lib/arrange-product-data-by-time";
 
 export default function CartTable() {
-  const { data: cartData, toggleSelected, removeItem, updateQty, getItem } = useCartStore();
+  const { data, toggleSelected, removeItem, updateQty, getItem, setItem } = useCartStore();
   const { user } = useUser();
   const [, startTransition] = useTransition();
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchCartData() {
+      // DB에서 장바구니 데이터 불러오기
+      const { data: fetchedData, errors } = await getCartDataFromDB(supabase, user!.id);
+
+      if (errors) {
+        toast.error("장바구니 데이터를 불러오는 중 오류가 발생했습니다.", { description: errors.message });
+        return;
+      }
+
+      // 로컬 스토리지와 병합 (시간순)
+      const finalCartData = arrangeProductDataByTime(fetchedData, data);
+      setItem(finalCartData);
+
+      // 병합된 데이터로 DB 데이터 동기화
+      const { error } = await supabase.from("profiles").update({ cart: finalCartData }).eq("id", user!.id);
+
+      if (error) {
+        toast.error("장바구니 데이터 업데이트에 실패했습니다. 다시 시도해주세요.");
+      }
+    }
+
+    if (user) {
+      fetchCartData();
+    }
+  }, [user, supabase, setItem, arrangeProductDataByTime]);
 
   const onChangeQty = async (cart: Cart, event: React.ChangeEvent<HTMLInputElement>) => {
     const newQty = event.target.value;
+    updateQty(cart.product.id, newQty);
+
     if (user) {
       // DB에도 업데이트
       startTransition(async () => {
-        const data = getItem().map((item) => {
-          if (item.product.id === cart.product.id) {
-            return { ...item, qty: newQty };
-          }
-          return item;
-        });
+        const updatedData = getItem();
 
-        const supabase = createClient();
-        const { error } = await supabase.from("profiles").update({ cart: data }).eq("id", user.id);
+        const { error } = await supabase.from("profiles").update({ cart: updatedData }).eq("id", user.id);
 
         if (error) {
           toast.error("장바구니 수량 업데이트에 실패했습니다. 다시 시도해주세요.");
         }
       });
     }
-    updateQty(cart.product.id, newQty);
   };
 
   const onRemoveItem = async (productId: string) => {
+    removeItem(productId);
     if (user) {
       // DB에서도 삭제
       startTransition(async () => {
-        const data = getItem().filter((item) => item.product.id !== productId);
-        const supabase = createClient();
+        const data = getItem();
+
         const { error } = await supabase.from("profiles").update({ cart: data }).eq("id", user.id);
 
         if (error) {
@@ -55,7 +81,6 @@ export default function CartTable() {
         }
       });
     }
-    removeItem(productId);
   };
 
   return (
@@ -71,7 +96,7 @@ export default function CartTable() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {cartData.map((cart) => (
+          {data.map((cart) => (
             <TableRow key={cart.product.id}>
               <TableCell>
                 <Checkbox
