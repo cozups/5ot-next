@@ -7,9 +7,46 @@ import { useUser } from "@/hooks/use-users";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 import LogoutButton from "@/features/auth/ui/logout-button";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import { getCartDataFromDB } from "@/features/cart/queries";
+import { createClient } from "@/utils/supabase/client";
+import { arrangeCartData } from "@/lib/arrange-cart-data";
+import { useCartStore } from "@/store/cart";
 
 export default function AuthSection() {
   const { user, isLoading } = useUser();
+  const { data: localCartData, setItem } = useCartStore();
+
+  useEffect(() => {
+    async function fetchCartData() {
+      // DB에서 장바구니 데이터 불러오기
+      const supabase = createClient();
+      const { data: fetchedData, errors } = await getCartDataFromDB(supabase, user!.id);
+
+      if (errors) {
+        toast.error("장바구니 데이터를 불러오는 중 오류가 발생했습니다.", { description: errors.message });
+        return;
+      }
+
+      // 로컬 스토리지와 병합
+      const finalCartData = arrangeCartData(fetchedData, localCartData);
+      setItem(finalCartData);
+
+      // 병합된 데이터로 DB 데이터 동기화
+      const { error } = await supabase.from("profiles").update({ cart: finalCartData }).eq("id", user!.id);
+
+      if (error) {
+        toast.error("장바구니 데이터 업데이트에 실패했습니다. 다시 시도해주세요.");
+      }
+
+      localStorage.removeItem("cart-storage");
+    }
+
+    if (user) {
+      fetchCartData();
+    }
+  }, [user, setItem]);
 
   if (isLoading) {
     return (
