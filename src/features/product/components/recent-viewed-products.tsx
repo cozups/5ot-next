@@ -7,37 +7,25 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getRecentViewedProducts } from "../queries";
-
-interface RecentProducts {
-  id: string;
-  name: string;
-  image: string;
-  price: string;
-}
+import { RecentProducts } from "@/types/products";
 
 export default function RecentViewedProducts() {
   const [products, setProducts] = useState<RecentProducts[]>([]);
   const { user } = useUser();
 
   useEffect(() => {
-    let storedProducts = [];
-
     async function fetchRecentViewedProducts() {
+      // DB에서 최근 본 상품 불러오기
       const supabase = createClient();
       const { success, data } = await getRecentViewedProducts(supabase, user!.id);
 
       if (success) {
-        setProducts(data);
+        setProducts(data || []);
       }
     }
 
     if (user) {
       fetchRecentViewedProducts();
-    }
-
-    if (!user) {
-      storedProducts = JSON.parse(localStorage.getItem("recentViewedProducts") || "[]");
-      setProducts(storedProducts);
     }
   }, [user]);
 
@@ -58,14 +46,14 @@ export default function RecentViewedProducts() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {products.map((product) => (
-                <TableRow key={product.id}>
+              {products.map((item) => (
+                <TableRow key={item.product.id}>
                   <TableCell>
                     <div className="w-16 aspect-square relative">
-                      {product.image && (
+                      {item.product.image && (
                         <Image
-                          src={product.image}
-                          alt={`${product.name} image`}
+                          src={item.product.image}
+                          alt={`${item.product.name} image`}
                           fill
                           className="object-cover"
                           sizes="10vw"
@@ -73,10 +61,10 @@ export default function RecentViewedProducts() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.price.toLocaleString()}원</TableCell>
+                  <TableCell>{item.product.name}</TableCell>
+                  <TableCell>{item.product.price.toLocaleString()}원</TableCell>
                   <TableCell>
-                    <Link href={`/product/${product.id}`}>
+                    <Link href={`/product/${item.product.id}`}>
                       <Button>바로가기</Button>
                     </Link>
                   </TableCell>

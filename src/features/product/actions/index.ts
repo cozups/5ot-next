@@ -187,9 +187,9 @@ export async function updateProduct(formData: FormData, originalData: Products):
   return { success: true };
 }
 
-export async function insertRecentViewedProduct(
+export async function updateRecentViewedProduct(
   userId: string,
-  productInfo: { id: string; name: string; image: string; price: string }[]
+  productInfo: { product: { id: string; name: string; image: string; price: string }; addedAt: string }[]
 ): Promise<{ success: boolean; errors?: ErrorReturn }> {
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").update({ recent_viewed_products: productInfo }).eq("id", userId);

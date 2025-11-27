@@ -1,5 +1,6 @@
 import { mapErrors } from "@/lib/handle-errors";
-import { Products } from "@/types/products";
+import { ErrorReturn } from "@/types/error";
+import { Products, RecentProducts } from "@/types/products";
 import { ApiResponse, PaginationResponse } from "@/types/response";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -97,7 +98,10 @@ export async function getProductById(client: SupabaseClient, id: string): Promis
   };
 }
 
-export async function getRecentViewedProducts(client: SupabaseClient, userId: string) {
+export async function getRecentViewedProducts(
+  client: SupabaseClient,
+  userId: string
+): Promise<{ success: boolean; data: RecentProducts[] | null; errors?: ErrorReturn }> {
   const { data, error } = await client.from("profiles").select("recent_viewed_products").eq("id", userId).single();
 
   if (error) {

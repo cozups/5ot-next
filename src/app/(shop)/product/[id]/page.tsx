@@ -11,7 +11,7 @@ import { createClient } from "@/utils/supabase/server";
 import { getReviewsByPagination } from "@/features/review/queries";
 import { Suspense } from "react";
 import ReviewListSkeleton from "@/components/skeleton/review-list-skeleton";
-import LocalStorageSaver from "@/features/product/components/localstorage-saver";
+import RecentViewedDataSaver from "@/features/product/components/recent-viewed-data-saver";
 
 interface ProductDetailPageProps {
   params: Promise<{
@@ -96,7 +96,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
           </HydrationBoundary>
         </Suspense>
       </div>
-      <LocalStorageSaver product={product} />
+      <RecentViewedDataSaver product={product} />
     </div>
   );
 }

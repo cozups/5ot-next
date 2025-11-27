@@ -10,3 +10,13 @@ export interface Products {
   rate: number;
   cat_id: string;
 }
+
+export interface RecentProducts {
+  product: {
+    id: string;
+    name: string;
+    image: string;
+    price: string;
+  };
+  addedAt: string;
+}

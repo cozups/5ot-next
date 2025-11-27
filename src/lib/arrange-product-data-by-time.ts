@@ -1,6 +1,6 @@
 import { Products } from "@/types/products";
 
-export function arrangeProductDataByTime<T extends { product: Products; addedAt: string }>(
+export function arrangeProductDataByTime<T extends { product: Partial<Products>; addedAt: string }>(
   dbData: T[],
   localData: T[]
 ) {
@@ -16,9 +16,7 @@ export function arrangeProductDataByTime<T extends { product: Products; addedAt:
 
   dataToInitialize = [...localData, ...dataToInitialize];
 
-  dataToInitialize = dataToInitialize
-    .sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime())
-    .slice(0, 10);
+  dataToInitialize = dataToInitialize.sort((a, b) => new Date(b.addedAt).getTime() - new Date(a.addedAt).getTime());
 
   return dataToInitialize;
 }
