@@ -3,6 +3,8 @@ import RecentProducts from "@/features/product/components/recent-products";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Suspense } from "react";
+import { ErrorBoundary } from "react-error-boundary";
+import ErrorFallback from "@/components/error-fallbacks/error-fallback";
 
 export const metadata = {
   title: "5ot Next",
@@ -16,20 +18,22 @@ export default async function Home() {
         <MainImageSlider />
         <div>
           <h2 className="my-4 text-2xl font-bold">new</h2>
-          <Suspense
-            fallback={
-              <div className={cn("grid grid-cols-2 gap-1", "md:gap-2", "lg:grid-cols-4 lg:gap-4")}>
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton
-                    key={`recent-products-skeleton-${index}`}
-                    className="w-full aspect-square rounded-lg mb-1"
-                  />
-                ))}
-              </div>
-            }
-          >
-            <RecentProducts />
-          </Suspense>
+          <ErrorBoundary fallbackRender={ErrorFallback}>
+            <Suspense
+              fallback={
+                <div className={cn("grid grid-cols-2 gap-1", "md:gap-2", "lg:grid-cols-4 lg:gap-4")}>
+                  {Array.from({ length: 4 }).map((_, index) => (
+                    <Skeleton
+                      key={`recent-products-skeleton-${index}`}
+                      className="w-full aspect-square rounded-lg mb-1"
+                    />
+                  ))}
+                </div>
+              }
+            >
+              <RecentProducts />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
     </div>
