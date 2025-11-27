@@ -22,7 +22,7 @@ export default function AddressSearchDialog({ onCompleteSearch }: { onCompleteSe
   };
 
   return (
-    <Dialog open={isOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button className="w-20" onClick={() => setIsOpen(true)}>
           주소 찾기
