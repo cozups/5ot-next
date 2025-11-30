@@ -1,7 +1,6 @@
 import { Cart } from "@/types/cart";
 import { Purchase } from "@/types/orders";
 import { Products } from "@/types/products";
-import _ from "lodash";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 
@@ -44,14 +43,14 @@ export const useCartStore = create<CartStore>()(
       updateQty: (productId, qty) => {
         set((state) => ({ data: state.data.map((cart) => (cart.product.id === productId ? { ...cart, qty } : cart)) }));
       },
+      // 구매 후 데이터 정리
       updateCartAfterPurchase: (purchaseData) => {
         const { data } = get();
 
-        const updated = _.differenceWith(
-          data,
-          purchaseData,
-          (cart, purchase) => cart.product.id === purchase.product.id
-        );
+        // 장바구니 데이터에서 구매한 데이터는 제거
+        const purchaseProductsIds = new Set(purchaseData.map((purchaseItem) => purchaseItem.product.id));
+
+        const updated = data.filter((cartItem) => !purchaseProductsIds.has(cartItem.product.id));
 
         set({ data: updated, length: updated.length });
         sessionStorage.removeItem("purchase");
