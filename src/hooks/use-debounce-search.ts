@@ -3,22 +3,39 @@
 import { getProductByName } from "@/features/product/queries";
 import { Products } from "@/types/products";
 import { createClient } from "@/utils/supabase/client";
-import _ from "lodash";
-import { useCallback, useState } from "react";
+import { useState, useEffect } from "react";
 
-export function useDebounceSearch() {
+export function useDebounceSearch(value: string, delay: number = 300) {
+  const [debouncedSearchKeyword, setDebouncedSearchKeyword] = useState<string>(value);
   const [searchResults, setSearchResults] = useState<Products[]>([]);
 
-  const debounceSearch = useCallback(
-    _.debounce(async (query: string) => {
-      const supabase = createClient();
-      if (query.trim().length > 0) {
-        const searchedProducts = await getProductByName(supabase, query);
-        setSearchResults(searchedProducts.data || []);
-      }
-    }, 300),
-    []
-  );
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearchKeyword(value);
+    }, delay);
 
-  return { searchResults, setSearchResults, debounceSearch };
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [delay, value]);
+
+  useEffect(() => {
+    async function searchProducts() {
+      const supabase = createClient();
+      if (debouncedSearchKeyword.trim().length > 0) {
+        const searchedProducts = await getProductByName(supabase, debouncedSearchKeyword);
+        setSearchResults(searchedProducts.data || []);
+      } else {
+        setSearchResults([]);
+      }
+    }
+
+    if (debouncedSearchKeyword !== "") {
+      searchProducts();
+    } else {
+      setSearchResults([]);
+    }
+  }, [debouncedSearchKeyword]); // debouncedSearchKeyword가 바뀔 때마다 실행
+
+  return { searchResults, setSearchResults };
 }

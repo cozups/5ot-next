@@ -10,11 +10,11 @@ import { useDebounceSearch } from "@/hooks/use-debounce-search";
 import { useSidebar } from "../ui/sidebar";
 
 export default function SearchBar({ className }: { className?: string }) {
+  const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchWord, setSearchWord] = useState<string>("");
-  const router = useRouter();
-  const { searchResults, setSearchResults, debounceSearch } = useDebounceSearch();
+  const { searchResults, setSearchResults } = useDebounceSearch(searchWord, 300);
   const containerRef = useRef<HTMLDivElement>(null);
   const { toggleSidebar, isMobile } = useSidebar();
 
@@ -24,7 +24,9 @@ export default function SearchBar({ className }: { className?: string }) {
         setIsOpen(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
@@ -37,17 +39,19 @@ export default function SearchBar({ className }: { className?: string }) {
 
     setSearchWord(value);
     setIsOpen(true);
-
-    debounceSearch(value);
   };
 
   const onClickResult = (productId: string) => {
     router.push(`/product/${productId}`);
+
+    // 검색어 초기화
     if (inputRef.current) {
       inputRef.current.value = "";
       setSearchWord("");
       setSearchResults([]);
     }
+
+    // 모바일인 경우, 사이드바 닫기
     if (isMobile) {
       toggleSidebar();
     }
@@ -56,6 +60,7 @@ export default function SearchBar({ className }: { className?: string }) {
 
   return (
     <div className={cn("relative", className)} ref={containerRef}>
+      {/* 검색 바 */}
       <div className={cn("flex items-end gap-1", "md:gap-2")}>
         <Search className={cn("w-3 text-gray-500", "md:w-4")} />
         <input
@@ -66,16 +71,23 @@ export default function SearchBar({ className }: { className?: string }) {
           onClick={() => setIsOpen(true)}
         />
       </div>
+
+      {/* 검색 결과 */}
       <div
         className={cn(
           "absolute z-10 top-8 left-0 shadow w-64 p-1 max-h-[32rem] bg-white overflow-auto text-sm",
           isOpen ? "block" : "hidden"
         )}
       >
+        {/* 검색어 미입력 시 */}
         {searchWord === "" && <p className="text-gray-600">검색어를 입력해주세요.</p>}
+
+        {/* 검색 결과가 존재하지 않을 시 */}
         {searchWord !== "" && searchResults.length === 0 && (
           <p className="text-gray-600">검색 결과가 존재하지 않습니다.</p>
         )}
+
+        {/* 검색 결과 렌더링 */}
         {searchResults.length > 0 && (
           <ul>
             {searchResults.map((product) => (
