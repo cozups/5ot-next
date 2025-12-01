@@ -16,6 +16,7 @@ import {
 } from "@/lib/validations-schema/product";
 import { removeImageFromStorage, uploadImageToStorage } from "@/actions/storage";
 import { ErrorReturn } from "@/types/error";
+import { Cart } from "@/types/cart";
 
 export type ProductFormState = ApiResponse<ProductFormData, null>;
 export type UpdateProductFormState = ApiResponse<UpdateProductFormData, null>;
@@ -206,10 +207,15 @@ export async function updateRecentViewedProduct(
 
 export async function updateCart(
   userId: string,
-  cartData: { product: Products; qty: string; isSelected: boolean }[]
+  cartData: Cart[]
 ): Promise<{ success: boolean; errors?: ErrorReturn }> {
+  const cartDataForDB = cartData.map((cart) => ({
+    product: cart.product,
+    qty: cart.qty,
+  }));
+
   const supabase = await createClient();
-  const { error } = await supabase.from("profiles").update({ cart: cartData }).eq("id", userId);
+  const { error } = await supabase.from("profiles").update({ cart: cartDataForDB }).eq("id", userId);
 
   if (error) {
     return {

@@ -14,6 +14,7 @@ import { generateFormData } from "@/lib/generate-form-data";
 import { useFormTransition } from "@/hooks/use-form-transition";
 import { Spinner, Button, Input, Textarea } from "@/components/ui";
 import { OrderFormData, orderFormSchema } from "@/lib/validations-schema/order";
+import { useUser } from "@/hooks/use-users";
 
 export interface AddressResult {
   base: string;
@@ -28,14 +29,15 @@ export default function OrderForm() {
     control,
     setValue,
   } = useForm<OrderFormData>({ resolver: zodResolver(orderFormSchema) });
+  const { user } = useUser();
 
   const [purchaseData, setPurchaseData] = useState<Purchase[]>([]);
 
   const { updateCartAfterPurchase } = useCartStore();
   const router = useRouter();
   const { isPending, execute } = useFormTransition(createOrder, {
-    onSuccess: () => {
-      updateCartAfterPurchase(purchaseData);
+    onSuccess: async () => {
+      await updateCartAfterPurchase(purchaseData, user?.id);
       router.replace("/");
     },
     onSuccessText: ["주문이 완료되었습니다."],

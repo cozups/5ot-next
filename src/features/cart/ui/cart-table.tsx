@@ -12,46 +12,37 @@ import { Cart } from "@/types/cart";
 import { useUser } from "@/hooks/use-users";
 import { toast } from "sonner";
 import { useTransition } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { CheckedState } from "@radix-ui/react-checkbox";
 
 export default function CartTable() {
-  const { data, toggleSelected, removeItem, updateQty, getItem } = useCartStore();
+  const { data, removeItem, updateQty, toggleCart } = useCartStore();
   const { user } = useUser();
   const [, startTransition] = useTransition();
-  const supabase = createClient();
 
   const onChangeQty = async (cart: Cart, event: React.ChangeEvent<HTMLInputElement>) => {
     const newQty = event.target.value;
-    updateQty(cart.product.id, newQty);
 
-    if (user) {
-      // DB에도 업데이트
-      startTransition(async () => {
-        const updatedData = getItem();
-
-        const { error } = await supabase.from("profiles").update({ cart: updatedData }).eq("id", user.id);
-
-        if (error) {
-          toast.error("장바구니 수량 업데이트에 실패했습니다. 다시 시도해주세요.");
-        }
-      });
-    }
+    startTransition(async () => {
+      try {
+        updateQty(cart.product.id, newQty, user?.id);
+      } catch (error: unknown) {
+        toast.error((error as Error).message);
+      }
+    });
   };
 
   const onRemoveItem = async (productId: string) => {
-    removeItem(productId);
-    if (user) {
-      // DB에서도 삭제
-      startTransition(async () => {
-        const data = getItem();
+    startTransition(async () => {
+      try {
+        removeItem(productId, user?.id);
+      } catch (error: unknown) {
+        toast.error((error as Error).message);
+      }
+    });
+  };
 
-        const { error } = await supabase.from("profiles").update({ cart: data }).eq("id", user.id);
-
-        if (error) {
-          toast.error("장바구니 아이템 삭제에 실패했습니다. 다시 시도해주세요.");
-        }
-      });
-    }
+  const onToggleSelection = async (checked: CheckedState, cartItem: Cart) => {
+    toggleCart(!!checked, cartItem.product.id);
   };
 
   return (
@@ -72,7 +63,7 @@ export default function CartTable() {
               <TableCell>
                 <Checkbox
                   defaultChecked={cart.isSelected}
-                  onCheckedChange={toggleSelected.bind(null, cart.product.id)}
+                  onCheckedChange={(checked: CheckedState) => onToggleSelection(checked, cart)}
                 />
               </TableCell>
               <TableCell className="flex items-center gap-4">

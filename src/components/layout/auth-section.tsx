@@ -34,7 +34,12 @@ export default function AuthSection() {
       setItem(finalCartData);
 
       // 병합된 데이터로 DB 데이터 동기화
-      const { error } = await supabase.from("profiles").update({ cart: finalCartData }).eq("id", user!.id);
+      const cartDataForDB = finalCartData.map((item) => ({
+        product: item.product,
+        qty: item.qty,
+      }));
+
+      const { error } = await supabase.from("profiles").update({ cart: cartDataForDB }).eq("id", user!.id);
 
       if (error) {
         toast.error("장바구니 데이터 업데이트에 실패했습니다. 다시 시도해주세요.");
