@@ -32,7 +32,13 @@ export default async function CategoryProductView({ category }: CategoryProductV
               <TableRow key={product.id} className="text-center">
                 <TableCell className="flex gap-2 items-center">
                   <div className="w-16 h-16 bg-black relative">
-                    <Image src={product.image} alt={product.name} fill className="object-cover" sizes="10vw" />
+                    <Image
+                      src={product.image}
+                      alt={`${product.name} 제품 사진`}
+                      fill
+                      className="object-cover"
+                      sizes="10vw"
+                    />
                   </div>
                   {product.name}
                 </TableCell>

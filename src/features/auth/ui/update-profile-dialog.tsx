@@ -98,7 +98,7 @@ export default function UpdateProfileDialog({ user }: { user: User }) {
               src={imageSrc}
               fill
               className="object-cover"
-              alt="profile image"
+              alt={`${user.user_metadata.username}님의 프로필 이미지`}
               sizes="(max-width: 768px) 50vw, 25vw"
             />
             {!isChanged && (

@@ -149,7 +149,7 @@ export default function ProductForm() {
         </div>
         <ImagePreview
           src={pickedImage}
-          alt="new product image"
+          alt="새로 등록할 제품의 사진"
           sizes="(max-width: 768px) 33vw, 50vw"
           className="w-36 md:flex-1"
         />

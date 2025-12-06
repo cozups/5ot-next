@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={clsx(`${NotoSansKr.className} antialiased`, `w-screen relative`)}>
         <SidebarProvider defaultOpen={false}>
           <Providers>

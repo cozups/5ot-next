@@ -9,7 +9,7 @@ export default function ProductItem({ product }: { product: Products }) {
         <Image
           src={product.image}
           fill
-          alt={product.name}
+          alt={`${product.name} 제품 사진`}
           className="object-cover"
           sizes="(max-width: 768px) 45vw, 25vw"
         />

@@ -89,7 +89,7 @@ export default function AuthSection() {
                   src={user.user_metadata.image || "/images/user.png"}
                   fill
                   className="w-full object-cover"
-                  alt="user profile image"
+                  alt={`${user.user_metadata.username}님의 프로필 이미지`}
                   sizes="5vw"
                 />
               </div>

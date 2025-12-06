@@ -78,7 +78,7 @@ export default async function ProductDetailPage({ params, searchParams }: Produc
         <div className={cn("w-full aspect-square rounded-xl relative overflow-hidden", "md:w-72", "lg:w-96")}>
           <Image
             src={product.image}
-            alt={product.name}
+            alt={`${product.name} 제품 사진`}
             fill
             className="object-cover"
             sizes="(max-width: 768px) 90vw, 33vw"

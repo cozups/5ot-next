@@ -26,7 +26,7 @@ export default function MainImageSlider() {
             src="/images/main-1.jpg"
             fill
             className="object-cover"
-            alt="main-image-1"
+            alt="첫번째 슬라이드 이미지"
             priority
             sizes="(max-width: 1200px) 100vw, 80vw"
           />
@@ -36,7 +36,7 @@ export default function MainImageSlider() {
             src="/images/main-2.jpg"
             fill
             className="object-cover"
-            alt="main-image-2"
+            alt="두번째 슬라이드 이미지"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 80vw"
           />
         </CarouselItem>
@@ -45,7 +45,7 @@ export default function MainImageSlider() {
             src="/images/main-3.jpg"
             fill
             className="object-cover"
-            alt="main-image-3"
+            alt="세번째 슬라이드 이미지"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 80vw"
           />
         </CarouselItem>

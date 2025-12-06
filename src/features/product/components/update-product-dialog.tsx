@@ -92,7 +92,7 @@ export default function UpdateProductDialog({ product }: { product: Products }) 
           <div className="flex items-end gap-2">
             <ImagePreview
               src={pickedImage}
-              alt={`${product.name} image`}
+              alt={`${product.name} 제품 사진`}
               sizes="(max-width: 768px) 50vw, 20vw"
               className="w-48"
             />

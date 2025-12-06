@@ -51,7 +51,7 @@ export default function ProductListTable({ initialData, currentPage }: ProductLi
                   {product.image && (
                     <Image
                       src={product.image}
-                      alt={`${product.name} image`}
+                      alt={`${product.name} 제품 사진`}
                       fill
                       className="object-cover"
                       sizes="10vw"

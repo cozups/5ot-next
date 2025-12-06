@@ -15,7 +15,7 @@ export default async function RecentProducts() {
         <div key={product.id} className="w-full aspect-square rounded-lg relative overflow-hidden group">
           <Image
             src={product.image}
-            alt={product.name}
+            alt={`${product.name} 제품 사진`}
             fill
             className="object-cover"
             sizes="(max-width: 1200px) 50vw, 20vw"

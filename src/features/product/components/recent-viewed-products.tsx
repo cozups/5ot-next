@@ -53,7 +53,7 @@ export default function RecentViewedProducts() {
                       {item.product.image && (
                         <Image
                           src={item.product.image}
-                          alt={`${item.product.name} image`}
+                          alt={`${item.product.name} 제품 사진`}
                           fill
                           className="object-cover"
                           sizes="10vw"

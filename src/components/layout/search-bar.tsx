@@ -98,7 +98,13 @@ export default function SearchBar({ className }: { className?: string }) {
               >
                 <div className="flex items-center gap-4">
                   <div className="h-12 relative aspect-square">
-                    <Image src={product.image} fill alt={product.name} sizes="10vw" className="object-cover" />
+                    <Image
+                      src={product.image}
+                      fill
+                      alt={`${product.name} 제품 사진`}
+                      sizes="10vw"
+                      className="object-cover"
+                    />
                   </div>
                   <p>{product.name}</p>
                 </div>

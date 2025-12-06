@@ -19,7 +19,7 @@ export default async function MypageProfile() {
         <Image
           src={user?.user_metadata.image || "/images/user.png"}
           fill
-          alt={`${user?.user_metadata.username}'s profile image`}
+          alt={`${user?.user_metadata.username}님의 프로필 이미지`}
           className="object-cover"
           sizes="20vw"
           priority

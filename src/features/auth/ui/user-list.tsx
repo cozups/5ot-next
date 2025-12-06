@@ -38,7 +38,7 @@ export default function UserList() {
               <Image
                 src={user.user_metadata.image || "/images/user.png"}
                 fill
-                alt={`${user.user_metadata.username} image`}
+                alt={`${user.user_metadata.username}님의 프로필 이미지`}
                 sizes="5vw"
               />
             </div>

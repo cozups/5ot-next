@@ -38,7 +38,7 @@ export default function PurchasePage() {
                     <TableCell className="flex items-center gap-4">
                       <div className="w-16 aspect-square relative">
                         <Image
-                          src={data.product.image}
+                          src={`${data.product.image} 제품 사진`}
                           fill
                           alt={data.product.name}
                           className="object-cover"
