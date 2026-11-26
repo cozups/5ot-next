@@ -31,7 +31,6 @@ export default function AuthSection() {
 
       // 로컬 스토리지와 병합
       const finalCartData = arrangeCartData(fetchedData, localCartData);
-      setItem(finalCartData);
 
       // 병합된 데이터로 DB 데이터 동기화
       const cartDataForDB = finalCartData.map((item) => ({
@@ -43,8 +42,10 @@ export default function AuthSection() {
 
       if (error) {
         toast.error("장바구니 데이터 업데이트에 실패했습니다. 다시 시도해주세요.");
+        return;
       }
 
+      setItem(finalCartData);
       localStorage.removeItem("cart-storage");
     }
 
